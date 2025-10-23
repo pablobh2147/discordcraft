@@ -117,7 +117,7 @@ public class CommandManager extends ListenerAdapter {
 
             DiscordCraft.logInfo("Registering command: \"" + command.getName() + "\" is enabled: \"" + command.isEnabled() + "\"");
 
-            if (command.isEnabled()) {
+            if (!command.isEnabled()) {
                 SlashCommandData data = Commands.slash(command.getName(), command.getDescription());
 
                 if (command.hasOptions()) {
