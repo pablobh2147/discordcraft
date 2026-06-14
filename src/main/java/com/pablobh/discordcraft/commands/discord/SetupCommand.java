@@ -1,12 +1,12 @@
-package com.electrodiux.discordcraft.commands.discord;
+package com.pablobh.discordcraft.commands.discord;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
-import com.electrodiux.discordcraft.Discord;
-import com.electrodiux.discordcraft.DiscordCraft;
-import com.electrodiux.discordcraft.Messages;
-import com.electrodiux.discordcraft.StringUtils;
+import com.pablobh.discordcraft.Discord;
+import com.pablobh.discordcraft.DiscordCraft;
+import com.pablobh.discordcraft.Messages;
+import com.pablobh.discordcraft.StringUtils;
 
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.channel.ChannelType;

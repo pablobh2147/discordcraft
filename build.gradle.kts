@@ -3,7 +3,7 @@ plugins {
     id("io.github.goooler.shadow") version "8.1.8"
 }
 
-group = "com.electrodiux"
+group = "com.pablobh"
 version = "1.0"
 description = "Discord integration plugin for Minecraft"
 
@@ -41,8 +41,8 @@ tasks {
         archiveFileName.set("${project.name}-${project.version}.jar")
         
         // Relocate JDA to avoid conflicts with other plugins
-        relocate("net.dv8tion.jda", "com.electrodiux.discordcraft.libs.jda")
-        relocate("org.slf4j", "com.electrodiux.discordcraft.libs.slf4j")
+        relocate("net.dv8tion.jda", "com.pablobh.discordcraft.libs.jda")
+        relocate("org.slf4j", "com.pablobh.discordcraft.libs.slf4j")
         
         minimize {
             exclude(dependency("net.dv8tion:JDA:.*"))

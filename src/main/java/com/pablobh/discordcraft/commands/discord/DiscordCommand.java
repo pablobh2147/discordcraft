@@ -1,11 +1,11 @@
-package com.electrodiux.discordcraft.commands.discord;
+package com.pablobh.discordcraft.commands.discord;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import com.electrodiux.discordcraft.DiscordCraft;
+import com.pablobh.discordcraft.DiscordCraft;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

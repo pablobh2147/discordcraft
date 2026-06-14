@@ -1,4 +1,4 @@
-package com.electrodiux.discordcraft;
+package com.pablobh.discordcraft;
 
 import java.io.File;
 import java.io.IOException;

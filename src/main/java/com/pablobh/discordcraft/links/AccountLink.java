@@ -1,4 +1,4 @@
-package com.electrodiux.discordcraft.links;
+package com.pablobh.discordcraft.links;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,8 +9,8 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
-import com.electrodiux.discordcraft.Discord;
-import com.electrodiux.discordcraft.DiscordCraft;
+import com.pablobh.discordcraft.Discord;
+import com.pablobh.discordcraft.DiscordCraft;
 
 import net.dv8tion.jda.api.entities.Member;
 

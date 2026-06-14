@@ -1,4 +1,4 @@
-package com.electrodiux.discordcraft;
+package com.pablobh.discordcraft;
 
 import java.util.List;
 
@@ -8,8 +8,8 @@ import javax.security.auth.login.LoginException;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
-import com.electrodiux.discordcraft.commands.discord.CommandManager;
-import com.electrodiux.discordcraft.listeners.DiscordChatListener;
+import com.pablobh.discordcraft.commands.discord.CommandManager;
+import com.pablobh.discordcraft.listeners.DiscordChatListener;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;

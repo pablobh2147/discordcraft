@@ -1,12 +1,12 @@
-package com.electrodiux.discordcraft.listeners;
+package com.pablobh.discordcraft.listeners;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import com.electrodiux.discordcraft.Discord;
-import com.electrodiux.discordcraft.LinkedChannel;
-import com.electrodiux.discordcraft.Messages;
+import com.pablobh.discordcraft.Discord;
+import com.pablobh.discordcraft.LinkedChannel;
+import com.pablobh.discordcraft.Messages;
 
 public class MinecraftChatListener implements Listener {
 

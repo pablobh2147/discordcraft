@@ -1,9 +1,9 @@
-package com.electrodiux.discordcraft.commands.discord;
+package com.pablobh.discordcraft.commands.discord;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.electrodiux.discordcraft.DiscordCraft;
+import com.pablobh.discordcraft.DiscordCraft;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;

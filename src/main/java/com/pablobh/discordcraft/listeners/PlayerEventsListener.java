@@ -1,4 +1,4 @@
-package com.electrodiux.discordcraft.listeners;
+package com.pablobh.discordcraft.listeners;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -11,9 +11,9 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.electrodiux.discordcraft.Discord;
-import com.electrodiux.discordcraft.LinkedChannel;
-import com.electrodiux.discordcraft.Messages;
+import com.pablobh.discordcraft.Discord;
+import com.pablobh.discordcraft.LinkedChannel;
+import com.pablobh.discordcraft.Messages;
 
 public class PlayerEventsListener implements Listener {
 

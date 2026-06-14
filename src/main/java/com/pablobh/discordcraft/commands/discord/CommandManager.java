@@ -1,4 +1,4 @@
-package com.electrodiux.discordcraft.commands.discord;
+package com.pablobh.discordcraft.commands.discord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +7,9 @@ import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.electrodiux.discordcraft.Discord;
-import com.electrodiux.discordcraft.DiscordCraft;
-import com.electrodiux.discordcraft.Messages;
+import com.pablobh.discordcraft.Discord;
+import com.pablobh.discordcraft.DiscordCraft;
+import com.pablobh.discordcraft.Messages;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;

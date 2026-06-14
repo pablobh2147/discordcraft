@@ -1,4 +1,4 @@
-package com.electrodiux.discordcraft;
+package com.pablobh.discordcraft;
 
 import java.util.logging.Logger;
 
@@ -8,9 +8,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import com.electrodiux.discordcraft.links.AccountLink;
-import com.electrodiux.discordcraft.listeners.MinecraftChatListener;
-import com.electrodiux.discordcraft.listeners.PlayerEventsListener;
+import com.pablobh.discordcraft.links.AccountLink;
+import com.pablobh.discordcraft.listeners.MinecraftChatListener;
+import com.pablobh.discordcraft.listeners.PlayerEventsListener;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
