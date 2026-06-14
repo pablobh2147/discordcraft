@@ -1,2 +1,10 @@
-/.vscode
-/server
+# IDE
+.vscode/*
+
+# Development server
+/server/
+
+# Gradle
+.gradle/
+build/
+out/

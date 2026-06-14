@@ -1,0 +1,76 @@
+chat:
+  minecraft-format: '[%guild% -> %channel%] &e<%username%> &f%message%&7%attachments%'
+  minecraft-edited-format: '[%guild% -> %channel%] &e<%username%> &f%message%&7%attachments% &8&l(Edited)'
+  attachment-spoiler: ' (spoiler)'
+  attachment-separator: ', '
+  discord-format: '**<%player_name%>:** %message%'
+
+commands:
+  no-permission: "You don't have the required permissions to use this command!"
+  disabled: "This command has been disabled by the server administrator."
+  internal-error: "An internal error occurred while executing this command. Administrators have been notified."
+  not-found: "Command not found. Use `/help` to see the available commands."
+  main-guild-only: "This command can only be executed on the main server."
+  invalid-subcommand: "Invalid subcommand. Use `/help` to see the available subcommands."
+
+player:
+  join: '**%player_name%** has joined the game 😁 🎉'
+  first-join: '**%player_name%** has joined the game for the first time! 🎉'
+  left: '**%player_name%** has left the game 😭'
+  death: 'Haha, %player_name% died because `%death_message%`'
+  murder: '**%killer_name%** has killed **%victim_name%** 😈'
+
+custom-death-messages:
+  lava: '%death_message% 🔥🥵'
+  fire: '%death_message% 🔥🥵'
+  fall: '%death_message% 🪂✨'
+  void: '%death_message% 🌌🪂'
+  block_explosion: '%death_message% 💣✨'
+  entity_explosion: '%death_message% 💣✨'
+  drowning: '%death_message% 🌊'
+
+server:
+  start: |-
+    🟢 **The server has STARTED!** 🟢
+
+    ⚔️ The server is now online. Gather your friends, start building epic structures, and embark on new adventures. ⛏️
+    Happy Crafting!
+
+    **Server IP:** `mc.yourserver.com`
+
+    <@&your-role-id>
+  
+  stop: |-
+    🔴 **The server has SHUT DOWN!** 🔴
+
+    ⚔️ The server is now offline. Time to rest, plan new builds, and prepare for future adventures. ⛏️
+    Thank you for playing!
+
+    **Server IP:** `mc.yourserver.com`
+
+    <@&your-role-id>
+
+errors:
+  command-error: "An error occurred while executing command: %command_name% by %member_mention%"
+  command-registration-error: "An error occurred while registering commands!"
+  config-save-error: "There was an error while saving the config"
+
+setup:
+  complete: |-
+    ✅ **Server Setup Complete!** ✅
+
+    🔄 The Minecraft server is going to be restarted to apply the changes.
+
+    ⚙️ For further configuration, you can edit:
+    - `config.yml`
+    - `discord-commands.yml`
+
+    💬 You can modify the messages shown in Discord in:
+    - `messages.yml`
+
+    ❔You can use `/help` to see the available commands.
+  
+  already: |-
+    ❌ The server has already been set up.
+    
+    🗑️ If you want to reconfigure the bot, you have to manualy delete the `bot.yml` file and restart the server.

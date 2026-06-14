@@ -1,0 +1,6 @@
+name: DiscordCraft
+version: ${version}
+main: com.electrodiux.discordcraft.DiscordCraft
+api-version: 1.13
+author: electrodiux
+description: Discord integration plugin for Minecraft servers
