@@ -1,7 +1,6 @@
 # DiscordCraft
 
 [![License: MIT](https://img.shields.io/github/license/pablobh2147/discordcraft)](LICENSE)
-[![Build](https://img.shields.io/github/actions/workflow/status/pablobh2147/discordcraft/build.yml?branch=main)](https://github.com/pablobh2147/discordcraft/actions)
 [![Latest Release](https://img.shields.io/github/v/release/pablobh2147/discordcraft)](https://github.com/pablobh2147/discordcraft/releases)
 
 A Discord integration plugin for Minecraft servers. Bridge your Minecraft server chat with Discord channels, manage your server from Discord with slash commands, and keep your community connected.
