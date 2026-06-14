@@ -41,7 +41,7 @@ A Discord integration plugin for Minecraft servers. Bridge your Minecraft server
 
 **Option A — Download a release**
 
-Download the latest `DiscordCraft-x.x.jar` from the [Releases page](https://github.com/pablobh2147/discordcraft/releases).
+Download the latest `DiscordCraft-x.x.x.jar` from the [Releases page](https://github.com/pablobh2147/discordcraft/releases).
 
 **Option B — Build from source**
 
