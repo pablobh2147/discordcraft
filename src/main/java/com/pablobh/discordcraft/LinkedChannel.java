@@ -160,6 +160,10 @@ public class LinkedChannel {
         webhookClient.send(messageObj);
     }
 
+    public void sendMessage(String message) {
+        channel.sendMessage(message).queue();
+    }
+
     private void setChannel(TextChannel channel) {
         this.channel = channel;
         loadWebhookClient();
@@ -192,7 +196,7 @@ public class LinkedChannel {
 
         LinkedChannel data = new LinkedChannel();
 
-        ConfigurationSection defaults = DiscordCraft.instance().getMainConfigManager().getSection(DEFAULT_OPTIONS);
+        ConfigurationSection defaults = DiscordCraft.instance().getGlobalConfiguration().getSection(DEFAULT_OPTIONS);
 
         data.config = config;
 
@@ -221,9 +225,9 @@ public class LinkedChannel {
 
         LinkedChannel data = new LinkedChannel();
 
-        ConfigurationSection defaults = DiscordCraft.instance().getMainConfigManager().getSection(DEFAULT_OPTIONS);
+        ConfigurationSection defaults = DiscordCraft.instance().getGlobalConfiguration().getSection(DEFAULT_OPTIONS);
 
-        data.config = Discord.getBotConfig().createSection(CHANNEL_LIST + ".c" + channel.getIdLong());
+        data.config = Discord.getConfig().createSection(CHANNEL_LIST + ".c" + channel.getIdLong());
 
         data.setChannel(channel);
 
@@ -245,7 +249,7 @@ public class LinkedChannel {
 
     public static List<LinkedChannel> loadAllChannels() {
 
-        ConfigurationSection config = Discord.getBotConfig().getConfigurationSection(CHANNEL_LIST);
+        ConfigurationSection config = Discord.getConfig().getSection(CHANNEL_LIST);
 
         List<LinkedChannel> list = new ArrayList<>();
 
@@ -278,7 +282,7 @@ public class LinkedChannel {
     }
 
     public static void saveChannelsConfig() {
-        DiscordCraft.instance().getBotConfigManager().saveConfig();
+        DiscordCraft.instance().getBotConfiguration().save();
     }
 
     // Delete

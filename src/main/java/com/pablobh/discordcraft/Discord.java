@@ -6,9 +6,9 @@ import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 
 import com.pablobh.discordcraft.commands.discord.CommandManager;
+import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.listeners.DiscordChatListener;
 
 import net.dv8tion.jda.api.JDA;
@@ -44,7 +44,7 @@ public class Discord {
 
     private static Guild mainGuild;
 
-    private static ConfigurationSection config;
+    private static Configuration config;
 
     private static List<LinkedChannel> linkedChannels;
 
@@ -52,11 +52,10 @@ public class Discord {
 
     // Discord setup
 
-    public static boolean setup() {
+    public static boolean setup(Configuration config) {
+        Discord.config = config;
 
-        config = DiscordCraft.instance().getBotConfigManager().getConfig();
-
-        String token = getBotConfig().getString(BOT_TOKEN);
+        String token = config.getString(BOT_TOKEN);
 
         if (token == null || token.isBlank()) {
             DiscordCraft.logWarning("No bot token was found in the config! Please add one and restart the server.");
@@ -70,7 +69,7 @@ public class Discord {
             return false;
         }
 
-        mainGuild = getGuild(getBotConfig().getLong(GUILD_ID, 0));
+        mainGuild = getGuild(config.getLong(GUILD_ID, 0));
 
         if (mainGuild == null) {
             DiscordCraft.logWarning("No server was found with the ID provided in the config! Please check the ID or run /setup command on Discord.");
@@ -78,7 +77,7 @@ public class Discord {
 
         linkedChannels = LinkedChannel.loadAllChannels();
 
-        logChannel = getTextChannel(getBotConfig().getLong(LOG_CHANNEL, 0));
+        logChannel = getTextChannel(config.getLong(LOG_CHANNEL, 0));
 
         DiscordCraft.logInfo("Loaded " + linkedChannels.size() + " linked channels.");
         for (LinkedChannel linkedChannel : linkedChannels) {
@@ -99,14 +98,14 @@ public class Discord {
     }
 
     private static void configureActivity(JDABuilder builder) {
-        boolean showActivity = getBotConfig().getBoolean(ACTIVITY_ENABLED, true);
+        boolean showActivity = config.getBoolean(ACTIVITY_ENABLED, true);
 
         if (!showActivity) {
             return;
         }
 
-        String activityType = getBotConfig().getString(ACTIVITY_TYPE);
-        String activityName = getBotConfig().getString(ACTIVITY_NAME);
+        String activityType = config.getString(ACTIVITY_TYPE);
+        String activityName = config.getString(ACTIVITY_NAME);
 
         DiscordCraft.logInfo("Activity type: " + activityType);
         DiscordCraft.logInfo("Activity name: " + activityName);
@@ -238,10 +237,6 @@ public class Discord {
         return mainGuild;
     }
 
-    public static ConfigurationSection getBotConfig() {
-        return config;
-    }
-
     // Linked channels
 
     public static void addLinkedChannel(TextChannel channel) {
@@ -251,7 +246,7 @@ public class Discord {
 
         linkedChannels.add(LinkedChannel.create(channel));
 
-        DiscordCraft.instance().getBotConfigManager().saveConfig();
+        DiscordCraft.instance().getBotConfiguration().save();
     }
 
     public static void removeLinkedChannel(TextChannel channel) {
@@ -261,7 +256,7 @@ public class Discord {
                 linkedChannel.delete();
                 linkedChannels.remove(linkedChannel);
 
-                DiscordCraft.instance().getBotConfigManager().saveConfig();
+                DiscordCraft.instance().getBotConfiguration().save();
 
                 return;
             }
@@ -311,6 +306,10 @@ public class Discord {
 
     public static SelfUser getSelfUser() {
         return jda.getSelfUser();
+    }
+
+    public static Configuration getConfig() {
+        return config;
     }
 
 }

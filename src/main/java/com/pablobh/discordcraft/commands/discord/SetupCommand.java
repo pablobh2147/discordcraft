@@ -1,12 +1,12 @@
 package com.pablobh.discordcraft.commands.discord;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 
 import com.pablobh.discordcraft.Discord;
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.StringUtils;
+import com.pablobh.discordcraft.config.Configuration;
 
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -49,7 +49,7 @@ public class SetupCommand extends DiscordCommand {
             return;
         }
 
-        ConfigurationSection botConfig = DiscordCraft.instance().getBotConfigManager().getConfig();
+        Configuration botConfig = DiscordCraft.instance().getBotConfiguration();
 
         // Set guild
 
@@ -81,13 +81,10 @@ public class SetupCommand extends DiscordCommand {
             botConfig.set(Discord.LOG_CHANNEL, logChannel.getAsChannel().getIdLong());
         }
 
-        // Save config
-        DiscordCraft.instance().getBotConfigManager().saveConfig();
+        botConfig.save();
 
-        // Reply
         event.reply(Messages.getMessage("setup.complete")).setEphemeral(true).queue();
 
-        // Stop the server
         Bukkit.getScheduler().runTaskLater(DiscordCraft.instance(), () -> Bukkit.shutdown(), 3 * 20); // 3 seconds delay to stop the server, because the bot needs to send the message
     }
     

@@ -9,6 +9,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import com.pablobh.discordcraft.config.Configuration;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.md_5.bungee.api.ChatColor;
 
@@ -16,14 +18,10 @@ public class Messages {
 
     // Static loader
 
-    private static ConfigManager messagesConfig;
+    private static Configuration config;
 
-    static void setup() {
-        messagesConfig = DiscordCraft.instance().getMessagesConfigManager();
-    }
-
-    public static ConfigManager getConfiguration() {
-        return messagesConfig;
+    static void setup(Configuration config) {
+        Messages.config = config;
     }
 
     // Messages
@@ -51,14 +49,14 @@ public class Messages {
 
     @Nullable
     public static String getMessageWithDefault(@Nonnull String key, @Nullable String defaultMessage, Object... args) {
-        Objects.requireNonNull(messagesConfig, "The messages config is null, Messages has been initialized?");
-        return getMessage(messagesConfig.getConfig(), key, defaultMessage, args);
+        Objects.requireNonNull(config, "The messages config is null, Messages has been initialized?");
+        return getMessage(config.getConfigObj(), key, defaultMessage, args);
     }
 
     @Nonnull
     public static String getMessage(@Nonnull String key, Object... args) {
-        Objects.requireNonNull(messagesConfig, "The messages config is null, Messages has been initialized?");
-        return getMessage(messagesConfig.getConfig(), key, key, args);
+        Objects.requireNonNull(config, "The messages config is null, Messages has been initialized?");
+        return getMessage(config.getConfigObj(), key, key, args);
     }
 
     // Variables

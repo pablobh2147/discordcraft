@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.config.GlobalConfiguration;
 import com.pablobh.discordcraft.listeners.MinecraftChatListener;
 import com.pablobh.discordcraft.listeners.PlayerEventsListener;
@@ -20,75 +21,82 @@ public class DiscordCraft extends JavaPlugin {
 
     private static DiscordCraft instance;
     
-    // Flags
-
-    private boolean isDiscordCraftEnabled = false;
-    
     // Configurations
     
-    private ConfigManager mainConfig;
-    private ConfigManager messagesConfig;
-    private ConfigManager botConfig;
-    private ConfigManager discordCommandsConfig;
+    private Configuration messagesConfig;
+    private Configuration botConfig;
+    private Configuration discordCommandsConfig;
 
     private GlobalConfiguration globalConfiguration;
+
+    private boolean enabled = false;
 
     @Override
     public void onEnable() {
         instance = this;
 
-        // Load Configurations
-        mainConfig = new ConfigManager("config.yml", true);
-        messagesConfig = new ConfigManager("messages.yml", true);
-        botConfig = new ConfigManager("bot.yml", true);
-        discordCommandsConfig = new ConfigManager("discord-commands.yml", true);
+        globalConfiguration = new GlobalConfiguration(this, "config.yml");
+        messagesConfig = new Configuration(this, "messages.yml");
+        botConfig = new Configuration(this, "bot.yml");
+        discordCommandsConfig = new Configuration(this, "discord-commands.yml");
 
-        globalConfiguration = new GlobalConfiguration(mainConfig);
+        Messages.setup(messagesConfig);
 
-        // Setup Messages
-        Messages.setup();
-
-        // Load Discord JDA
-        if (!Discord.setup()) {
+        if (!Discord.setup(botConfig)) {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
-        // Register Listeners
         registerSpigotListeners();
-
-        isDiscordCraftEnabled = true;
-
-        // Start Messages
         serverStartMessages();
 
+        enabled = true;
         DiscordCraft.logInfo(getDescription().getName() + " v" + getDescription().getVersion() + " has been enabled!");
     }
 
     @Override
     public void onDisable() {
-        // Check if DiscordCraft is enabled
-        if (!DiscordCraft.isDiscordCraftEnabled()) {
+        if (!enabled) {
             return;
         }
 
-        // Stop Messages
         serverStopMessages();
-
-        // Shutdown Discord JDA
         Discord.shutdown();
 
-        // Save Configurations
-        mainConfig.saveConfig();
-        messagesConfig.saveConfig();
-        botConfig.saveConfig();
-        discordCommandsConfig.saveConfig();
+        saveAllConfigurations();
 
-        // Disable
         DiscordCraft.logInfo(getDescription().getName() + " v" + getDescription().getVersion() + " has been disabled!");
 
         instance = null;
-        isDiscordCraftEnabled = false;
+        enabled = false;
+    }
+
+    public void saveAllConfigurations() {
+        globalConfiguration.save();
+        messagesConfig.save();
+        botConfig.save();
+        discordCommandsConfig.save();
+    }
+
+    public void reloadConfig() {
+        globalConfiguration.load();
+        DiscordCraft.logInfo("Configuration reloaded.");
+    }
+
+    public GlobalConfiguration getGlobalConfiguration() {
+        return globalConfiguration;
+    }
+
+    public Configuration getMessagesConfiguration() {
+        return messagesConfig;
+    }
+
+    public Configuration getBotConfiguration() {
+        return botConfig;
+    }
+
+    public Configuration getDiscordCommandsConfiguration() {
+        return discordCommandsConfig;
     }
 
     // Notifications
@@ -98,7 +106,7 @@ public class DiscordCraft extends JavaPlugin {
 
         for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
             if (linkedChannel.canSendServerStartMessages()) {
-                linkedChannel.getChannel().sendMessage(message).queue();
+                linkedChannel.sendMessage(message);
             }
         }
     }
@@ -108,7 +116,7 @@ public class DiscordCraft extends JavaPlugin {
 
         for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
             if (linkedChannel.canSendServerStopMessages()) {
-                linkedChannel.getChannel().sendMessage(message).queue();
+                linkedChannel.sendMessage(message);
             }
         }
     }
@@ -124,39 +132,6 @@ public class DiscordCraft extends JavaPlugin {
     public void registerSpigotListeners() {
         Bukkit.getPluginManager().registerEvents(new MinecraftChatListener(globalConfiguration), this);
         Bukkit.getPluginManager().registerEvents(new PlayerEventsListener(), this);
-    }
-
-    // Configurations
-
-    public void reloadConfig() {
-        globalConfiguration.reload();
-        DiscordCraft.logInfo("Configuration reloaded.");
-    }
-
-    public GlobalConfiguration getGlobalConfiguration() {
-        return globalConfiguration;
-    }
-
-    public ConfigManager getMainConfigManager() {
-        return mainConfig;
-    }
-
-    public ConfigManager getMessagesConfigManager() {
-        return messagesConfig;
-    }
-
-    public ConfigManager getBotConfigManager() {
-        return botConfig;
-    }
-
-    public ConfigManager getDiscordCommandsConfigManager() {
-        return discordCommandsConfig;
-    }
-
-    // Checkers
-
-    public static boolean isDiscordCraftEnabled() {
-        return instance != null && instance.isDiscordCraftEnabled;
     }
 
     // Logging

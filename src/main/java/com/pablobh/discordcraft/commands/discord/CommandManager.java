@@ -108,7 +108,7 @@ public class CommandManager extends ListenerAdapter {
 
         for (DiscordCommand command : commands) {
 
-            if (!command.isGlobal() && guild.getIdLong() != Discord.getBotConfig().getLong(Discord.GUILD_ID)) {
+            if (!command.isGlobal() && guild.getIdLong() != Discord.getConfig().getLong(Discord.GUILD_ID)) {
                 // Skip if the command is not global and the guild is not the main server
                 continue;
             }

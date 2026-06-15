@@ -44,7 +44,7 @@ public abstract class DiscordCommand {
 
         // Initialize the configuration
 
-        config = DiscordCraft.instance().getDiscordCommandsConfigManager().getConfig().getConfigurationSection("commands." + configName);
+        config = DiscordCraft.instance().getDiscordCommandsConfiguration().getSection("commands." + configName);
 
         if (config == null) {
             throw new IllegalArgumentException("Configuration section not found for command: " + configName);
