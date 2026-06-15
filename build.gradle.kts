@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.pablobh"
-version = "0.1.0"
+version = "0.2.0"
 description = "Discord integration plugin for Minecraft"
 
 repositories {
@@ -24,7 +24,7 @@ dependencies {
     
     // Discord Webhooks
     implementation("club.minnced:discord-webhooks:0.8.4")
-    
+
     // Logging
     implementation("org.slf4j:slf4j-api:2.0.9")
     implementation("org.slf4j:slf4j-simple:2.0.9")
