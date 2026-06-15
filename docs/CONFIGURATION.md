@@ -53,6 +53,8 @@ The main bot configuration file. This file is created on first run and updated a
 Default settings applied to newly linked channels. Each option controls which event types are forwarded to Discord.
 
 ```yaml
+avatar-style: bust
+
 channel-defaults:
   minecraft-chat-messages: true    # Minecraft chat → Discord
   player-join-messages: true       # Player join notifications
@@ -65,6 +67,23 @@ channel-defaults:
   server-start: true               # Server start announcement
   server-stop: true                # Server stop announcement
 ```
+
+#### Avatar Style
+
+The `avatar-style` option controls how player avatars are displayed in Discord messages. Three styles are available:
+
+| Style | Description | Preview |
+|---|---|---|
+| `body` | Full player body | ![Body Style](img/avatar_body.webp) |
+| `bust` | Player head and torso (default) | ![Bust Style](img/avatar_bust.webp) |
+| `face` | Player head only | ![Face Style](img/avatar_face.webp) |
+
+**Example:**
+```yaml
+avatar-style: face
+```
+
+#### Channel Defaults
 
 These defaults are applied when a new channel is linked. Each linked channel can override these values individually via the `/link config` command.
 
