@@ -8,7 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import com.pablobh.discordcraft.links.AccountLink;
 import com.pablobh.discordcraft.listeners.MinecraftChatListener;
 import com.pablobh.discordcraft.listeners.PlayerEventsListener;
 
@@ -50,8 +49,6 @@ public class DiscordCraft extends JavaPlugin {
             return;
         }
 
-        AccountLink.initialize();
-
         // Register Listeners
         registerSpigotListeners();
 
@@ -72,9 +69,6 @@ public class DiscordCraft extends JavaPlugin {
 
         // Stop Messages
         serverStopMessages();
-
-        // Save Account Links
-        AccountLink.save();
 
         // Shutdown Discord JDA
         Discord.shutdown();

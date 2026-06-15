@@ -1,4 +1,4 @@
-token: '' # Paste here your bot token
+token: "" # Paste here your bot token
 # If you don't have a bot token, you can create a new bot at https://discord.com/developers/applications
 
 # To setup the bot and configure the basic settings, you need to run the /setup command in Discord.
@@ -15,5 +15,3 @@ guild: 0
 log-channel: 0
 
 channels:
-
-account-links:
