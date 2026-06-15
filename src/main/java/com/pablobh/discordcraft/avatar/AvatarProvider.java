@@ -12,9 +12,6 @@ public class AvatarProvider {
     private static final String BASE_URL = "https://render.crafty.gg/";
     private static final String DEFAULT_AVATAR_HANDLE = "MHF_Stevee";
 
-    public static final int MIN_AVATAR_SIZE = 16;
-    public static final int MAX_AVATAR_SIZE = 256;
-
     private String getPlayerAvatarHandle(Player player) {
         return player.getUniqueId().toString();
     }
@@ -30,8 +27,9 @@ public class AvatarProvider {
             case BUST:
                 return "3d/bust";
             case FACE:
-            default:
                 return "2d/head";
+            default:
+                throw new IllegalArgumentException("Invalid avatar style: " + style);
         }
     }
    
@@ -45,10 +43,6 @@ public class AvatarProvider {
     }
 
     private URL getAvatarUrl(String handle, AvatarStyle style, int size) {
-        if (size < MIN_AVATAR_SIZE || size > MAX_AVATAR_SIZE) {
-            throw new IllegalArgumentException("Avatar size must be between " + MIN_AVATAR_SIZE + " and " + MAX_AVATAR_SIZE);
-        }
-
         String avatarPath = getAvatarPath(style);
 
         StringBuilder urlBuilder = new StringBuilder();
