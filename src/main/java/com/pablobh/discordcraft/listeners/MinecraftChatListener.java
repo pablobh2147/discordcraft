@@ -25,23 +25,12 @@ public class MinecraftChatListener implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
-        for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
-            if (linkedChannel.canSendMinecraftChatMessages()) {
-                sendMinecraftMessage(linkedChannel, event.getPlayer(), event.getMessage());
+        for (LinkedChannel channel : Discord.getLinkedChannels()) {
+            if (channel.canSendMinecraftChatMessages()) {
+                URL avatarUrl = avatarProvider.getAvatarUrl(event.getPlayer(), AvatarStyle.BUST, 128);
+                channel.sendMessage(event.getPlayer().getName(), avatarUrl, event.getMessage());
             }
         }
-    }
-
-    public void sendMinecraftMessage(LinkedChannel channel, Player player, String message) {
-        URL avatarUrl = avatarProvider.getAvatarUrl(player, AvatarStyle.BUST, 128);
-
-        WebhookMessage messageObj = new WebhookMessageBuilder()
-            .setUsername(player.getName())
-            .setAvatarUrl(avatarUrl.toString())
-            .setContent(message)
-            .build();
-
-        channel.send(messageObj);
     }
 
 }

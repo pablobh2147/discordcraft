@@ -148,8 +148,14 @@ public class LinkedChannel {
         return webhookClient;
     }
 
-    public void send(WebhookMessage message) {
-        webhookClient.send(message);
+    public void sendMessage(String username, URL avatarUrl, String message) {
+        WebhookMessage messageObj = new WebhookMessageBuilder()
+            .setUsername(username)
+            .setAvatarUrl(avatarUrl != null ? avatarUrl.toString() : null)
+            .setContent(message)
+            .build();
+        
+        webhookClient.send(messageObj);
     }
 
     private void setChannel(TextChannel channel) {
