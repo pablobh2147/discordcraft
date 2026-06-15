@@ -3,6 +3,7 @@ package com.pablobh.discordcraft.commands.discord;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.profile.PlayerProfile;
 
 import com.pablobh.discordcraft.DiscordCraft;
 
@@ -36,7 +37,8 @@ public class PardonCommand extends DiscordCommand {
             return;
         }
 
-        Bukkit.getBanList(BanList.Type.NAME).pardon(offlinePlayer.getName());
+        BanList<PlayerProfile> profileBanList = Bukkit.getBanList(BanList.Type.PROFILE);
+        profileBanList.pardon(offlinePlayer.getPlayerProfile());
 
         event.reply(successMessage.replace("%player%", player)).setEphemeral(isEphemeral).queue();
 

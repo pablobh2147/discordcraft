@@ -1,8 +1,11 @@
 package com.pablobh.discordcraft.commands.discord;
 
+import java.time.Instant;
+
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.profile.PlayerProfile;
 
 import com.pablobh.discordcraft.DiscordCraft;
 
@@ -48,7 +51,8 @@ public class BanCommand extends DiscordCommand {
             return;
         }
 
-        Bukkit.getBanList(BanList.Type.NAME).addBan(offlinePlayer.getName(), reason, null, reason);
+        BanList<PlayerProfile> profileBanList = Bukkit.getBanList(BanList.Type.PROFILE);
+        profileBanList.addBan(offlinePlayer.getPlayerProfile(), reason, (Instant) null, reason);
 
         event.reply(successMessage.replace("%player%", player).replace("%reason%", reason)).setEphemeral(isEphemeral).queue();
 
