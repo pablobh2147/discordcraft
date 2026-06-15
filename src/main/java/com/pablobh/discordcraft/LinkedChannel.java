@@ -5,11 +5,14 @@ import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.send.WebhookMessage;
+import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class LinkedChannel {
 
-    // Config Keys
+    // --------------------- Config Keys ---------------------
 
     public static final String DEFAULT_OPTIONS = "channel-defaults";
     public static final String CHANNEL_LIST = "channels";
@@ -28,9 +31,15 @@ public class LinkedChannel {
     public static final String SERVER_START = "server-start";
     public static final String SERVER_STOP = "server-stop";
 
-    private ConfigurationSection config;
+    private static final String WEBHOOK_NAME = "mc-chat-relay";
 
+    // --------------------- Fields ---------------------
+
+    private ConfigurationSection config;
     private TextChannel channel;
+    private WebhookClient webhookClient;
+
+    // --------------------- Flags ---------------------
 
     private boolean minecraftChatMessages;
     private boolean playerJoinMessages;
@@ -44,7 +53,7 @@ public class LinkedChannel {
     private boolean serverStartMessages;
     private boolean serverStopMessages;
 
-    // Get flags
+    // --------------------- Flag Getters ---------------------
 
     public boolean canSendMinecraftChatMessages() {
         return minecraftChatMessages;
@@ -82,11 +91,7 @@ public class LinkedChannel {
         return serverStopMessages;
     }
 
-    public TextChannel getChannel() {
-        return channel;
-    }
-
-    // Set flags
+    // --------------------- Flag Setters ---------------------
 
     public void setSendMinecraftChatMessages(boolean value) {
         minecraftChatMessages = value;
@@ -133,12 +138,38 @@ public class LinkedChannel {
         config.set(SERVER_STOP, value);
     }
 
+    // --------------------- Methods ---------------------
+
+    public TextChannel getChannel() {
+        return channel;
+    }
+
+    public WebhookClient getWebhookClient() {
+        return webhookClient;
+    }
+
+    public void send(WebhookMessage message) {
+        webhookClient.send(message);
+    }
+
     private void setChannel(TextChannel channel) {
         this.channel = channel;
+        loadWebhookClient();
         config.set(CHANNEL_ID, channel.getIdLong());
     }
 
-    // Config
+    private void loadWebhookClient() {
+        List<Webhook> webhooks = channel.retrieveWebhooks().complete();
+
+        Webhook webhook = webhooks.stream()
+            .filter(w -> w.getName().equals(WEBHOOK_NAME))
+            .findFirst()
+            .orElseGet(() -> channel.createWebhook(WEBHOOK_NAME).complete());
+
+        this.webhookClient = WebhookClient.withUrl(webhook.getUrl());
+    }
+
+    // --------------------- Config ---------------------
 
     private static LinkedChannel loadChannel(ConfigurationSection config) {
         if (config == null) {
