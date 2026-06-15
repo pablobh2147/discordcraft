@@ -18,10 +18,6 @@ public class AvatarProvider {
 
     private String getAvatarPath(AvatarStyle style) {
         switch (style) {
-            case FRONT:
-                return "2d/front";
-            case FRONT_FULL:
-                return "2d/frontfull";
             case BODY:
                 return "3d/full";
             case BUST:
