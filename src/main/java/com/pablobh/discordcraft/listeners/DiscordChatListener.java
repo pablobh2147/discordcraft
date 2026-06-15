@@ -43,18 +43,20 @@ public class DiscordChatListener extends ListenerAdapter {
 
     private void onMessage(GenericMessageEvent event, User author, Message message, boolean edited) {
 
-        if (event.getChannelType() == ChannelType.PRIVATE) { // ignore private messages
-            return;
-        }
-
-        LinkedChannel linkedChannel = Discord.getLinkedChannel(message.getChannel().asTextChannel());
-
-        if (linkedChannel == null || !linkedChannel.canSendDiscordMessages()) { // ignore messages from channels that are not linked
+        // Ignore private messages
+        if (event.getChannelType() == ChannelType.PRIVATE) { 
             return;
         }
 
         // Ignore bot messages (to prevent webhooks from being displayed as messages)
         if (author.isBot()) { 
+            return;
+        }
+        
+        LinkedChannel linkedChannel = Discord.getLinkedChannel(message.getChannel().asTextChannel());
+
+        // Ignore messages from channels that are not linked
+        if (linkedChannel == null || !linkedChannel.canSendDiscordMessages()) { 
             return;
         }
 
@@ -79,7 +81,6 @@ public class DiscordChatListener extends ListenerAdapter {
         ));
 
         // Replace attachments placeholder
-
         String[] parts = messageWithoutAttachments.split("%attachments%", 2);
 
         ComponentBuilder finalMessageBuilder = new ComponentBuilder("");
@@ -96,7 +97,6 @@ public class DiscordChatListener extends ListenerAdapter {
         }
 
         // Send message to all online players
-
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.spigot().sendMessage(finalMessageBuilder.create());
         }

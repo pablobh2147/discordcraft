@@ -128,6 +128,11 @@ public class DiscordCraft extends JavaPlugin {
 
     // Configurations
 
+    public void reloadConfig() {
+        globalConfiguration.reload();
+        DiscordCraft.logInfo("Configuration reloaded.");
+    }
+
     public GlobalConfiguration getGlobalConfiguration() {
         return globalConfiguration;
     }

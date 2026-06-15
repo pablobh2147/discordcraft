@@ -1,3 +1,5 @@
+avatar-style: bust
+
 channel-defaults:
   minecraft-chat-messages: true
   player-join-messages: true
