@@ -7,4 +7,5 @@
 # Gradle
 .gradle/
 build/
+bin/
 out/
