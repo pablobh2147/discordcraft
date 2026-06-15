@@ -2,11 +2,11 @@ package com.pablobh.discordcraft.commands.discord;
 
 import org.bukkit.Bukkit;
 
-import com.pablobh.discordcraft.Discord;
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.StringUtils;
 import com.pablobh.discordcraft.config.Configuration;
+import com.pablobh.discordcraft.discord.Discord;
 
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.channel.ChannelType;

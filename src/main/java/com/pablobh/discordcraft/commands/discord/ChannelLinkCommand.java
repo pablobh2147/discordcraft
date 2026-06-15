@@ -1,8 +1,8 @@
 package com.pablobh.discordcraft.commands.discord;
 
-import com.pablobh.discordcraft.Discord;
-import com.pablobh.discordcraft.LinkedChannel;
 import com.pablobh.discordcraft.Messages;
+import com.pablobh.discordcraft.discord.Discord;
+import com.pablobh.discordcraft.discord.LinkedChannel;
 
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;

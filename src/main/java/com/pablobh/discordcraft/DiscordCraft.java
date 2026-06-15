@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.config.GlobalConfiguration;
+import com.pablobh.discordcraft.discord.Discord;
+import com.pablobh.discordcraft.discord.LinkedChannel;
 import com.pablobh.discordcraft.listeners.MinecraftChatListener;
 import com.pablobh.discordcraft.listeners.PlayerEventsListener;
 

@@ -1,10 +1,12 @@
-package com.pablobh.discordcraft;
+package com.pablobh.discordcraft.discord;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
+
+import com.pablobh.discordcraft.DiscordCraft;
 
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.send.WebhookMessage;

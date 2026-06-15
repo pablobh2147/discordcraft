@@ -1,4 +1,4 @@
-package com.pablobh.discordcraft;
+package com.pablobh.discordcraft.discord;
 
 import java.util.List;
 
@@ -7,6 +7,7 @@ import javax.security.auth.login.LoginException;
 
 import org.bukkit.Bukkit;
 
+import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.commands.discord.CommandManager;
 import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.listeners.DiscordChatListener;

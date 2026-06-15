@@ -7,9 +7,9 @@ import javax.annotation.Nonnull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.pablobh.discordcraft.Discord;
-import com.pablobh.discordcraft.LinkedChannel;
 import com.pablobh.discordcraft.Messages;
+import com.pablobh.discordcraft.discord.Discord;
+import com.pablobh.discordcraft.discord.LinkedChannel;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;

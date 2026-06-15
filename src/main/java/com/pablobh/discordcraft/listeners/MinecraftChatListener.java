@@ -6,10 +6,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import com.pablobh.discordcraft.Discord;
-import com.pablobh.discordcraft.LinkedChannel;
 import com.pablobh.discordcraft.avatar.AvatarProvider;
 import com.pablobh.discordcraft.config.GlobalConfiguration;
+import com.pablobh.discordcraft.discord.Discord;
+import com.pablobh.discordcraft.discord.LinkedChannel;
 
 public class MinecraftChatListener implements Listener {
 

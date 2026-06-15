@@ -11,9 +11,9 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.pablobh.discordcraft.Discord;
-import com.pablobh.discordcraft.LinkedChannel;
 import com.pablobh.discordcraft.Messages;
+import com.pablobh.discordcraft.discord.Discord;
+import com.pablobh.discordcraft.discord.LinkedChannel;
 
 public class PlayerEventsListener implements Listener {
 
