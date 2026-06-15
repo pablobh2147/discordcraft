@@ -50,7 +50,6 @@ public class ChannelLinkCommand extends DiscordCommand {
             optionOption.addChoice("Player Death", LinkedChannel.PLAYER_DEATH_MESSAGES);
             optionOption.addChoice("Player Murder", LinkedChannel.PLAYER_MURDER_MENSAGES);
 
-            optionOption.addChoice("Bot Messages", LinkedChannel.DISCORD_BOT_MESSAGES);
             optionOption.addChoice("System Messages", LinkedChannel.DISCORD_SYSTEM_MESSAGES);
             optionOption.addChoice("Discord Chat", LinkedChannel.DISCORD_MESSAGES);
 
@@ -182,8 +181,6 @@ public class ChannelLinkCommand extends DiscordCommand {
                 break;
             case LinkedChannel.PLAYER_MURDER_MENSAGES:
                 linkedChannel.setSendPlayerMurderMessages(computedValue);
-            case LinkedChannel.DISCORD_BOT_MESSAGES:
-                linkedChannel.setSendBotMessages(computedValue);
                 break;
             case LinkedChannel.DISCORD_SYSTEM_MESSAGES:
                 linkedChannel.setSendDiscordSystemMessages(computedValue);
@@ -203,7 +200,6 @@ public class ChannelLinkCommand extends DiscordCommand {
                 linkedChannel.setSendPlayerLeaveMessages(computedValue);
                 linkedChannel.setSendPlayerDeathMessages(computedValue);
                 linkedChannel.setSendPlayerMurderMessages(computedValue);
-                linkedChannel.setSendBotMessages(computedValue);
                 linkedChannel.setSendDiscordSystemMessages(computedValue);
                 linkedChannel.setSendDiscordMessages(computedValue);
                 linkedChannel.setSendServerStartMessages(computedValue);

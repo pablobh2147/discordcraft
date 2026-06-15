@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.pablobh"
-version = "0.1.0"
+version = "0.2.0"
 description = "Discord integration plugin for Minecraft"
 
 repositories {
@@ -17,11 +17,14 @@ dependencies {
     // Spigot API - 1.20.1 (stable, supports 1.13+ via api-version)
     compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
     
-    // JDA - Discord library (bundled in final JAR)
+    // JDA - Discord library
     implementation("net.dv8tion:JDA:5.0.0") {
         exclude(module = "opus-java")
     }
     
+    // Discord Webhooks
+    implementation("club.minnced:discord-webhooks:0.8.4")
+
     // Logging
     implementation("org.slf4j:slf4j-api:2.0.9")
     implementation("org.slf4j:slf4j-simple:2.0.9")
@@ -43,9 +46,11 @@ tasks {
         // Relocate JDA to avoid conflicts with other plugins
         relocate("net.dv8tion.jda", "com.pablobh.discordcraft.libs.jda")
         relocate("org.slf4j", "com.pablobh.discordcraft.libs.slf4j")
+        relocate("club.minnced.discord.webhook", "com.pablobh.discordcraft.libs.webhook")
         
         minimize {
             exclude(dependency("net.dv8tion:JDA:.*"))
+            exclude(dependency("club.minnced:discord-webhooks:.*"))
         }
     }
     

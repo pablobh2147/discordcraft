@@ -9,6 +9,7 @@ commands:
   configuration:
     description: Configures the plugin
     help: Help message for configure
+    command: config
   playerlist:
     enabled: true
     command: playerlist
@@ -30,11 +31,11 @@ commands:
         enabled: true
         name: Banned
     messages:
-      list-disabled: '%list_name% players list is disabled!'
+      list-disabled: "%list_name% players list is disabled!"
       list-empty: There are no %list_name% players online!
-      list-header: 'List of %list_name% players (%player_count%):'
-      list-row: '- ***%player%***'
-  
+      list-header: "List of %list_name% players (%player_count%):"
+      list-row: "- ***%player%***"
+
   stop-server:
     enabled: true
     command: stop
@@ -45,24 +46,24 @@ commands:
     message: The server is stopping in %seconds% seconds
     is-ephemeral: true
     show-title: true
-  
+
   channel-link:
     enabled: true
     command: link
     description: Adds a channel to the list of channels
     help: Adds a channel to the list of channels
     admin-only: true
-  
+
   help: # TODO: Add a flag to show only the commands that the user can use
     enabled: true
     command: help
     description: Shows the list of commands
     help: If you need help to use this command you are a fool.
     is-ephemeral: true
-    message: 'Here is the list of commands:'
-    row-format: '- **%command%**: %message%'
+    message: "Here is the list of commands:"
+    row-format: "- **%command%**: %message%"
     admin-only: false
-  
+
   ban:
     enabled: true
     command: ban
@@ -75,7 +76,7 @@ commands:
       already-banned: The player %player% is already banned!
       not-found: The player %player% was not found!
     default-reason: You have been banned from the server!
-  
+
   pardon:
     enabled: true
     command: pardon
@@ -86,7 +87,7 @@ commands:
     messages:
       success: The player %player% has been unbanned!
       not-banned: The player %player% is not banned!
-  
+
   whitelist:
     enabled: true
     command: whitelist
@@ -103,7 +104,7 @@ commands:
       not-whitelisted: The player %player% is not whitelisted!
       not-found: The player %player% was not found!
       no-player-option: You must specify a player to add or remove from the whitelist!
-      
+
       enabled: The whitelist has been enabled!
       already-enabled: The whitelist is already enabled!
       disabled: The whitelist has been disabled!

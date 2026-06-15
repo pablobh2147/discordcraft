@@ -1,19 +1,23 @@
 package com.pablobh.discordcraft;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.send.WebhookMessage;
+import club.minnced.discord.webhook.send.WebhookMessageBuilder;
+import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class LinkedChannel {
 
-    // Config Keys
+    // --------------------- Config Keys ---------------------
 
     public static final String DEFAULT_OPTIONS = "channel-defaults";
     public static final String CHANNEL_LIST = "channels";
-
 
     public static final String CHANNEL_ID = "channel-id";
 
@@ -24,15 +28,20 @@ public class LinkedChannel {
     public static final String PLAYER_MURDER_MENSAGES = "player-murder-messages";
 
     public static final String DISCORD_MESSAGES = "discord-messages";
-    public static final String DISCORD_BOT_MESSAGES = "discord-bot-messages";
     public static final String DISCORD_SYSTEM_MESSAGES = "discord-system-messages";
 
     public static final String SERVER_START = "server-start";
     public static final String SERVER_STOP = "server-stop";
 
-    private ConfigurationSection config;
+    private static final String WEBHOOK_NAME = "mc-chat-relay";
 
+    // --------------------- Fields ---------------------
+
+    private ConfigurationSection config;
     private TextChannel channel;
+    private WebhookClient webhookClient;
+
+    // --------------------- Flags ---------------------
 
     private boolean minecraftChatMessages;
     private boolean playerJoinMessages;
@@ -41,13 +50,12 @@ public class LinkedChannel {
     private boolean playerMurderMessages;
 
     private boolean discordMessages;
-    private boolean botMessages;
     private boolean discordSystemMessages;
 
     private boolean serverStartMessages;
     private boolean serverStopMessages;
 
-    // Get flags
+    // --------------------- Flag Getters ---------------------
 
     public boolean canSendMinecraftChatMessages() {
         return minecraftChatMessages;
@@ -73,10 +81,6 @@ public class LinkedChannel {
         return discordMessages;
     }
 
-    public boolean canSendBotMessages() {
-        return botMessages;
-    }
-
     public boolean canSendDiscordSystemMessages() {
         return discordSystemMessages;
     }
@@ -89,11 +93,7 @@ public class LinkedChannel {
         return serverStopMessages;
     }
 
-    public TextChannel getChannel() {
-        return channel;
-    }
-
-    // Set flags
+    // --------------------- Flag Setters ---------------------
 
     public void setSendMinecraftChatMessages(boolean value) {
         minecraftChatMessages = value;
@@ -125,11 +125,6 @@ public class LinkedChannel {
         config.set(DISCORD_MESSAGES, value);
     }
 
-    public void setSendBotMessages(boolean value) {
-        botMessages = value;
-        config.set(DISCORD_BOT_MESSAGES, value);
-    }
-
     public void setSendDiscordSystemMessages(boolean value) {
         discordSystemMessages = value;
         config.set(DISCORD_SYSTEM_MESSAGES, value);
@@ -145,12 +140,44 @@ public class LinkedChannel {
         config.set(SERVER_STOP, value);
     }
 
+    // --------------------- Methods ---------------------
+
+    public TextChannel getChannel() {
+        return channel;
+    }
+
+    public WebhookClient getWebhookClient() {
+        return webhookClient;
+    }
+
+    public void sendMessage(String username, URL avatarUrl, String message) {
+        WebhookMessage messageObj = new WebhookMessageBuilder()
+            .setUsername(username)
+            .setAvatarUrl(avatarUrl != null ? avatarUrl.toString() : null)
+            .setContent(message)
+            .build();
+        
+        webhookClient.send(messageObj);
+    }
+
     private void setChannel(TextChannel channel) {
         this.channel = channel;
+        loadWebhookClient();
         config.set(CHANNEL_ID, channel.getIdLong());
     }
 
-    // Config
+    private void loadWebhookClient() {
+        List<Webhook> webhooks = channel.retrieveWebhooks().complete();
+
+        Webhook webhook = webhooks.stream()
+            .filter(w -> w.getName().equals(WEBHOOK_NAME))
+            .findFirst()
+            .orElseGet(() -> channel.createWebhook(WEBHOOK_NAME).complete());
+
+        this.webhookClient = WebhookClient.withUrl(webhook.getUrl());
+    }
+
+    // --------------------- Config ---------------------
 
     private static LinkedChannel loadChannel(ConfigurationSection config) {
         if (config == null) {
@@ -178,7 +205,6 @@ public class LinkedChannel {
         data.setSendPlayerMurderMessages(config.getBoolean(PLAYER_MURDER_MENSAGES, defaults.getBoolean(PLAYER_MURDER_MENSAGES, true)));
 
         data.setSendDiscordMessages(config.getBoolean(DISCORD_MESSAGES, defaults.getBoolean(DISCORD_MESSAGES, true)));
-        data.setSendBotMessages(config.getBoolean(DISCORD_BOT_MESSAGES, defaults.getBoolean(DISCORD_BOT_MESSAGES, true)));
         data.setSendDiscordSystemMessages(config.getBoolean(DISCORD_SYSTEM_MESSAGES, defaults.getBoolean(DISCORD_SYSTEM_MESSAGES, true)));
 
         data.setSendServerStartMessages(config.getBoolean(SERVER_START, defaults.getBoolean(SERVER_START, true)));
@@ -209,7 +235,6 @@ public class LinkedChannel {
         data.setSendPlayerMurderMessages(defaults.getBoolean(PLAYER_MURDER_MENSAGES, true));
 
         data.setSendDiscordMessages(defaults.getBoolean(DISCORD_MESSAGES, true));
-        data.setSendBotMessages(defaults.getBoolean(DISCORD_BOT_MESSAGES, true));
         data.setSendDiscordSystemMessages(defaults.getBoolean(DISCORD_SYSTEM_MESSAGES, true));
 
         data.setSendServerStartMessages(defaults.getBoolean(SERVER_START, true));

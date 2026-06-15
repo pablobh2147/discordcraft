@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import com.pablobh.discordcraft.config.GlobalConfiguration;
 import com.pablobh.discordcraft.listeners.MinecraftChatListener;
 import com.pablobh.discordcraft.listeners.PlayerEventsListener;
 
@@ -30,6 +31,8 @@ public class DiscordCraft extends JavaPlugin {
     private ConfigManager botConfig;
     private ConfigManager discordCommandsConfig;
 
+    private GlobalConfiguration globalConfiguration;
+
     @Override
     public void onEnable() {
         instance = this;
@@ -39,6 +42,8 @@ public class DiscordCraft extends JavaPlugin {
         messagesConfig = new ConfigManager("messages.yml", true);
         botConfig = new ConfigManager("bot.yml", true);
         discordCommandsConfig = new ConfigManager("discord-commands.yml", true);
+
+        globalConfiguration = new GlobalConfiguration(mainConfig);
 
         // Setup Messages
         Messages.setup();
@@ -117,11 +122,20 @@ public class DiscordCraft extends JavaPlugin {
     // Listeners
 
     public void registerSpigotListeners() {
-        Bukkit.getPluginManager().registerEvents(new MinecraftChatListener(), this);
+        Bukkit.getPluginManager().registerEvents(new MinecraftChatListener(globalConfiguration), this);
         Bukkit.getPluginManager().registerEvents(new PlayerEventsListener(), this);
     }
 
     // Configurations
+
+    public void reloadConfig() {
+        globalConfiguration.reload();
+        DiscordCraft.logInfo("Configuration reloaded.");
+    }
+
+    public GlobalConfiguration getGlobalConfiguration() {
+        return globalConfiguration;
+    }
 
     public ConfigManager getMainConfigManager() {
         return mainConfig;

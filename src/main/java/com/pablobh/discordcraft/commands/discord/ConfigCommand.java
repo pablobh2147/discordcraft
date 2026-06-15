@@ -1,0 +1,33 @@
+package com.pablobh.discordcraft.commands.discord;
+
+import com.pablobh.discordcraft.DiscordCraft;
+import com.pablobh.discordcraft.Messages;
+
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+
+public class ConfigCommand extends DiscordCommand {
+
+    public ConfigCommand() {
+        super("configuration");
+
+        addSubcommand("reload", "Reloads the plugin configuration");
+    }
+
+    @Override
+    public void onCommandInteraction(SlashCommandInteractionEvent event) {
+        switch (event.getSubcommandName()) {
+            case "reload":
+                subcommandReload(event);
+                break;
+            default:
+                event.reply(Messages.getMessage(CommandManager.COMMAND_INVALID_SUBCOMMAND)).setEphemeral(true).queue();
+                break;
+        }
+    }
+
+    private void subcommandReload(SlashCommandInteractionEvent event) {
+        DiscordCraft.instance().reloadConfig();
+        event.reply("Configuration reloaded successfully.").setEphemeral(true).queue();
+    }
+
+}

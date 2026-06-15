@@ -2,6 +2,7 @@ package com.pablobh.discordcraft.commands.discord;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -38,18 +39,15 @@ public class CommandManager extends ListenerAdapter {
     public CommandManager() {
 
         try {
-            this.addCommands(new SetupCommand());
-
-            // Add commands here
-            this.addCommands(new HelpCommand(this));
-            this.addCommands(new PlayerListCommand());
-            this.addCommands(new StopServerCommand());
-            this.addCommands(new BanCommand());
-            this.addCommands(new PardonCommand());
-            this.addCommands(new WhitelistCommand());
-
-            // Unify all to one command
-            this.addCommands(new ChannelLinkCommand());
+            registerCommand(new SetupCommand());
+            registerCommand(new HelpCommand(this));
+            registerCommand(new PlayerListCommand());
+            registerCommand(new StopServerCommand());
+            registerCommand(new BanCommand());
+            registerCommand(new PardonCommand());
+            registerCommand(new WhitelistCommand());
+            registerCommand(new ChannelLinkCommand());
+            registerCommand(new ConfigCommand());
         } catch (Exception e) {
             DiscordCraft.logException(e, Messages.getMessage("errors.command-registration-error"));
         }
@@ -148,12 +146,9 @@ public class CommandManager extends ListenerAdapter {
 
     // Command management
 
-    public void addCommands(@NotNull DiscordCommand... commands) {
-        for (DiscordCommand command : commands) {
-            if (command != null) {
-                this.commands.add(command);
-            }
-        }
+    public void registerCommand(@NotNull DiscordCommand command) {
+        Objects.requireNonNull(command, "Command cannot be null");
+        commands.add(command);
     }
 
     @Nullable
