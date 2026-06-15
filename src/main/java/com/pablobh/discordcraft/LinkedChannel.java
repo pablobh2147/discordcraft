@@ -14,7 +14,6 @@ public class LinkedChannel {
     public static final String DEFAULT_OPTIONS = "channel-defaults";
     public static final String CHANNEL_LIST = "channels";
 
-
     public static final String CHANNEL_ID = "channel-id";
 
     public static final String MINECRAFT_CHAT_MESSAGES = "minecraft-chat-messages";
@@ -24,7 +23,6 @@ public class LinkedChannel {
     public static final String PLAYER_MURDER_MENSAGES = "player-murder-messages";
 
     public static final String DISCORD_MESSAGES = "discord-messages";
-    public static final String DISCORD_BOT_MESSAGES = "discord-bot-messages";
     public static final String DISCORD_SYSTEM_MESSAGES = "discord-system-messages";
 
     public static final String SERVER_START = "server-start";
@@ -41,7 +39,6 @@ public class LinkedChannel {
     private boolean playerMurderMessages;
 
     private boolean discordMessages;
-    private boolean botMessages;
     private boolean discordSystemMessages;
 
     private boolean serverStartMessages;
@@ -71,10 +68,6 @@ public class LinkedChannel {
 
     public boolean canSendDiscordMessages() {
         return discordMessages;
-    }
-
-    public boolean canSendBotMessages() {
-        return botMessages;
     }
 
     public boolean canSendDiscordSystemMessages() {
@@ -125,11 +118,6 @@ public class LinkedChannel {
         config.set(DISCORD_MESSAGES, value);
     }
 
-    public void setSendBotMessages(boolean value) {
-        botMessages = value;
-        config.set(DISCORD_BOT_MESSAGES, value);
-    }
-
     public void setSendDiscordSystemMessages(boolean value) {
         discordSystemMessages = value;
         config.set(DISCORD_SYSTEM_MESSAGES, value);
@@ -178,7 +166,6 @@ public class LinkedChannel {
         data.setSendPlayerMurderMessages(config.getBoolean(PLAYER_MURDER_MENSAGES, defaults.getBoolean(PLAYER_MURDER_MENSAGES, true)));
 
         data.setSendDiscordMessages(config.getBoolean(DISCORD_MESSAGES, defaults.getBoolean(DISCORD_MESSAGES, true)));
-        data.setSendBotMessages(config.getBoolean(DISCORD_BOT_MESSAGES, defaults.getBoolean(DISCORD_BOT_MESSAGES, true)));
         data.setSendDiscordSystemMessages(config.getBoolean(DISCORD_SYSTEM_MESSAGES, defaults.getBoolean(DISCORD_SYSTEM_MESSAGES, true)));
 
         data.setSendServerStartMessages(config.getBoolean(SERVER_START, defaults.getBoolean(SERVER_START, true)));
@@ -209,7 +196,6 @@ public class LinkedChannel {
         data.setSendPlayerMurderMessages(defaults.getBoolean(PLAYER_MURDER_MENSAGES, true));
 
         data.setSendDiscordMessages(defaults.getBoolean(DISCORD_MESSAGES, true));
-        data.setSendBotMessages(defaults.getBoolean(DISCORD_BOT_MESSAGES, true));
         data.setSendDiscordSystemMessages(defaults.getBoolean(DISCORD_SYSTEM_MESSAGES, true));
 
         data.setSendServerStartMessages(defaults.getBoolean(SERVER_START, true));

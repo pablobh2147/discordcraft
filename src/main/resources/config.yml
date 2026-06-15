@@ -5,7 +5,6 @@ channel-defaults:
   player-death-messages: true
   player-murder-messages: true
   discord-messages: true
-  discord-bot-messages: true
   discord-system-messages: true
   server-start: true
   server-stop: true

@@ -53,19 +53,22 @@ public class DiscordChatListener extends ListenerAdapter {
             return;
         }
 
-        if (!linkedChannel.canSendBotMessages() && author.isBot()) { // ignore bot messages if not allowed
+        // Ignore bot messages (to prevent webhooks from being displayed as messages)
+        if (author.isBot()) { 
             return;
         }
 
-        if (!linkedChannel.canSendDiscordSystemMessages() && author.isSystem()) { // ignore system messages if not allowed
+        // Ignore system messages if not allowed
+        if (!linkedChannel.canSendDiscordSystemMessages() && author.isSystem()) { 
             return;
         }
 
-        if (author.getIdLong() == Discord.getSelfUser().getIdLong()) { // ignore messages from the bot itself
+        // Ignore messages from the bot itself
+        if (author.getIdLong() == Discord.getSelfUser().getIdLong()) { 
             return;
         }
 
-        // normal message broadcast
+        // Normal message broadcast
 
         String messageWithoutAttachments = Messages.applyMinecraftColorFormatting(Messages.getMessage(
                 edited ? "chat.minecraft-edited-format" : "chat.minecraft-format",
