@@ -104,7 +104,11 @@ public class PlayerEventsListener implements Listener {
 
         for (LinkedChannel channel : discordService.getLinkedChannels()) {
             if (channel.canSendPlayerDeathMessages()) {
-                channel.sendMessage(finalDeathMessageStr);
+                if (finalDeathMessage != null) {
+                    channel.sendMessage(finalDeathMessage);
+                } else {
+                    channel.sendMessage(finalDeathMessageStr);
+                }
             }
         }
     }
