@@ -13,7 +13,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.config.Configuration;
-import com.pablobh.discordcraft.discord.commands.CommandManager;
 import com.pablobh.discordcraft.listeners.DiscordChatListener;
 
 import net.dv8tion.jda.api.JDA;
@@ -127,7 +126,7 @@ public class DiscordService {
             configureActivity(builder);
 
             builder.addEventListeners(new DiscordChatListener(this));
-            builder.addEventListeners(new CommandManager(this));
+            builder.addEventListeners(new DiscordCommandManager(this));
 
             jda = builder.build();
             if (jda == null) {

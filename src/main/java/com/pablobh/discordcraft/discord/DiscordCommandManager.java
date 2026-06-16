@@ -1,4 +1,4 @@
-package com.pablobh.discordcraft.discord.commands;
+package com.pablobh.discordcraft.discord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +10,15 @@ import org.jetbrains.annotations.NotNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.Messages;
-import com.pablobh.discordcraft.discord.DiscordCommand;
-import com.pablobh.discordcraft.discord.DiscordService;
+import com.pablobh.discordcraft.discord.commands.BanCommand;
+import com.pablobh.discordcraft.discord.commands.ChannelLinkCommand;
+import com.pablobh.discordcraft.discord.commands.ConfigCommand;
+import com.pablobh.discordcraft.discord.commands.HelpCommand;
+import com.pablobh.discordcraft.discord.commands.PardonCommand;
+import com.pablobh.discordcraft.discord.commands.PlayerListCommand;
+import com.pablobh.discordcraft.discord.commands.SetupCommand;
+import com.pablobh.discordcraft.discord.commands.StopServerCommand;
+import com.pablobh.discordcraft.discord.commands.WhitelistCommand;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -23,7 +30,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
-public class CommandManager extends ListenerAdapter {
+public class DiscordCommandManager extends ListenerAdapter {
 
     // Message keys
 
@@ -38,7 +45,7 @@ public class CommandManager extends ListenerAdapter {
     private List<DiscordCommand> commands = new ArrayList<>();
     private final DiscordService discordService;
 
-    public CommandManager(DiscordService discordService) {
+    public DiscordCommandManager(DiscordService discordService) {
         this.discordService = discordService;
 
         try {
@@ -68,13 +75,13 @@ public class CommandManager extends ListenerAdapter {
                         // Check if the command was executed in the main server
 
                         if (!command.isGlobal() && !event.getGuild().equals(discordService.getMainGuild())) {
-                            event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_MAIN_GUILD_ONLY)).setEphemeral(true).queue();
+                            event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_MAIN_GUILD_ONLY)).setEphemeral(true).queue();
                             return;
                         }
 
                         // Check if the user has the required permissions
                         if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-                            event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_NO_PERMISSION)).setEphemeral(true).queue();
+                            event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_NO_PERMISSION)).setEphemeral(true).queue();
                             return;
                         }
                     }
@@ -86,20 +93,20 @@ public class CommandManager extends ListenerAdapter {
                         return;
                     } catch (Exception e) {
                         DiscordCraft.discordLogException(e, Messages.getMessage("errors.command-error", "command_name", command.getName(), "member", event.getMember()));
-                        event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_INTERNAL_ERROR)).setEphemeral(true).queue();
+                        event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_INTERNAL_ERROR)).setEphemeral(true).queue();
                     }
 
                     return;
                 } else {
                     // Command is disabled
-                    event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_DISABLED)).setEphemeral(true).queue(); // Should never happen because the command should not be registered
+                    event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_DISABLED)).setEphemeral(true).queue(); // Should never happen because the command should not be registered
                     return;
                 }
             }
         }
 
         // Command not found
-        event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_NOT_FOUND)).setEphemeral(true).queue(); // Should never happen because the command should not be registered
+        event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_NOT_FOUND)).setEphemeral(true).queue(); // Should never happen because the command should not be registered
     }
 
     private void registerCommands(Guild guild) {

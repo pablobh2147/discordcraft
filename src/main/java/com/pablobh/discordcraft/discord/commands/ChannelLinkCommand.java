@@ -2,6 +2,7 @@ package com.pablobh.discordcraft.discord.commands;
 
 import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.discord.DiscordService;
 import com.pablobh.discordcraft.discord.LinkedChannel;
 
@@ -86,7 +87,7 @@ public class ChannelLinkCommand extends DiscordCommand {
                 subcommandConfig(event);
                 break;
             default:
-                event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_INVALID_SUBCOMMAND)).setEphemeral(true).queue(); // Should never happen
+                event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_INVALID_SUBCOMMAND)).setEphemeral(true).queue(); // Should never happen
                 break;
         }
     }

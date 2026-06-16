@@ -1,14 +1,15 @@
 package com.pablobh.discordcraft.discord.commands;
 
 import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class HelpCommand extends DiscordCommand {
 
-    private CommandManager commandManager;
+    private DiscordCommandManager commandManager;
 
-    public HelpCommand(CommandManager commandManager) {
+    public HelpCommand(DiscordCommandManager commandManager) {
         super("help");
         this.commandManager = commandManager;
     }

@@ -5,6 +5,7 @@ import org.bukkit.OfflinePlayer;
 
 import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -51,7 +52,7 @@ public class WhitelistCommand extends DiscordCommand {
                 subcommandRemove(event, isEphemeral);
                 break;
             default:
-                event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_INVALID_SUBCOMMAND)).setEphemeral(true).queue(); // Should never happen
+                event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_INVALID_SUBCOMMAND)).setEphemeral(true).queue(); // Should never happen
                 break;
         }
     }
