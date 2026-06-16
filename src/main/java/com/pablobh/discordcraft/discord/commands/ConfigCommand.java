@@ -1,7 +1,8 @@
-package com.pablobh.discordcraft.commands.discord;
+package com.pablobh.discordcraft.discord.commands;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.Messages;
+import com.pablobh.discordcraft.discord.DiscordCommand;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
@@ -20,7 +21,7 @@ public class ConfigCommand extends DiscordCommand {
                 subcommandReload(event);
                 break;
             default:
-                event.reply(Messages.getMessage(CommandManager.COMMAND_INVALID_SUBCOMMAND)).setEphemeral(true).queue();
+                event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_INVALID_SUBCOMMAND)).setEphemeral(true).queue();
                 break;
         }
     }

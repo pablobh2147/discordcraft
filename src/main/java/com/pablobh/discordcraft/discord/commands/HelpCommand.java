@@ -1,4 +1,6 @@
-package com.pablobh.discordcraft.commands.discord;
+package com.pablobh.discordcraft.discord.commands;
+
+import com.pablobh.discordcraft.discord.DiscordCommand;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 

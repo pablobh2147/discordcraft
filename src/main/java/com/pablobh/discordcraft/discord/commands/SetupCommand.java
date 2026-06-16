@@ -1,4 +1,4 @@
-package com.pablobh.discordcraft.commands.discord;
+package com.pablobh.discordcraft.discord.commands;
 
 import org.bukkit.Bukkit;
 
@@ -6,6 +6,7 @@ import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.StringUtils;
 import com.pablobh.discordcraft.config.Configuration;
+import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordService;
 
 import net.dv8tion.jda.api.entities.Activity.ActivityType;

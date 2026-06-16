@@ -1,4 +1,4 @@
-package com.pablobh.discordcraft.commands.discord;
+package com.pablobh.discordcraft.discord.commands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.Messages;
+import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordService;
 
 import net.dv8tion.jda.api.Permission;
@@ -26,12 +27,12 @@ public class CommandManager extends ListenerAdapter {
 
     // Message keys
 
-    public static final String COMMAND_MAIN_GUILD_ONLY = "commands.main-guild-only";
-    public static final String COMMAND_NO_PERMISSION = "commands.no-permission";
-    public static final String COMMAND_INTERNAL_ERROR = "commands.internal-error";
-    public static final String COMMAND_DISABLED = "commands.disabled";
-    public static final String COMMAND_NOT_FOUND = "commands.not-found";
-    public static final String COMMAND_INVALID_SUBCOMMAND = "commands.invalid-subcommand";
+    public static final String MSG_KEY_COMMAND_MAIN_GUILD_ONLY = "commands.main-guild-only";
+    public static final String MSG_KEY_COMMAND_NO_PERMISSION = "commands.no-permission";
+    public static final String MSG_KEY_COMMAND_INTERNAL_ERROR = "commands.internal-error";
+    public static final String MSG_KEY_COMMAND_DISABLED = "commands.disabled";
+    public static final String MSG_KEY_COMMAND_NOT_FOUND = "commands.not-found";
+    public static final String MSG_KEY_COMMAND_INVALID_SUBCOMMAND = "commands.invalid-subcommand";
     
 
     private List<DiscordCommand> commands = new ArrayList<>();
@@ -67,13 +68,13 @@ public class CommandManager extends ListenerAdapter {
                         // Check if the command was executed in the main server
 
                         if (!command.isGlobal() && !event.getGuild().equals(discordService.getMainGuild())) {
-                            event.reply(Messages.getMessage(CommandManager.COMMAND_MAIN_GUILD_ONLY)).setEphemeral(true).queue();
+                            event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_MAIN_GUILD_ONLY)).setEphemeral(true).queue();
                             return;
                         }
 
                         // Check if the user has the required permissions
                         if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-                            event.reply(Messages.getMessage(CommandManager.COMMAND_NO_PERMISSION)).setEphemeral(true).queue();
+                            event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_NO_PERMISSION)).setEphemeral(true).queue();
                             return;
                         }
                     }
@@ -85,20 +86,20 @@ public class CommandManager extends ListenerAdapter {
                         return;
                     } catch (Exception e) {
                         DiscordCraft.discordLogException(e, Messages.getMessage("errors.command-error", "command_name", command.getName(), "member", event.getMember()));
-                        event.reply(Messages.getMessage(CommandManager.COMMAND_INTERNAL_ERROR)).setEphemeral(true).queue();
+                        event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_INTERNAL_ERROR)).setEphemeral(true).queue();
                     }
 
                     return;
                 } else {
                     // Command is disabled
-                    event.reply(Messages.getMessage(CommandManager.COMMAND_DISABLED)).setEphemeral(true).queue(); // Should never happen because the command should not be registered
+                    event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_DISABLED)).setEphemeral(true).queue(); // Should never happen because the command should not be registered
                     return;
                 }
             }
         }
 
         // Command not found
-        event.reply(Messages.getMessage(CommandManager.COMMAND_NOT_FOUND)).setEphemeral(true).queue(); // Should never happen because the command should not be registered
+        event.reply(Messages.getMessage(CommandManager.MSG_KEY_COMMAND_NOT_FOUND)).setEphemeral(true).queue(); // Should never happen because the command should not be registered
     }
 
     private void registerCommands(Guild guild) {

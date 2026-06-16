@@ -12,8 +12,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
-import com.pablobh.discordcraft.commands.discord.CommandManager;
 import com.pablobh.discordcraft.config.Configuration;
+import com.pablobh.discordcraft.discord.commands.CommandManager;
 import com.pablobh.discordcraft.listeners.DiscordChatListener;
 
 import net.dv8tion.jda.api.JDA;

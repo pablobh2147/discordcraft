@@ -1,4 +1,4 @@
-package com.pablobh.discordcraft.commands.discord;
+package com.pablobh.discordcraft.discord.commands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.pablobh.discordcraft.StringUtils;
+import com.pablobh.discordcraft.discord.DiscordCommand;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

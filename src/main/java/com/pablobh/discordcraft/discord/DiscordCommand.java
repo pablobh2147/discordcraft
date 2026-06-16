@@ -1,4 +1,4 @@
-package com.pablobh.discordcraft.commands.discord;
+package com.pablobh.discordcraft.discord;
 
 import java.util.ArrayList;
 import java.util.Collection;
