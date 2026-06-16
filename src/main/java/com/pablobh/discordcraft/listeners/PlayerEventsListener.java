@@ -1,5 +1,10 @@
 package com.pablobh.discordcraft.listeners;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import org.bukkit.advancement.Advancement;
+import org.bukkit.advancement.AdvancementDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,12 +13,16 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.discord.DiscordService;
 import com.pablobh.discordcraft.discord.LinkedChannel;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class PlayerEventsListener implements Listener {
 
@@ -36,7 +45,7 @@ public class PlayerEventsListener implements Listener {
 
         for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
             if (linkedChannel.canSendPlayerJoinMessages()) {
-                linkedChannel.getChannel().sendMessage(message).queue();
+                linkedChannel.sendMessage(message);
             }
         }
     }
@@ -47,7 +56,7 @@ public class PlayerEventsListener implements Listener {
 
         for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
             if (linkedChannel.canSendPlayerLeaveMessages()) {
-                linkedChannel.getChannel().sendMessage(message).queue();
+                linkedChannel.sendMessage(message);
             }
         }
     }
@@ -68,7 +77,7 @@ public class PlayerEventsListener implements Listener {
 
             for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
                 if (linkedChannel.canSendPlayerDeathMessages()) {
-                    linkedChannel.getChannel().sendMessage(finalMessage).queue();
+                    linkedChannel.sendMessage(finalMessage);
                 }
             }
         }
@@ -95,7 +104,7 @@ public class PlayerEventsListener implements Listener {
                     // Send a message to the linked channels
                     for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
                         if (linkedChannel.canSendPlayerMurderMessages()) {
-                            linkedChannel.getChannel().sendMessage(killMessage).queue();
+                            linkedChannel.sendMessage(killMessage);
                         }
                     }
                 }
@@ -117,6 +126,49 @@ public class PlayerEventsListener implements Listener {
                 damagedPlayer.setLastDamageCause(event);
             }
         }
+    }
+
+    private static final String ADVANCEMENT_API_ENDPOINT = "https://minecraft-api.com/api/achivements/{block}/{title}/{desc}";
+
+    private String getAdvancementDisplayURL(AdvancementDisplay display) {
+        String block = display.getIcon().getType().name().toLowerCase();
+        String title = "Advancement..Made";
+        String name = URLEncoder.encode(display.getTitle().replace(" ", ".."), StandardCharsets.UTF_8);
+
+        String url = ADVANCEMENT_API_ENDPOINT
+            .replace("{block}", block)
+            .replace("{title}", title)
+            .replace("{desc}", name);
+        
+        return url;
+    }
+
+    @EventHandler
+    public void onPlayerAdvancement(PlayerAdvancementDoneEvent event) {
+        Advancement advancement = event.getAdvancement();
+        AdvancementDisplay display = advancement.getDisplay();
+
+        // Skip hidden advancements (like recipe unlocks)
+        if (display == null) {
+            return;
+        }
+
+        String title = Messages.getMessage("player.achivement-unlock.title", "player", event.getPlayer(), "advancement_title", display.getTitle());
+        String description = Messages.getMessage("player.achivement-unlock.description", "player", event.getPlayer(), "advancement_title", display.getTitle(), "advancement_description", display.getDescription());
+        String attachmentUrl = getAdvancementDisplayURL(display);
+
+        for (LinkedChannel channel : discordService.getLinkedChannels()) {
+            if (channel.canSendPlayerAdvancementMessages()) {
+                TextChannel textChannel = channel.getChannel();
+
+                textChannel.sendMessage(title).addEmbeds(new EmbedBuilder()
+                    .setTitle(title)
+                    .setDescription(description)
+                    .setImage(attachmentUrl)
+                    .build()).queue();
+            }
+        }
+
     }
 
 }

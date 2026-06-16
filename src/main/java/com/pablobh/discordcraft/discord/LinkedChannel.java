@@ -28,6 +28,7 @@ public class LinkedChannel {
     public static final String PLAYER_LEAVE_MESSAGES = "player-leave-messages";
     public static final String PLAYER_DEATH_MESSAGES = "player-death-messages";
     public static final String PLAYER_MURDER_MENSAGES = "player-murder-messages";
+    public static final String PLAYER_ADVANCEMENT_MESSAGES = "player-advancement-messages";
 
     public static final String DISCORD_MESSAGES = "discord-messages";
     public static final String DISCORD_SYSTEM_MESSAGES = "discord-system-messages";
@@ -51,6 +52,7 @@ public class LinkedChannel {
     private boolean playerLeaveMessages;
     private boolean playerDeathMessages;
     private boolean playerMurderMessages;
+    private boolean playerAdvancementMessages;
 
     private boolean discordMessages;
     private boolean discordSystemMessages;
@@ -136,6 +138,7 @@ public class LinkedChannel {
         this.playerLeaveMessages = config.getBoolean(PLAYER_LEAVE_MESSAGES, defaultConfig.getBoolean(PLAYER_LEAVE_MESSAGES, true));
         this.playerDeathMessages = config.getBoolean(PLAYER_DEATH_MESSAGES, defaultConfig.getBoolean(PLAYER_DEATH_MESSAGES, true));
         this.playerMurderMessages = config.getBoolean(PLAYER_MURDER_MENSAGES, defaultConfig.getBoolean(PLAYER_MURDER_MENSAGES, true));
+        this.playerAdvancementMessages = config.getBoolean(PLAYER_ADVANCEMENT_MESSAGES, defaultConfig.getBoolean(PLAYER_ADVANCEMENT_MESSAGES, true));
         this.discordMessages = config.getBoolean(DISCORD_MESSAGES, defaultConfig.getBoolean(DISCORD_MESSAGES, true));
         this.discordSystemMessages = config.getBoolean(DISCORD_SYSTEM_MESSAGES, defaultConfig.getBoolean(DISCORD_SYSTEM_MESSAGES, true));
         this.serverStartMessages = config.getBoolean(SERVER_START, defaultConfig.getBoolean(SERVER_START, true));
@@ -162,6 +165,10 @@ public class LinkedChannel {
 
     public boolean canSendPlayerMurderMessages() {
         return playerMurderMessages;
+    }
+
+    public boolean canSendPlayerAdvancementMessages() {
+        return playerAdvancementMessages;
     }
 
     public boolean canSendDiscordMessages() {
@@ -205,6 +212,11 @@ public class LinkedChannel {
     public void setSendPlayerMurderMessages(boolean value) {
         playerMurderMessages = value;
         config.set(PLAYER_MURDER_MENSAGES, value);
+    }
+
+    public void setSendPlayerAdvancementMessages(boolean value) {
+        playerAdvancementMessages = value;
+        config.set(PLAYER_ADVANCEMENT_MESSAGES, value);
     }
 
     public void setSendDiscordMessages(boolean value) {

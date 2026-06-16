@@ -1,9 +1,9 @@
 chat:
-  minecraft-format: '[%guild% -> %channel%] &e<%username%> &f%message%&7%attachments%'
-  minecraft-edited-format: '[%guild% -> %channel%] &e<%username%> &f%message%&7%attachments% &8&l(Edited)'
-  attachment-spoiler: ' (spoiler)'
-  attachment-separator: ', '
-  discord-format: '**<%player_name%>:** %message%'
+  minecraft-format: "[%guild% -> %channel%] &e<%username%> &f%message%&7%attachments%"
+  minecraft-edited-format: "[%guild% -> %channel%] &e<%username%> &f%message%&7%attachments% &8&l(Edited)"
+  attachment-spoiler: " (spoiler)"
+  attachment-separator: ", "
+  discord-format: "**<%player_name%>:** %message%"
 
 commands:
   no-permission: "You don't have the required permissions to use this command!"
@@ -14,20 +14,23 @@ commands:
   invalid-subcommand: "Invalid subcommand. Use `/help` to see the available subcommands."
 
 player:
-  join: '**%player_name%** has joined the game 😁 🎉'
-  first-join: '**%player_name%** has joined the game for the first time! 🎉'
-  left: '**%player_name%** has left the game 😭'
-  death: 'Haha, %player_name% died because `%death_message%`'
-  murder: '**%killer_name%** has killed **%victim_name%** 😈'
+  join: "**%player_name%** has joined the game 😁 🎉"
+  first-join: "**%player_name%** has joined the game for the first time! 🎉"
+  left: "**%player_name%** has left the game 😭"
+  death: "Haha, %player_name% died because `%death_message%`"
+  murder: "**%killer_name%** has killed **%victim_name%** 😈"
+  achivement-unlock:
+    title: "%player_name% has unlocked a new achievement!"
+    description: ""
 
 custom-death-messages:
-  lava: '%death_message% 🔥🥵'
-  fire: '%death_message% 🔥🥵'
-  fall: '%death_message% 🪂✨'
-  void: '%death_message% 🌌🪂'
-  block_explosion: '%death_message% 💣✨'
-  entity_explosion: '%death_message% 💣✨'
-  drowning: '%death_message% 🌊'
+  lava: "%death_message% 🔥🥵"
+  fire: "%death_message% 🔥🥵"
+  fall: "%death_message% 🪂✨"
+  void: "%death_message% 🌌🪂"
+  block_explosion: "%death_message% 💣✨"
+  entity_explosion: "%death_message% 💣✨"
+  drowning: "%death_message% 🌊"
 
 server:
   start: |-
@@ -39,7 +42,7 @@ server:
     **Server IP:** `mc.yourserver.com`
 
     <@&your-role-id>
-  
+
   stop: |-
     🔴 **The server has SHUT DOWN!** 🔴
 
@@ -69,8 +72,8 @@ setup:
     - `messages.yml`
 
     ❔You can use `/help` to see the available commands.
-  
+
   already: |-
     ❌ The server has already been set up.
-    
+
     🗑️ If you want to reconfigure the bot, you have to manualy delete the `bot.yml` file and restart the server.
