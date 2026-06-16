@@ -19,12 +19,11 @@ public class AvatarProvider {
         switch (style) {
             case BODY:
                 return "3d/full";
-            case BUST:
-                return "3d/bust";
             case FACE:
                 return "2d/head";
+            case BUST:
             default:
-                throw new IllegalArgumentException("Invalid avatar style: " + style);
+                return "3d/bust";
         }
     }
    
