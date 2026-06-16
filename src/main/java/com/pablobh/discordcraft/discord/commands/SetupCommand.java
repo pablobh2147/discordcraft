@@ -1,12 +1,14 @@
 package com.pablobh.discordcraft.discord.commands;
 
 import org.bukkit.Bukkit;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.StringUtils;
 import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.discord.DiscordService;
 
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
@@ -18,10 +20,14 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class SetupCommand extends DiscordCommand {
 
+    private static final String COMMAND_NAME = "setup";
+    private static final String COMMAND_CONFIG_KEY = "setup";
+
     private final DiscordService discordService;
 
-    public SetupCommand(DiscordService discordService) {
-        super("setup", "This command is used for setting up the server and start configuration", "This command is used for setting up the server and start configuration", true, true);
+    public SetupCommand(@NonNull DiscordCommandManager manager, DiscordService discordService) {
+        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
+
         this.discordService = discordService;
 
         setGlobal(true);

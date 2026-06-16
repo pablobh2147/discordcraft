@@ -2,10 +2,12 @@ package com.pablobh.discordcraft.discord;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
+
+import javax.annotation.Nullable;
 
 import org.bukkit.configuration.ConfigurationSection;
-
-import com.pablobh.discordcraft.DiscordCraft;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -40,40 +42,17 @@ public abstract class DiscordCommand {
 
     // Constructors
 
-    public DiscordCommand(String configName) {
+    public DiscordCommand(@NonNull String name, @Nullable ConfigurationSection config) {
+        Objects.requireNonNull(name, "Command name cannot be null");
 
-        // Initialize the configuration
-
-        config = DiscordCraft.instance().getDiscordCommandsConfiguration().getSection("commands." + configName);
-
-        if (config == null) {
-            throw new IllegalArgumentException("Configuration section not found for command: " + configName);
-        }
-
-        // Load the configuration
+        this.config = config;
+        this.name = name;
 
         enabled = getConfig().getBoolean("enabled", true);
-
-        name = getConfig().getString("command", configName.replaceAll("[^A-Za-z0-9 -]", "").toLowerCase());
         description = getConfig().getString("description", null);
         help = getConfig().getString("help", null);
 
         isAdministratorOnly = getConfig().getBoolean("admin-only", false);
-
-    }
-
-    public DiscordCommand(String name, String description, String help, boolean enabled, boolean isAdministratorOnly) {
-
-        this.config = null;
-
-        this.enabled = enabled;
-
-        this.name = name;
-        this.description = description;
-        this.help = help;
-
-        this.isAdministratorOnly = isAdministratorOnly;
-
     }
 
     // Configuration methods

@@ -6,17 +6,22 @@ import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.profile.PlayerProfile;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 public class BanCommand extends DiscordCommand {
 
-    public BanCommand() {
-        super("ban");
+    private static final String COMMAND_NAME = "ban";
+    private static final String COMMAND_CONFIG_KEY = "ban";
+
+    public BanCommand(@NonNull DiscordCommandManager manager) {
+        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
 
         addOption(OptionType.STRING, "player", "The player to ban", true);
         addOption(OptionType.STRING, "reason", "The reason for the ban", false);

@@ -1,5 +1,7 @@
 package com.pablobh.discordcraft.discord.commands;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
@@ -15,10 +17,14 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class ChannelLinkCommand extends DiscordCommand {
 
+    private static final String COMMAND_NAME = "link";
+    private static final String COMMAND_CONFIG_KEY = "channel-link";
+
     private final DiscordService discordService;
 
-    public ChannelLinkCommand(DiscordService discordService) {
-        super("channel-link");
+    public ChannelLinkCommand(@NonNull DiscordCommandManager manager, DiscordService discordService) {
+        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
+
         this.discordService = discordService;
 
         // Subcommand "add"
@@ -124,7 +130,7 @@ public class ChannelLinkCommand extends DiscordCommand {
             return;
         }
 
-        if (!discordService.isLinkedChannel(channel)) {
+        if (!discordService.isChannelLinked(channel)) {
 
             String channelNotWasLinkedMessage = "The channel was not linked!";
 

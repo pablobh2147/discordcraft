@@ -3,6 +3,7 @@ package com.pablobh.discordcraft;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
+import javax.security.auth.login.LoginException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,6 +19,8 @@ import com.pablobh.discordcraft.listeners.PlayerEventsListener;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class DiscordCraft extends JavaPlugin {
+
+    private static final String TOKEN_ENV_VAR_NAME = "DISCORDCRAFT_BOT_TOKEN";
     
     // Instance
 
@@ -46,8 +49,7 @@ public class DiscordCraft extends JavaPlugin {
 
         Messages.setup(messagesConfig);
 
-        discordService = new DiscordService();
-        if (!discordService.setup(botConfig)) {
+        if (!initializeDiscordService()) {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -76,6 +78,34 @@ public class DiscordCraft extends JavaPlugin {
 
         instance = null;
         enabled = false;
+    }
+
+    private boolean initializeDiscordService() {
+        String token = botConfig.getString("token", null);
+        if (token == null || token.isEmpty()) {
+            try {
+                token = System.getenv(TOKEN_ENV_VAR_NAME);
+                DiscordCraft.logInfo("Using bot token from environment variables.");
+            } catch (SecurityException e) {
+                DiscordCraft.logSevere("Security exception while reading " + TOKEN_ENV_VAR_NAME + " from environment variables.");
+            }
+        } else {
+            DiscordCraft.logInfo("Using bot token from config.");
+        }
+
+        if (token == null || token.isEmpty()) {
+            DiscordCraft.logSevere("Bot token is not set in bot.yml nor in environment variables. Please set it and restart the server.");
+            return false;
+        }
+
+        try {
+            discordService = new DiscordService(token, botConfig, discordCommandsConfig);
+        } catch (LoginException e) {
+            DiscordCraft.logSevere("Failed to initialize Discord service: " + e.getMessage());
+            return false;
+        }
+
+        return true;
     }
 
     public void saveAllConfigurations() {

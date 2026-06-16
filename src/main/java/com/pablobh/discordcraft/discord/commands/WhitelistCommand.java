@@ -2,6 +2,7 @@ package com.pablobh.discordcraft.discord.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.discord.DiscordCommand;
@@ -12,8 +13,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 public class WhitelistCommand extends DiscordCommand {
 
-    public WhitelistCommand() {
-        super("whitelist");
+    private static final String COMMAND_NAME = "whitelist";
+    private static final String COMMAND_CONFIG_KEY = "whitelist";
+
+    public WhitelistCommand(@NonNull DiscordCommandManager manager) {
+        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
 
         boolean allowToggleWhitelist = getConfig().getBoolean("allow-toggle-whitelist", true);
         boolean allowModifyWhitelist = getConfig().getBoolean("allow-modify-whitelist", true);

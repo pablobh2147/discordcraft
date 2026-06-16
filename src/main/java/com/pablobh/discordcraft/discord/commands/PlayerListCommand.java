@@ -7,15 +7,20 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.StringUtils;
 import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class PlayerListCommand extends DiscordCommand {
+
+    private static final String COMMAND_NAME = "playerlist";
+    private static final String COMMAND_CONFIG_KEY = "playerlist";
 
     private static class PlayerListData {
 
@@ -44,8 +49,8 @@ public class PlayerListCommand extends DiscordCommand {
 
     }
 
-    public PlayerListCommand() {
-        super("playerlist");
+    public PlayerListCommand(@NonNull DiscordCommandManager manager) {
+        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
 
         PlayerListData online = new PlayerListData(getConfig().getConfigurationSection("lists.online"), "online");
         PlayerListData whitelisted = new PlayerListData(getConfig().getConfigurationSection("lists.whitelisted"), "whitelisted");

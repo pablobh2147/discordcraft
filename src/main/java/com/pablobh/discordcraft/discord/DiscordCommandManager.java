@@ -6,10 +6,12 @@ import java.util.Objects;
 
 import javax.annotation.Nullable;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.Messages;
+import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.discord.commands.BanCommand;
 import com.pablobh.discordcraft.discord.commands.ChannelLinkCommand;
 import com.pablobh.discordcraft.discord.commands.ConfigCommand;
@@ -43,21 +45,24 @@ public class DiscordCommandManager extends ListenerAdapter {
     
 
     private List<DiscordCommand> commands = new ArrayList<>();
+
     private final DiscordService discordService;
+    private final Configuration config;
 
-    public DiscordCommandManager(DiscordService discordService) {
+    public DiscordCommandManager(DiscordService discordService, Configuration config) {
         this.discordService = discordService;
-
+        this.config = config;
+        
         try {
-            registerCommand(new SetupCommand(discordService));
+            registerCommand(new SetupCommand(this, discordService));
             registerCommand(new HelpCommand(this));
-            registerCommand(new PlayerListCommand());
-            registerCommand(new StopServerCommand());
-            registerCommand(new BanCommand());
-            registerCommand(new PardonCommand());
-            registerCommand(new WhitelistCommand());
-            registerCommand(new ChannelLinkCommand(discordService));
-            registerCommand(new ConfigCommand());
+            registerCommand(new PlayerListCommand(this));
+            registerCommand(new StopServerCommand(this));
+            registerCommand(new BanCommand(this));
+            registerCommand(new PardonCommand(this));
+            registerCommand(new WhitelistCommand(this));
+            registerCommand(new ChannelLinkCommand(this, discordService));
+            registerCommand(new ConfigCommand(this));
         } catch (Exception e) {
             DiscordCraft.logException(e, Messages.getMessage("errors.command-registration-error"));
         }
@@ -175,6 +180,18 @@ public class DiscordCommandManager extends ListenerAdapter {
         }
 
         return null;
+    }
+
+    public ConfigurationSection getCommandConfig(String name) {
+        String path = "commands." + name;
+
+        ConfigurationSection section = config.getSection(path);
+        if (section == null) {
+            config.createSection(path);
+            section = config.getSection(path);
+        }
+
+        return section;
     }
 
 }

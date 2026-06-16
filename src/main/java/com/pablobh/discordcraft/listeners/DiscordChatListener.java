@@ -77,7 +77,6 @@ public class DiscordChatListener extends ListenerAdapter {
         }
 
         // Normal message broadcast
-
         String messageWithoutAttachments = Messages.applyMinecraftColorFormatting(Messages.getMessage(
                 edited ? "chat.minecraft-edited-format" : "chat.minecraft-format",
                 "username", author.getEffectiveName(),

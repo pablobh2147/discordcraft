@@ -1,5 +1,7 @@
 package com.pablobh.discordcraft.discord.commands;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
 
@@ -7,10 +9,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 public class HelpCommand extends DiscordCommand {
 
+    private static final String COMMAND_NAME = "help";
+    private static final String COMMAND_CONFIG_KEY = "help";
+
     private DiscordCommandManager commandManager;
 
-    public HelpCommand(DiscordCommandManager commandManager) {
-        super("help");
+    public HelpCommand(@NonNull DiscordCommandManager commandManager) {
+        super(COMMAND_NAME, commandManager.getCommandConfig(COMMAND_CONFIG_KEY));
+        
         this.commandManager = commandManager;
     }
 

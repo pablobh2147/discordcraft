@@ -1,5 +1,7 @@
 package com.pablobh.discordcraft.discord.commands;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.discord.DiscordCommand;
@@ -9,8 +11,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 public class ConfigCommand extends DiscordCommand {
 
-    public ConfigCommand() {
-        super("configuration");
+    private static final String COMMAND_NAME = "configuration";
+    private static final String COMMAND_CONFIG_KEY = "configuration";
+
+    public ConfigCommand(@NonNull DiscordCommandManager manager) {
+        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
 
         addSubcommand("reload", "Reloads the plugin configuration");
     }

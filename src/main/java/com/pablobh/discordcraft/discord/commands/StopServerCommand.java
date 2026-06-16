@@ -2,9 +2,11 @@ package com.pablobh.discordcraft.discord.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -12,11 +14,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 public class StopServerCommand extends DiscordCommand {
 
+    private static final String COMMAND_NAME = "stop";
+    private static final String COMMAND_CONFIG_KEY = "stop-server";
+
     public static final int MINIMUM_DELAY = 5;
     public static final int MAXIMUM_DELAY = 60 * 10; // 10 minutes
 
-    public StopServerCommand() {
-        super("stop-server");
+    public StopServerCommand(@NonNull DiscordCommandManager manager) {
+        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
 
         addOption(OptionType.INTEGER, "delay", "Delay in seconds", false)
         .setMinValue(MINIMUM_DELAY)
