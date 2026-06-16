@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -42,7 +42,7 @@ public abstract class DiscordCommand {
 
     // Constructors
 
-    public DiscordCommand(@NonNull String name, @Nullable ConfigurationSection config) {
+    public DiscordCommand(@Nonnull String name, @Nullable ConfigurationSection config) {
         Objects.requireNonNull(name, "Command name cannot be null");
 
         this.config = config;

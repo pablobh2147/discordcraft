@@ -2,11 +2,12 @@ package com.pablobh.discordcraft.discord.commands;
 
 import java.time.Instant;
 
+import javax.annotation.Nonnull;
+
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.profile.PlayerProfile;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.discord.DiscordCommand;
@@ -20,7 +21,7 @@ public class BanCommand extends DiscordCommand {
     private static final String COMMAND_NAME = "ban";
     private static final String COMMAND_CONFIG_KEY = "ban";
 
-    public BanCommand(@NonNull DiscordCommandManager manager) {
+    public BanCommand(@Nonnull DiscordCommandManager manager) {
         super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
 
         addOption(OptionType.STRING, "player", "The player to ban", true);

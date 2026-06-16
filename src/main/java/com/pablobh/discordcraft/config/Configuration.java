@@ -15,7 +15,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
-import com.pablobh.discordcraft.Messages;
 
 public class Configuration {
 
@@ -62,7 +61,7 @@ public class Configuration {
         try {
             configObj.save(configFile);
         } catch (IOException e) {
-            DiscordCraft.logException(e, Messages.getMessage("errors.config-save-error"));
+            DiscordCraft.logException(e, "An error occurred while saving the configuration file.");
         }
     }
 

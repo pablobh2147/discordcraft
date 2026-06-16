@@ -1,15 +1,16 @@
 package com.pablobh.discordcraft.discord.commands;
 
+import javax.annotation.Nonnull;
+
 import org.bukkit.Bukkit;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
-import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.StringUtils;
 import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.discord.DiscordService;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -24,11 +25,13 @@ public class SetupCommand extends DiscordCommand {
     private static final String COMMAND_CONFIG_KEY = "setup";
 
     private final DiscordService discordService;
+    private final MessageService messageService;
 
-    public SetupCommand(@NonNull DiscordCommandManager manager, DiscordService discordService) {
+    public SetupCommand(@Nonnull DiscordCommandManager manager, @Nonnull DiscordService discordService, @Nonnull MessageService messageService) {
         super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
 
         this.discordService = discordService;
+        this.messageService = messageService;
 
         setGlobal(true);
 
@@ -55,7 +58,7 @@ public class SetupCommand extends DiscordCommand {
     public void onCommandInteraction(SlashCommandInteractionEvent event) {
         
         if (discordService.getMainGuild() != null) {
-            event.reply(Messages.getMessage("setup.already")).setEphemeral(true).queue();
+            event.reply(messageService.getDiscordMessage("setup.already").toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
@@ -93,7 +96,8 @@ public class SetupCommand extends DiscordCommand {
 
         botConfig.save();
 
-        event.reply(Messages.getMessage("setup.complete")).setEphemeral(true).queue();
+        
+        event.reply(messageService.getDiscordMessage("setup.complete").toDiscordMessage()).setEphemeral(true).queue();
 
         Bukkit.getScheduler().runTaskLater(DiscordCraft.instance(), () -> Bukkit.shutdown(), 3 * 20); // 3 seconds delay to stop the server, because the bot needs to send the message
     }

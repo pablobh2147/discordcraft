@@ -1,6 +1,6 @@
 package com.pablobh.discordcraft.discord.commands;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import javax.annotation.Nonnull;
 
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
@@ -14,7 +14,7 @@ public class HelpCommand extends DiscordCommand {
 
     private DiscordCommandManager commandManager;
 
-    public HelpCommand(@NonNull DiscordCommandManager commandManager) {
+    public HelpCommand(@Nonnull DiscordCommandManager commandManager) {
         super(COMMAND_NAME, commandManager.getCommandConfig(COMMAND_CONFIG_KEY));
         
         this.commandManager = commandManager;

@@ -1,12 +1,12 @@
 package com.pablobh.discordcraft.discord.commands;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import javax.annotation.Nonnull;
 
-import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.discord.DiscordService;
 import com.pablobh.discordcraft.discord.LinkedChannel;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -21,11 +21,13 @@ public class ChannelLinkCommand extends DiscordCommand {
     private static final String COMMAND_CONFIG_KEY = "channel-link";
 
     private final DiscordService discordService;
+    private final MessageService messageService;
 
-    public ChannelLinkCommand(@NonNull DiscordCommandManager manager, DiscordService discordService) {
+    public ChannelLinkCommand(@Nonnull DiscordCommandManager manager, DiscordService discordService, MessageService messageService) {
         super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
 
         this.discordService = discordService;
+        this.messageService = messageService;
 
         // Subcommand "add"
         {
@@ -93,7 +95,7 @@ public class ChannelLinkCommand extends DiscordCommand {
                 subcommandConfig(event);
                 break;
             default:
-                event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_INVALID_SUBCOMMAND)).setEphemeral(true).queue(); // Should never happen
+                event.reply(messageService.getDiscordMessage("commands.invalid-subcommand").toDiscordMessage()).setEphemeral(true).queue(); // Should never happen
                 break;
         }
     }

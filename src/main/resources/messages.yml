@@ -3,7 +3,6 @@ chat:
   minecraft-edited-format: "[%guild% -> %channel%] &e<%username%> &f%message%&7%attachments% &8&l(Edited)"
   attachment-spoiler: " (spoiler)"
   attachment-separator: ", "
-  discord-format: "**<%player_name%>:** %message%"
 
 commands:
   no-permission: "You don't have the required permissions to use this command!"
@@ -14,44 +13,79 @@ commands:
   invalid-subcommand: "Invalid subcommand. Use `/help` to see the available subcommands."
 
 player:
-  join: "**%player_name%** has joined the game 😁 🎉"
-  first-join: "**%player_name%** has joined the game for the first time! 🎉"
-  left: "**%player_name%** has left the game 😭"
-  death: "Haha, %player_name% died because `%death_message%`"
-  murder: "**%killer_name%** has killed **%victim_name%** 😈"
+  join:
+    embed:
+      title: "Player Joined"
+      description: "**%player_name%** has joined the game!"
+      color: "#2ECC71"
+      thumbnail: "https://mc-heads.net/avatar/%player_name%/64"
+
+  welcome:
+    embed:
+      title: "Welcome!"
+      description: "**%player_name%** has joined the server for the first time! 🎉"
+      color: "#F1C40F"
+      thumbnail: "https://mc-heads.net/avatar/%player_name%/64"
+
+  left:
+    embed:
+      title: "Player Left"
+      description: "**%player_name%** has left the game."
+      color: "#E74C3C"
+      thumbnail: "https://mc-heads.net/avatar/%player_name%/64"
+
+  death:
+    embed:
+      description: "%death_message%"
+      color: "#8B0000"
+      thumbnail: "https://mc-heads.net/avatar/%player_name%/64"
+
+  murder:
+    embed:
+      title: "Player Killed"
+      description: "**%killer_name%** killed **%victim_name%** ⚔️"
+      color: "#8B0000"
+      thumbnail: "https://mc-heads.net/avatar/%killer_name%/64"
+
   achivement-unlock:
-    title: "%player_name% has unlocked a new achievement!"
-    description: ""
+    embed:
+      title: "%advancement_type%: %advancement_title%"
+      description: "%advancement_description%"
+      color: "#9B59B6"
+      thumbnail: "https://mc-heads.net/avatar/%player_name%/64"
+      image: "%display_url%"
+      footer:
+        text: "Unlocked by %player_name%"
 
 custom-death-messages:
-  lava: "%death_message% 🔥🥵"
-  fire: "%death_message% 🔥🥵"
-  fall: "%death_message% 🪂✨"
-  void: "%death_message% 🌌🪂"
-  block_explosion: "%death_message% 💣✨"
-  entity_explosion: "%death_message% 💣✨"
+  lava: "%death_message% 🔥"
+  fire: "%death_message% 🔥"
+  fall: "%death_message% 🪂"
+  void: "%death_message% 🌌"
+  block_explosion: "%death_message% 💣"
+  entity_explosion: "%death_message% 💣"
   drowning: "%death_message% 🌊"
 
 server:
-  start: |-
-    🟢 **The server has STARTED!** 🟢
+  start:
+    embed:
+      title: "Server Online"
+      description: "The server is now online! Gather your friends, start building epic structures, and embark on new adventures. ⛏️"
+      color: "#2ECC71"
+      fields:
+        - name: "Server IP"
+          value: "`mc.yourserver.com`"
+          inline: true
 
-    ⚔️ The server is now online. Gather your friends, start building epic structures, and embark on new adventures. ⛏️
-    Happy Crafting!
-
-    **Server IP:** `mc.yourserver.com`
-
-    <@&your-role-id>
-
-  stop: |-
-    🔴 **The server has SHUT DOWN!** 🔴
-
-    ⚔️ The server is now offline. Time to rest, plan new builds, and prepare for future adventures. ⛏️
-    Thank you for playing!
-
-    **Server IP:** `mc.yourserver.com`
-
-    <@&your-role-id>
+  stop:
+    embed:
+      title: "Server Offline"
+      description: "The server has shut down. Time to rest, plan new builds, and prepare for future adventures. Thank you for playing! 🛏️"
+      color: "#E74C3C"
+      fields:
+        - name: "Server IP"
+          value: "`mc.yourserver.com`"
+          inline: true
 
 errors:
   command-error: "An error occurred while executing command: %command_name% by %member_mention%"
@@ -59,21 +93,28 @@ errors:
   config-save-error: "There was an error while saving the config"
 
 setup:
-  complete: |-
-    ✅ **Server Setup Complete!** ✅
+  complete:
+    embed:
+      title: "Setup Complete"
+      description: "The server has been configured successfully! A restart will be performed to apply the changes."
+      color: "#2ECC71"
+      fields:
+        - name: "Configuration Files"
+          value: "`config.yml` — General settings\n`discord-commands.yml` — Command configuration"
+          inline: false
+        - name: "Messages"
+          value: "`messages.yml` — Customize Discord messages"
+          inline: false
+        - name: "Help"
+          value: "Use `/help` to see the available commands."
+          inline: false
 
-    🔄 The Minecraft server is going to be restarted to apply the changes.
-
-    ⚙️ For further configuration, you can edit:
-    - `config.yml`
-    - `discord-commands.yml`
-
-    💬 You can modify the messages shown in Discord in:
-    - `messages.yml`
-
-    ❔You can use `/help` to see the available commands.
-
-  already: |-
-    ❌ The server has already been set up.
-
-    🗑️ If you want to reconfigure the bot, you have to manualy delete the `bot.yml` file and restart the server.
+  already:
+    embed:
+      title: "Already Configured"
+      description: "The server has already been set up."
+      color: "#E74C3C"
+      fields:
+        - name: "Reconfigure"
+          value: "Delete the `bot.yml` file and restart the server to reconfigure."
+          inline: false

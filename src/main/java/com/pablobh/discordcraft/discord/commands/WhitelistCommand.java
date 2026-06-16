@@ -1,12 +1,13 @@
 package com.pablobh.discordcraft.discord.commands;
 
+import javax.annotation.Nonnull;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
-import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -16,8 +17,12 @@ public class WhitelistCommand extends DiscordCommand {
     private static final String COMMAND_NAME = "whitelist";
     private static final String COMMAND_CONFIG_KEY = "whitelist";
 
-    public WhitelistCommand(@NonNull DiscordCommandManager manager) {
+    private final MessageService messageService;
+
+    public WhitelistCommand(@Nonnull DiscordCommandManager manager, MessageService messageService) {
         super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
+
+        this.messageService = messageService;
 
         boolean allowToggleWhitelist = getConfig().getBoolean("allow-toggle-whitelist", true);
         boolean allowModifyWhitelist = getConfig().getBoolean("allow-modify-whitelist", true);
@@ -56,7 +61,7 @@ public class WhitelistCommand extends DiscordCommand {
                 subcommandRemove(event, isEphemeral);
                 break;
             default:
-                event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_INVALID_SUBCOMMAND)).setEphemeral(true).queue(); // Should never happen
+                event.reply(messageService.getDiscordMessage("commands.invalid-subcommand").toDiscordMessage()).setEphemeral(true).queue(); // Should never happen
                 break;
         }
     }

@@ -4,9 +4,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.bukkit.configuration.ConfigurationSection;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.pablobh.discordcraft.message.Message;
 
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import club.minnced.discord.webhook.send.AllowedMentions;
@@ -60,18 +63,18 @@ public class LinkedChannel {
     private boolean serverStartMessages;
     private boolean serverStopMessages;
 
-    public LinkedChannel(@NonNull ConfigurationSection config, @NonNull ConfigurationSection defaultConfig, @NonNull TextChannel channel) {
+    public LinkedChannel(@Nonnull ConfigurationSection config, @Nonnull ConfigurationSection defaultConfig, @Nonnull TextChannel channel) {
         setConfiguration(config, defaultConfig);
         setChannel(channel);
     }
 
     // --------------------- Methods ---------------------
 
-    public void sendMessage(@Nullable String username, @Nullable URL avatarUrl, @NonNull String message) {
+    public void sendMessage(@Nullable String username, @Nullable URL avatarUrl, @Nonnull String message) {
         sendMessage(username, avatarUrl, message, AllowedMentions.none());
     }
 
-    public void sendMessage(@Nullable String username, @Nullable URL avatarUrl, @NonNull String message, @NonNull AllowedMentions mentions) {
+    public void sendMessage(@Nullable String username, @Nullable URL avatarUrl, @Nonnull String message, @Nonnull AllowedMentions mentions) {
         Objects.requireNonNull(message, "Message cannot be null");
         Objects.requireNonNull(mentions, "Mentions cannot be null");
 
@@ -88,17 +91,21 @@ public class LinkedChannel {
 
     }
 
-    public void sendMessage(@NonNull String message) {
-        Objects.requireNonNull(message, "Message cannot be null");
+    public void sendMessage(@javax.annotation.Nullable String message) {
+        if (message != null && !message.isEmpty()) {
+            channel.sendMessage(message).queue();
+        }
+    }
 
-        channel.sendMessage(message).queue();
+    public void sendMessage(@Nonnull Message message) {
+        channel.sendMessage(message.toDiscordMessage()).queue();
     }
 
     public TextChannel getChannel() {
         return channel;
     }
 
-    private void setChannel(@NonNull TextChannel channel) {
+    private void setChannel(@Nonnull TextChannel channel) {
         Objects.requireNonNull(channel, "Channel cannot be null");
 
         this.channel = channel;

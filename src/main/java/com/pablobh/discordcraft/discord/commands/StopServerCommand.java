@@ -1,8 +1,9 @@
 package com.pablobh.discordcraft.discord.commands;
 
+import javax.annotation.Nonnull;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.discord.DiscordCommand;
@@ -20,7 +21,7 @@ public class StopServerCommand extends DiscordCommand {
     public static final int MINIMUM_DELAY = 5;
     public static final int MAXIMUM_DELAY = 60 * 10; // 10 minutes
 
-    public StopServerCommand(@NonNull DiscordCommandManager manager) {
+    public StopServerCommand(@Nonnull DiscordCommandManager manager) {
         super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
 
         addOption(OptionType.INTEGER, "delay", "Delay in seconds", false)

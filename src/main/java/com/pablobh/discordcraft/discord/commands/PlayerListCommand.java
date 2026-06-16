@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.StringUtils;
 import com.pablobh.discordcraft.discord.DiscordCommand;
@@ -49,7 +50,7 @@ public class PlayerListCommand extends DiscordCommand {
 
     }
 
-    public PlayerListCommand(@NonNull DiscordCommandManager manager) {
+    public PlayerListCommand(@Nonnull DiscordCommandManager manager) {
         super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
 
         PlayerListData online = new PlayerListData(getConfig().getConfigurationSection("lists.online"), "online");

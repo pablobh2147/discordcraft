@@ -9,11 +9,11 @@ import javax.security.auth.login.LoginException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.listeners.DiscordChatListener;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -50,10 +50,12 @@ public class DiscordService {
 
     private Configuration botConfig;
     private Configuration commandConfig;
+    private MessageService messageService;
 
-    public DiscordService(@NonNull String token, @NonNull Configuration botConfig, @NonNull Configuration commandConfig) throws LoginException {
+    public DiscordService(@Nonnull String token, @Nonnull Configuration botConfig, @Nonnull Configuration commandConfig, @Nonnull MessageService messageService) throws LoginException {
         this.botConfig = botConfig;
         this.commandConfig = commandConfig;
+        this.messageService = messageService;
 
         boolean jdaLoaded = setupJDA(token);
         if (!jdaLoaded) {
@@ -82,8 +84,8 @@ public class DiscordService {
             configureMemoryUsage(builder);
             configureActivity(builder);
 
-            builder.addEventListeners(new DiscordChatListener(this));
-            builder.addEventListeners(new DiscordCommandManager(this, commandConfig));
+            builder.addEventListeners(new DiscordChatListener(this, messageService));
+            builder.addEventListeners(new DiscordCommandManager(this, messageService, commandConfig));
 
             jda = builder.build();
             if (jda == null) {
@@ -256,7 +258,7 @@ public class DiscordService {
         return LinkedChannel.CHANNEL_LIST + ".c" + channelId;
     }
 
-    public LinkedChannel createChannelLink(@NonNull TextChannel textChannel) {
+    public LinkedChannel createChannelLink(@Nonnull TextChannel textChannel) {
         Objects.requireNonNull(textChannel, "TextChannel cannot be null");
         
         ConfigurationSection defaultConfig = DiscordCraft.instance().getGlobalConfiguration().getSection(LinkedChannel.DEFAULT_OPTIONS);
@@ -276,7 +278,7 @@ public class DiscordService {
         removeChannelLink(channel);
     }
 
-    public void removeChannelLink(@NonNull LinkedChannel channel) {
+    public void removeChannelLink(@Nonnull LinkedChannel channel) {
         Objects.requireNonNull(channel, "LinkedChannel cannot be null");
 
         botConfig.set(getChannelConfigPath(channel.getChannel().getIdLong()), null);
@@ -314,7 +316,7 @@ public class DiscordService {
         return list;
     }
 
-    private LinkedChannel loadChannelLinkFromConfig(@NonNull ConfigurationSection channelConfig) {
+    private LinkedChannel loadChannelLinkFromConfig(@Nonnull ConfigurationSection channelConfig) {
         Objects.requireNonNull(channelConfig, "Config cannot be null");
 
         long channelId = channelConfig.getLong(LinkedChannel.CHANNEL_ID, 0);

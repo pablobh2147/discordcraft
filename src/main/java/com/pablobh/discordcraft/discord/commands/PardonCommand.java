@@ -1,10 +1,11 @@
 package com.pablobh.discordcraft.discord.commands;
 
+import javax.annotation.Nonnull;
+
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.profile.PlayerProfile;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.discord.DiscordCommand;
@@ -18,7 +19,7 @@ public class PardonCommand extends DiscordCommand {
     private static final String COMMAND_NAME = "pardon";
     private static final String COMMAND_CONFIG_KEY = "pardon";
 
-    public PardonCommand(@NonNull DiscordCommandManager manager) {
+    public PardonCommand(@Nonnull DiscordCommandManager manager) {
         super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
 
         addOption(OptionType.STRING, "player", "The player to pardon", true);

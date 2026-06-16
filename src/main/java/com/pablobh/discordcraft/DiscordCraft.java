@@ -15,26 +15,24 @@ import com.pablobh.discordcraft.discord.DiscordService;
 import com.pablobh.discordcraft.discord.LinkedChannel;
 import com.pablobh.discordcraft.listeners.MinecraftChatListener;
 import com.pablobh.discordcraft.listeners.PlayerEventsListener;
+import com.pablobh.discordcraft.message.Message;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class DiscordCraft extends JavaPlugin {
 
     private static final String TOKEN_ENV_VAR_NAME = "DISCORDCRAFT_BOT_TOKEN";
-    
-    // Instance
 
     private static DiscordCraft instance;
     
-    // Configurations
-    
+    private GlobalConfiguration globalConfiguration;
     private Configuration messagesConfig;
     private Configuration botConfig;
     private Configuration discordCommandsConfig;
 
-    private GlobalConfiguration globalConfiguration;
-
     private DiscordService discordService;
+    private MessageService messageService;
 
     private boolean enabled = false;
 
@@ -47,7 +45,7 @@ public class DiscordCraft extends JavaPlugin {
         botConfig = new Configuration(this, "bot.yml");
         discordCommandsConfig = new Configuration(this, "discord-commands.yml");
 
-        Messages.setup(messagesConfig);
+        messageService = new MessageService(messagesConfig);
 
         if (!initializeDiscordService()) {
             Bukkit.getPluginManager().disablePlugin(this);
@@ -99,7 +97,7 @@ public class DiscordCraft extends JavaPlugin {
         }
 
         try {
-            discordService = new DiscordService(token, botConfig, discordCommandsConfig);
+            discordService = new DiscordService(token, botConfig, discordCommandsConfig, messageService);
         } catch (LoginException e) {
             DiscordCraft.logSevere("Failed to initialize Discord service: " + e.getMessage());
             return false;
@@ -117,6 +115,9 @@ public class DiscordCraft extends JavaPlugin {
 
     public void reloadConfig() {
         globalConfiguration.load();
+        messagesConfig.load();
+        botConfig.load();
+        discordCommandsConfig.load();
         DiscordCraft.logInfo("Configuration reloaded.");
     }
 
@@ -136,28 +137,24 @@ public class DiscordCraft extends JavaPlugin {
         return discordCommandsConfig;
     }
 
-    public DiscordService getDiscordService() {
-        return discordService;
-    }
-
     // Notifications
 
     private void serverStartMessages() {
-        String message = Messages.getMessage("server.start");
-
-        for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
-            if (linkedChannel.canSendServerStartMessages()) {
-                linkedChannel.sendMessage(message);
+        Message msg = messageService.getDiscordMessage("server.start");
+        
+        for (LinkedChannel channel : discordService.getLinkedChannels()) {
+            if (channel.canSendServerStartMessages()) {
+                channel.sendMessage(msg);
             }
         }
     }
 
     private void serverStopMessages() {
-        String message = Messages.getMessage("server.stop");
+        Message msg = messageService.getDiscordMessage("server.stop");
 
-        for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
-            if (linkedChannel.canSendServerStopMessages()) {
-                linkedChannel.sendMessage(message);
+        for (LinkedChannel channel : discordService.getLinkedChannels()) {
+            if (channel.canSendServerStopMessages()) {
+                channel.sendMessage(msg);
             }
         }
     }
@@ -170,9 +167,9 @@ public class DiscordCraft extends JavaPlugin {
 
     // Listeners
 
-    public void registerSpigotListeners() {
+    private void registerSpigotListeners() {
         Bukkit.getPluginManager().registerEvents(new MinecraftChatListener(globalConfiguration, discordService), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerEventsListener(discordService), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerEventsListener(discordService, messageService), this);
     }
 
     // Logging

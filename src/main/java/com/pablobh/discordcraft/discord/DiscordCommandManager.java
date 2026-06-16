@@ -10,7 +10,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
-import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.discord.commands.BanCommand;
 import com.pablobh.discordcraft.discord.commands.ChannelLinkCommand;
@@ -21,6 +20,7 @@ import com.pablobh.discordcraft.discord.commands.PlayerListCommand;
 import com.pablobh.discordcraft.discord.commands.SetupCommand;
 import com.pablobh.discordcraft.discord.commands.StopServerCommand;
 import com.pablobh.discordcraft.discord.commands.WhitelistCommand;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -33,38 +33,32 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 public class DiscordCommandManager extends ListenerAdapter {
-
-    // Message keys
-
-    public static final String MSG_KEY_COMMAND_MAIN_GUILD_ONLY = "commands.main-guild-only";
-    public static final String MSG_KEY_COMMAND_NO_PERMISSION = "commands.no-permission";
-    public static final String MSG_KEY_COMMAND_INTERNAL_ERROR = "commands.internal-error";
-    public static final String MSG_KEY_COMMAND_DISABLED = "commands.disabled";
-    public static final String MSG_KEY_COMMAND_NOT_FOUND = "commands.not-found";
-    public static final String MSG_KEY_COMMAND_INVALID_SUBCOMMAND = "commands.invalid-subcommand";
     
-
     private List<DiscordCommand> commands = new ArrayList<>();
 
-    private final DiscordService discordService;
     private final Configuration config;
+    
+    private final DiscordService discordService;
+    private final MessageService messageService;
 
-    public DiscordCommandManager(DiscordService discordService, Configuration config) {
-        this.discordService = discordService;
+    public DiscordCommandManager(DiscordService discordService, MessageService messageService, Configuration config) {
         this.config = config;
+
+        this.discordService = discordService;
+        this.messageService = messageService;
         
         try {
-            registerCommand(new SetupCommand(this, discordService));
+            registerCommand(new SetupCommand(this, discordService, messageService));
             registerCommand(new HelpCommand(this));
             registerCommand(new PlayerListCommand(this));
             registerCommand(new StopServerCommand(this));
             registerCommand(new BanCommand(this));
             registerCommand(new PardonCommand(this));
-            registerCommand(new WhitelistCommand(this));
-            registerCommand(new ChannelLinkCommand(this, discordService));
-            registerCommand(new ConfigCommand(this));
+            registerCommand(new WhitelistCommand(this, messageService));
+            registerCommand(new ChannelLinkCommand(this, discordService, messageService));
+            registerCommand(new ConfigCommand(this, messageService));
         } catch (Exception e) {
-            DiscordCraft.logException(e, Messages.getMessage("errors.command-registration-error"));
+            DiscordCraft.logException(e, messageService.getPlainMessage("errors.command-registration-error"));
         }
 
     }
@@ -80,13 +74,13 @@ public class DiscordCommandManager extends ListenerAdapter {
                         // Check if the command was executed in the main server
 
                         if (!command.isGlobal() && !event.getGuild().equals(discordService.getMainGuild())) {
-                            event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_MAIN_GUILD_ONLY)).setEphemeral(true).queue();
+                            event.reply(messageService.getPlainMessage("commands.main-guild-only")).setEphemeral(true).queue();
                             return;
                         }
 
                         // Check if the user has the required permissions
                         if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-                            event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_NO_PERMISSION)).setEphemeral(true).queue();
+                            event.reply(messageService.getPlainMessage("commands.no-permission")).setEphemeral(true).queue();
                             return;
                         }
                     }
@@ -97,21 +91,28 @@ public class DiscordCommandManager extends ListenerAdapter {
                         command.onCommandInteraction(event);
                         return;
                     } catch (Exception e) {
-                        DiscordCraft.discordLogException(e, Messages.getMessage("errors.command-error", "command_name", command.getName(), "member", event.getMember()));
-                        event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_INTERNAL_ERROR)).setEphemeral(true).queue();
+                        
+                        DiscordCraft.discordLogException(e,
+                            messageService.getMessage("errors.command-error")
+                                .replace("command_name", command.getName())
+                                .replace("member", event.getMember())
+                                .toString()
+                        );
+
+                        event.reply(messageService.getDiscordMessage("commands.internal-error").toDiscordMessage()).setEphemeral(true).queue();
                     }
 
                     return;
                 } else {
                     // Command is disabled
-                    event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_DISABLED)).setEphemeral(true).queue(); // Should never happen because the command should not be registered
+                    event.reply(messageService.getPlainMessage("commands.disabled")).setEphemeral(true).queue(); // Should never happen because the command should not be registered
                     return;
                 }
             }
         }
 
         // Command not found
-        event.reply(Messages.getMessage(DiscordCommandManager.MSG_KEY_COMMAND_NOT_FOUND)).setEphemeral(true).queue(); // Should never happen because the command should not be registered
+        event.reply(messageService.getPlainMessage("commands.not-found")).setEphemeral(true).queue(); // Should never happen because the command should not be registered
     }
 
     private void registerCommands(Guild guild) {
