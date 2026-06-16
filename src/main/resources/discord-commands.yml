@@ -1,7 +1,6 @@
 commands:
   set-global-channel:
     enabled: true
-    command: globalchannel
     description: Sets the global channel
     help: Help message for set-global-channel
     admin-only: true
@@ -9,10 +8,8 @@ commands:
   configuration:
     description: Configures the plugin
     help: Help message for configure
-    command: config
   playerlist:
     enabled: true
-    command: playerlist
     description: Shows the list of players online
     help: Help message for playerlist
     admin-only: false
@@ -38,7 +35,6 @@ commands:
 
   stop-server:
     enabled: true
-    command: stop
     description: Stops the minecraft server
     help: Help message for stop-server
     admin-only: true
@@ -49,14 +45,12 @@ commands:
 
   channel-link:
     enabled: true
-    command: link
     description: Adds a channel to the list of channels
     help: Adds a channel to the list of channels
     admin-only: true
 
   help: # TODO: Add a flag to show only the commands that the user can use
     enabled: true
-    command: help
     description: Shows the list of commands
     help: If you need help to use this command you are a fool.
     is-ephemeral: true
@@ -64,9 +58,14 @@ commands:
     row-format: "- **%command%**: %message%"
     admin-only: false
 
+  setup:
+    enabled: true
+    description: Sets up the bot
+    help: Sets up the bot
+    admin-only: true
+
   ban:
     enabled: true
-    command: ban
     description: Bans a player in the minecraft server
     help: Help message for ban
     admin-only: true
@@ -79,7 +78,6 @@ commands:
 
   pardon:
     enabled: true
-    command: pardon
     description: Unbans a player in the minecraft server
     help: Help message for pardon
     admin-only: true
@@ -90,7 +88,6 @@ commands:
 
   whitelist:
     enabled: true
-    command: whitelist
     description: Adds or removes a player from the whitelist
     help: Help message for whitelist
     admin-only: true

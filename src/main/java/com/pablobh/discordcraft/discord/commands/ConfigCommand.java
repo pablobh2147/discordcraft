@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 public class ConfigCommand extends DiscordCommand {
 
-    private static final String COMMAND_NAME = "configuration";
+    private static final String COMMAND_NAME = "config";
     private static final String COMMAND_CONFIG_KEY = "configuration";
 
     public ConfigCommand(@NonNull DiscordCommandManager manager) {
