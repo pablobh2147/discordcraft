@@ -1,17 +1,48 @@
-token: "" # Paste here your bot token
-# If you don't have a bot token, you can create a new bot at https://discord.com/developers/applications
+# ============================================================================
+#                        DISCORDCRAFT - BOT SETTINGS
+# ============================================================================
+#
+# Discord bot connection and identity settings.
+# This file is generated on first run. Use /setup in Discord to configure
+# the guild and channels automatically.
+#
+# For general plugin settings, see config.yml.
+# For message customization, see messages.yml.
+#
+# ============================================================================
 
-# To setup the bot and configure the basic settings, you need to run the /setup command in Discord.
+# ----------------------------------------------------------------------------
+# Bot Token
+# ----------------------------------------------------------------------------
+# Your Discord bot token. Get one at https://discord.com/developers/applications
+# IMPORTANT: Keep this secret! Never share your token publicly.
+token: ""
 
+# ----------------------------------------------------------------------------
+# Bot Activity (Rich Presence)
+# ----------------------------------------------------------------------------
+# Controls the status shown under the bot's name in the member list.
 activity:
+  # Whether to display an activity status
   show: true
-  type: PLAYING
-  name: Minecraft Server
+  # Activity type: PLAYING, WATCHING, LISTENING, COMPETING
+  type: "PLAYING"
+  # The text displayed after the activity type
+  name: "Minecraft Server"
 
-# We recommend to not change anything below this line unless you know what you are doing, as it may break the bot.
-# You can configure the bot using commands through Discord. Use /help to see the available commands.
+# ============================================================================
+# WARNING: Do not modify settings below unless you know what you are doing.
+# These are managed automatically via Discord commands (use /help to see them).
+# ============================================================================
 
+# ----------------------------------------------------------------------------
+# Guild & Channels
+# ----------------------------------------------------------------------------
+# The main Discord server (guild) ID where the bot operates
 guild: 0
+# The channel ID used for logging bot events and errors (0 = disabled)
 log-channel: 0
 
+# Linked channels are managed via the /channel-link command in Discord.
+# Each entry maps a Discord text channel to relay messages to/from Minecraft.
 channels:

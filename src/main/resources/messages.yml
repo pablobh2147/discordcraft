@@ -1,62 +1,166 @@
+# ============================================================================
+#                         DISCORDCRAFT - MESSAGES
+# ============================================================================
+#
+# This file controls all messages sent by the plugin, both in Minecraft chat
+# and in Discord channels.
+#
+# ----------------------------------------------------------------------------
+#  DISCORD MESSAGE FORMAT
+# ----------------------------------------------------------------------------
+#
+# Messages sent to Discord can be either plain text or rich embeds.
+#
+# Plain text format:
+#   key: "Your message here"
+#
+# Embed format:
+#   key:
+#     content: "Optional text above the embed"
+#     embed:
+#       title: "Embed title"
+#       description: "Embed body text"
+#       color: "#HEX_COLOR"
+#       thumbnail: "https://image-url.com/image.png"
+#       image: "https://image-url.com/large-image.png"
+#       author:
+#         name: "Author name"
+#         url: "https://author-link.com"
+#         icon_url: "https://author-icon.com/icon.png"
+#       footer:
+#         text: "Footer text"
+#         icon_url: "https://footer-icon.com/icon.png"
+#       fields:
+#         - name: "Field title"
+#           value: "Field content"
+#           inline: true
+#
+# Both plain text and embed fields support Discord markdown:
+#   **bold**, *italic*, __underline__, ~~strikethrough~~, `code`, ```code block```
+#
+# ----------------------------------------------------------------------------
+#  MINECRAFT COLOR CODES
+# ----------------------------------------------------------------------------
+#
+# Messages displayed in Minecraft chat support color codes using '&':
+#   &0-&9, &a-&f (colors), &l (bold), &o (italic), &n (underline),
+#   &m (strikethrough), &k (obfuscated), &r (reset)
+#
+# Fields that support Minecraft color codes:
+#   - chat.minecraft-format
+#   - chat.minecraft-edited-format
+#
+# ----------------------------------------------------------------------------
+#  PLACEHOLDERS
+# ----------------------------------------------------------------------------
+#
+# Placeholders use the format %placeholder_name% and are replaced at runtime.
+# Available placeholders vary per message and are documented in each section.
+#
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# Chat - Messages displayed in Minecraft when relaying Discord messages
+# ----------------------------------------------------------------------------
+# Placeholders: %username%, %message%, %attachments%, %guild%, %channel%
 chat:
-  minecraft-format: "[%guild% -> %channel%] &e<%username%> &f%message%&7%attachments%"
-  minecraft-edited-format: "[%guild% -> %channel%] &e<%username%> &f%message%&7%attachments% &8&l(Edited)"
+  # Format for messages relayed from Discord to Minecraft
+  minecraft-format: "&9[Discord] &b%username% &8» &f%message%&7%attachments%"
+  # Format for edited messages relayed from Discord to Minecraft
+  minecraft-edited-format: "&9[Discord] &b%username% &8» &f%message%&7%attachments% &8(edited)"
+  # Text appended to spoiler attachments
   attachment-spoiler: " (spoiler)"
+  # Separator between multiple attachments
   attachment-separator: ", "
 
+# ----------------------------------------------------------------------------
+# Commands - Response messages for plugin commands
+# ----------------------------------------------------------------------------
+# Placeholders: %command_name%, %member_mention% (only in errors.command-error)
 commands:
+  # Shown when a user lacks permission to run a command
   no-permission: "You don't have the required permissions to use this command!"
+  # Shown when a command is disabled in the configuration
   disabled: "This command has been disabled by the server administrator."
+  # Shown when an unexpected error occurs during command execution
   internal-error: "An internal error occurred while executing this command. Administrators have been notified."
+  # Shown when a user runs an unrecognized command
   not-found: "Command not found. Use `/help` to see the available commands."
+  # Shown when a command is restricted to the main guild
   main-guild-only: "This command can only be executed on the main server."
+  # Shown when an invalid subcommand is provided
   invalid-subcommand: "Invalid subcommand. Use `/help` to see the available subcommands."
 
+# ----------------------------------------------------------------------------
+# Player - Discord messages for player events
+# ----------------------------------------------------------------------------
+
 player:
+  # Sent when a player joins the server
+  # Placeholders: %player_name%, %player_displayname%, %player_uuid%, %player_ip%
   join:
     embed:
       title: "Player Joined"
       description: "**%player_name%** has joined the game!"
       color: "#2ECC71"
-      thumbnail: "https://mc-heads.net/avatar/%player_name%/64"
+      thumbnail: "https://mc-heads.net/head/%player_uuid%/64"
 
+  # Sent when a player joins the server for the first time
+  # Placeholders: %player_name%, %player_displayname%, %player_uuid%, %player_ip%
   welcome:
     embed:
       title: "Welcome!"
       description: "**%player_name%** has joined the server for the first time! 🎉"
       color: "#F1C40F"
-      thumbnail: "https://mc-heads.net/avatar/%player_name%/64"
+      thumbnail: "https://mc-heads.net/head/%player_uuid%/64"
 
+  # Sent when a player leaves the server
+  # Placeholders: %player_name%, %player_displayname%, %player_uuid%, %player_ip%
   left:
     embed:
       title: "Player Left"
       description: "**%player_name%** has left the game."
       color: "#E74C3C"
-      thumbnail: "https://mc-heads.net/avatar/%player_name%/64"
+      thumbnail: "https://mc-heads.net/head/%player_uuid%/64"
 
+  # Sent when a player dies (non-PvP)
+  # Placeholders: %player_name%, %player_displayname%, %player_uuid%, %player_ip%, %death_message%
   death:
     embed:
+      title: "Player Died"
       description: "%death_message%"
       color: "#8B0000"
-      thumbnail: "https://mc-heads.net/avatar/%player_name%/64"
+      thumbnail: "https://mc-heads.net/head/%player_uuid%/64"
 
+  # Sent when a player is killed by another player
+  # Placeholders: %killer_name%, %killer_displayname%, %killer_uuid%, %killer_ip%,
+  #               %victim_name%, %victim_displayname%, %victim_uuid%, %victim_ip%
   murder:
     embed:
       title: "Player Killed"
       description: "**%killer_name%** killed **%victim_name%** ⚔️"
       color: "#8B0000"
-      thumbnail: "https://mc-heads.net/avatar/%killer_name%/64"
+      thumbnail: "https://mc-heads.net/head/%killer_uuid%/64"
 
+  # Sent when a player unlocks an advancement
+  # Placeholders: %player_name%, %player_displayname%, %player_uuid%, %player_ip%,
+  #               %advancement_type%, %advancement_title%, %advancement_description%, %display_url%
   achivement-unlock:
     embed:
       title: "%advancement_type%: %advancement_title%"
       description: "%advancement_description%"
       color: "#9B59B6"
-      thumbnail: "https://mc-heads.net/avatar/%player_name%/64"
+      thumbnail: "https://mc-heads.net/head/%player_uuid%/64"
       image: "%display_url%"
       footer:
         text: "Unlocked by %player_name%"
 
+# ----------------------------------------------------------------------------
+# Custom Death Messages - Emoji suffixes per death cause
+# ----------------------------------------------------------------------------
+# These override the default death message with a decorated version.
+# Placeholders: %player_name%, %player_displayname%, %player_uuid%, %player_ip%, %death_message%
+# Keys must match EntityDamageEvent.DamageCause names in lowercase.
 custom-death-messages:
   lava: "%death_message% 🔥"
   fire: "%death_message% 🔥"
@@ -66,7 +170,12 @@ custom-death-messages:
   entity_explosion: "%death_message% 💣"
   drowning: "%death_message% 🌊"
 
+# ----------------------------------------------------------------------------
+# Server - Discord messages for server lifecycle events
+# ----------------------------------------------------------------------------
+
 server:
+  # Sent when the server starts up
   start:
     embed:
       title: "Server Online"
@@ -77,6 +186,7 @@ server:
           value: "`mc.yourserver.com`"
           inline: true
 
+  # Sent when the server shuts down
   stop:
     embed:
       title: "Server Offline"
@@ -87,12 +197,24 @@ server:
           value: "`mc.yourserver.com`"
           inline: true
 
+# ----------------------------------------------------------------------------
+# Errors - Internal error messages (sent to Discord for admin visibility)
+# ----------------------------------------------------------------------------
+# Placeholders: %command_name%, %member_mention%
 errors:
+  # Sent when a Discord command fails unexpectedly
   command-error: "An error occurred while executing command: %command_name% by %member_mention%"
+  # Logged when slash command registration fails
   command-registration-error: "An error occurred while registering commands!"
+  # Logged when the config file fails to save
   config-save-error: "There was an error while saving the config"
 
+# ----------------------------------------------------------------------------
+# Setup - Messages shown during initial bot setup
+# ----------------------------------------------------------------------------
+
 setup:
+  # Sent when the setup process completes successfully
   complete:
     embed:
       title: "Setup Complete"
@@ -109,6 +231,7 @@ setup:
           value: "Use `/help` to see the available commands."
           inline: false
 
+  # Sent when setup is attempted but already completed
   already:
     embed:
       title: "Already Configured"
