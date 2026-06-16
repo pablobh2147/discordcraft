@@ -8,7 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.pablobh.discordcraft.Messages;
-import com.pablobh.discordcraft.discord.Discord;
+import com.pablobh.discordcraft.discord.DiscordService;
 import com.pablobh.discordcraft.discord.LinkedChannel;
 
 import net.dv8tion.jda.api.entities.Message;
@@ -24,6 +24,12 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class DiscordChatListener extends ListenerAdapter {
+
+    private final DiscordService discordService;
+
+    public DiscordChatListener(DiscordService discordService) {
+        this.discordService = discordService;
+    }
 
     @Override
     public void onMessageUpdate(@Nonnull MessageUpdateEvent event) {
@@ -53,7 +59,7 @@ public class DiscordChatListener extends ListenerAdapter {
             return;
         }
         
-        LinkedChannel linkedChannel = Discord.getLinkedChannel(message.getChannel().asTextChannel());
+        LinkedChannel linkedChannel = discordService.getLinkedChannel(message.getChannel().asTextChannel());
 
         // Ignore messages from channels that are not linked
         if (linkedChannel == null || !linkedChannel.canSendDiscordMessages()) { 
@@ -66,7 +72,7 @@ public class DiscordChatListener extends ListenerAdapter {
         }
 
         // Ignore messages from the bot itself
-        if (author.getIdLong() == Discord.getSelfUser().getIdLong()) { 
+        if (author.getIdLong() == discordService.getSelfUser().getIdLong()) { 
             return;
         }
 

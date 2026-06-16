@@ -1,7 +1,7 @@
 package com.pablobh.discordcraft.commands.discord;
 
 import com.pablobh.discordcraft.Messages;
-import com.pablobh.discordcraft.discord.Discord;
+import com.pablobh.discordcraft.discord.DiscordService;
 import com.pablobh.discordcraft.discord.LinkedChannel;
 
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -13,8 +13,11 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class ChannelLinkCommand extends DiscordCommand {
 
-    public ChannelLinkCommand() {
+    private final DiscordService discordService;
+
+    public ChannelLinkCommand(DiscordService discordService) {
         super("channel-link");
+        this.discordService = discordService;
 
         // Subcommand "add"
         {
@@ -95,7 +98,7 @@ public class ChannelLinkCommand extends DiscordCommand {
             return;
         }
 
-        if (channel.getGuild().getIdLong() != Discord.getMainGuild().getIdLong()) {
+        if (channel.getGuild().getIdLong() != discordService.getMainGuild().getIdLong()) {
 
             String channelNotInServerMessage = "The channel must be in the same server as the bot!";
 
@@ -104,7 +107,7 @@ public class ChannelLinkCommand extends DiscordCommand {
             return;
         }
 
-        Discord.addLinkedChannel(channel);
+        discordService.addLinkedChannel(channel);
 
         String channelAddedMessage = "Added a new channel %channel%";
 
@@ -119,7 +122,7 @@ public class ChannelLinkCommand extends DiscordCommand {
             return;
         }
 
-        if (!Discord.isLinkedChannel(channel)) {
+        if (!discordService.isLinkedChannel(channel)) {
 
             String channelNotWasLinkedMessage = "The channel was not linked!";
 
@@ -128,7 +131,7 @@ public class ChannelLinkCommand extends DiscordCommand {
             return;
         }
 
-        Discord.removeLinkedChannel(channel);
+        discordService.removeChannelLink(channel);
 
         String channelAddedMessage = "Removed channel %channel%";
 
@@ -143,7 +146,7 @@ public class ChannelLinkCommand extends DiscordCommand {
             return;
         }
 
-        LinkedChannel linkedChannel = Discord.getLinkedChannel(channel);
+        LinkedChannel linkedChannel = discordService.getLinkedChannel(channel);
 
         if (linkedChannel == null) {
             event.reply("The channel is not linked!").setEphemeral(true).queue();
@@ -210,7 +213,8 @@ public class ChannelLinkCommand extends DiscordCommand {
                 return;
         }
 
-        LinkedChannel.saveChannelsConfig(); // Save the configuration
+        // Save the configuration
+        discordService.getConfig().save();
 
         event.reply("Option " + option + " has been set to " + value + " for channel " + channel.getAsMention()).setEphemeral(true).queue();
     }

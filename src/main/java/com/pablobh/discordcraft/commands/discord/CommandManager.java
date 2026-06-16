@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.Messages;
-import com.pablobh.discordcraft.discord.Discord;
+import com.pablobh.discordcraft.discord.DiscordService;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -35,18 +35,20 @@ public class CommandManager extends ListenerAdapter {
     
 
     private List<DiscordCommand> commands = new ArrayList<>();
+    private final DiscordService discordService;
 
-    public CommandManager() {
+    public CommandManager(DiscordService discordService) {
+        this.discordService = discordService;
 
         try {
-            registerCommand(new SetupCommand());
+            registerCommand(new SetupCommand(discordService));
             registerCommand(new HelpCommand(this));
             registerCommand(new PlayerListCommand());
             registerCommand(new StopServerCommand());
             registerCommand(new BanCommand());
             registerCommand(new PardonCommand());
             registerCommand(new WhitelistCommand());
-            registerCommand(new ChannelLinkCommand());
+            registerCommand(new ChannelLinkCommand(discordService));
             registerCommand(new ConfigCommand());
         } catch (Exception e) {
             DiscordCraft.logException(e, Messages.getMessage("errors.command-registration-error"));
@@ -64,7 +66,7 @@ public class CommandManager extends ListenerAdapter {
 
                         // Check if the command was executed in the main server
 
-                        if (!command.isGlobal() && !event.getGuild().equals(Discord.getMainGuild())) {
+                        if (!command.isGlobal() && !event.getGuild().equals(discordService.getMainGuild())) {
                             event.reply(Messages.getMessage(CommandManager.COMMAND_MAIN_GUILD_ONLY)).setEphemeral(true).queue();
                             return;
                         }
@@ -108,7 +110,7 @@ public class CommandManager extends ListenerAdapter {
 
         for (DiscordCommand command : commands) {
 
-            if (!command.isGlobal() && guild.getIdLong() != Discord.getConfig().getLong(Discord.GUILD_ID)) {
+            if (!command.isGlobal() && guild.getIdLong() != discordService.getConfig().getLong(DiscordService.GUILD_ID)) {
                 // Skip if the command is not global and the guild is not the main server
                 continue;
             }

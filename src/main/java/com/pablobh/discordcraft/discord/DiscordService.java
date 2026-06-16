@@ -1,11 +1,15 @@
 package com.pablobh.discordcraft.discord;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.commands.discord.CommandManager;
@@ -26,9 +30,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
-public class Discord {
-
-    // Config keys
+public class DiscordService {
 
     public static final String BOT_TOKEN = "token";
 
@@ -39,22 +41,18 @@ public class Discord {
     public static final String ACTIVITY_TYPE = "activity.type";
     public static final String ACTIVITY_NAME = "activity.name";
 
-    // Data
+    private JDA jda;
 
-    private static JDA jda;
+    private Guild mainGuild;
 
-    private static Guild mainGuild;
+    private Configuration config;
 
-    private static Configuration config;
+    private List<LinkedChannel> linkedChannels;
 
-    private static List<LinkedChannel> linkedChannels;
+    private TextChannel logChannel;
 
-    private static TextChannel logChannel;
-
-    // Discord setup
-
-    public static boolean setup(Configuration config) {
-        Discord.config = config;
+    public boolean setup(Configuration config) {
+        this.config = config;
 
         String token = config.getString(BOT_TOKEN);
 
@@ -63,7 +61,7 @@ public class Discord {
             return false;
         }
 
-        boolean settedUp = setputJDA(token);
+        boolean settedUp = setupJDA(token);
 
         if (!settedUp) {
             DiscordCraft.logWarning("An error occurred while setting up Discord JDA!");
@@ -76,7 +74,7 @@ public class Discord {
             DiscordCraft.logWarning("No server was found with the ID provided in the config! Please check the ID or run /setup command on Discord.");
         }
 
-        linkedChannels = LinkedChannel.loadAllChannels();
+        linkedChannels = loadChannelLinks();
 
         logChannel = getTextChannel(config.getLong(LOG_CHANNEL, 0));
 
@@ -88,17 +86,15 @@ public class Discord {
         return true;
     }
 
-    // Discord JDA setup
-
-    private static void configureMemoryUsage(JDABuilder builder) {
+    private void configureMemoryUsage(JDABuilder builder) {
         builder.disableCache(CacheFlag.ACTIVITY);
 
-        builder.enableIntents(GatewayIntent.GUILD_MEMBERS);
-        builder.enableIntents(GatewayIntent.DIRECT_MESSAGES);
+        builder.enableIntents(GatewayIntent.GUILD_MESSAGES);
         builder.enableIntents(GatewayIntent.MESSAGE_CONTENT);
+        builder.enableIntents(GatewayIntent.GUILD_WEBHOOKS);
     }
 
-    private static void configureActivity(JDABuilder builder) {
+    private void configureActivity(JDABuilder builder) {
         boolean showActivity = config.getBoolean(ACTIVITY_ENABLED, true);
 
         if (!showActivity) {
@@ -123,15 +119,15 @@ public class Discord {
         }
     }
 
-    private static boolean setputJDA(String token) {
+    private boolean setupJDA(String token) {
         try {
             JDABuilder builder = JDABuilder.createDefault(token);
 
             configureMemoryUsage(builder);
             configureActivity(builder);
 
-            builder.addEventListeners(new DiscordChatListener());
-            builder.addEventListeners(new CommandManager());
+            builder.addEventListeners(new DiscordChatListener(this));
+            builder.addEventListeners(new CommandManager(this));
 
             jda = builder.build();
             if (jda == null) {
@@ -148,17 +144,13 @@ public class Discord {
         }
     }
 
-    // Shutdown
-
-    public static void shutdown() {
+    public void shutdown() {
         if (jda != null) {
             jda.shutdown();
         }
     }
 
-    // Discord element getters
-
-    public static TextChannel getTextChannel(long id) {
+    public TextChannel getTextChannel(long id) {
 
         if (id != 0) {
             TextChannel channel = mainGuild.getTextChannelById(id);
@@ -172,7 +164,7 @@ public class Discord {
         return null;
     }
 
-    public static VoiceChannel getVoiceChannel(long id) {
+    public VoiceChannel getVoiceChannel(long id) {
 
         if (id != 0) {
             VoiceChannel channel = mainGuild.getVoiceChannelById(id);
@@ -186,7 +178,7 @@ public class Discord {
         return null;
     }
 
-    public static Category getCategory(long id) {
+    public Category getCategory(long id) {
 
         if (id != 0) {
             Category category = mainGuild.getCategoryById(id);
@@ -200,7 +192,7 @@ public class Discord {
         return null;
     }
 
-    public static Guild getGuild(long id) {
+    public Guild getGuild(long id) {
 
         if (id != 0) {
             Guild guild = jda.getGuildById(id);
@@ -214,7 +206,7 @@ public class Discord {
         return null;
     }
 
-    public static Role getRole(long id) {
+    public Role getRole(long id) {
 
         if (id != 0) {
             Role role = mainGuild.getRoleById(id);
@@ -228,43 +220,25 @@ public class Discord {
         return null;
     }
 
-    // Getters
-
-    public static JDA getJDA() {
+    public JDA getJDA() {
         return jda;
     }
 
-    public static Guild getMainGuild() {
+    public Guild getMainGuild() {
         return mainGuild;
     }
 
-    // Linked channels
-
-    public static void addLinkedChannel(TextChannel channel) {
+    public void addLinkedChannel(TextChannel channel) {
         if (isLinkedChannel(channel)) {
             return;
         }
 
-        linkedChannels.add(LinkedChannel.create(channel));
+        linkedChannels.add(createChannelLink(channel));
 
         DiscordCraft.instance().getBotConfiguration().save();
     }
 
-    public static void removeLinkedChannel(TextChannel channel) {
-        for (LinkedChannel linkedChannel : linkedChannels) {
-            if (linkedChannel.getChannel().getIdLong() == channel.getIdLong()) {
-
-                linkedChannel.delete();
-                linkedChannels.remove(linkedChannel);
-
-                DiscordCraft.instance().getBotConfiguration().save();
-
-                return;
-            }
-        }
-    }
-
-    public static boolean isLinkedChannel(TextChannel channel) {
+    public boolean isLinkedChannel(TextChannel channel) {
         for (LinkedChannel linkedChannel : linkedChannels) {
             if (linkedChannel.getChannel().getIdLong() == channel.getIdLong()) {
                 return true;
@@ -274,11 +248,11 @@ public class Discord {
         return false;
     }
 
-    public static List<LinkedChannel> getLinkedChannels() {
+    public List<LinkedChannel> getLinkedChannels() {
         return linkedChannels;
     }
 
-    public static LinkedChannel getLinkedChannel(TextChannel channel) {
+    public LinkedChannel getLinkedChannel(TextChannel channel) {
         for (LinkedChannel linkedChannel : linkedChannels) {
             if (linkedChannel.getChannel().getIdLong() == channel.getIdLong()) {
                 return linkedChannel;
@@ -288,7 +262,7 @@ public class Discord {
         return null;
     }
 
-    public static boolean isMessageInALinkedChannel(@Nonnull Message message) {
+    public boolean isMessageInALinkedChannel(@Nonnull Message message) {
         for (LinkedChannel linkedChannel : linkedChannels) {
             if (linkedChannel.getChannel().getIdLong() == message.getChannel().getIdLong()) {
                 return true;
@@ -297,20 +271,98 @@ public class Discord {
         return false;
     }
 
-    // Log channel
-
-    public static TextChannel getLogChannel() {
+    public TextChannel getLogChannel() {
         return logChannel;
     }
 
-    // Self user
-
-    public static SelfUser getSelfUser() {
+    public SelfUser getSelfUser() {
         return jda.getSelfUser();
     }
 
-    public static Configuration getConfig() {
+    public Configuration getConfig() {
         return config;
+    }
+
+    // --------------------- Channel Link Management ---------------------
+
+    private String getChannelConfigPath(long channelId) {
+        return LinkedChannel.CHANNEL_LIST + ".c" + channelId;
+    }
+
+    public LinkedChannel createChannelLink(@NonNull TextChannel textChannel) {
+        Objects.requireNonNull(textChannel, "TextChannel cannot be null");
+        
+        ConfigurationSection defaultConfig = DiscordCraft.instance().getGlobalConfiguration().getSection(LinkedChannel.DEFAULT_OPTIONS);
+        ConfigurationSection channelConfig = config.createSection(getChannelConfigPath(textChannel.getIdLong()));
+
+        return new LinkedChannel(channelConfig, defaultConfig, textChannel);
+    }
+
+    public void removeChannelLink(@Nonnull TextChannel textChannel) {
+        Objects.requireNonNull(textChannel, "TextChannel cannot be null");
+        
+        LinkedChannel channel = getLinkedChannel(textChannel);
+        if (channel == null) {
+            return;
+        }
+        
+        removeChannelLink(channel);
+    }
+
+    public void removeChannelLink(@NonNull LinkedChannel channel) {
+        Objects.requireNonNull(channel, "LinkedChannel cannot be null");
+
+        config.set(getChannelConfigPath(channel.getChannel().getIdLong()), null);
+        linkedChannels.remove(channel);
+        config.save();
+
+        channel.deleteWebhook();
+    }
+
+    private List<LinkedChannel> loadChannelLinks() {
+        ConfigurationSection channelsConfig = config.getSection(LinkedChannel.CHANNEL_LIST);
+
+        List<LinkedChannel> list = new ArrayList<>();
+
+        if (channelsConfig == null) {
+            return list;
+        }
+
+        DiscordCraft.logInfo("Loading " + channelsConfig.getKeys(false).size() + " linked channels.");
+
+        for (String key : channelsConfig.getKeys(false)) {
+            ConfigurationSection section = channelsConfig.getConfigurationSection(key);
+            if (section == null) {
+                continue;
+            }
+
+            LinkedChannel channel = loadChannelLinkFromConfig(section);
+            if (channel != null) {
+                list.add(channel);
+            } else {
+                DiscordCraft.logWarning("Failed to load linked channel: " + key);
+            }
+        }
+
+        return list;
+    }
+
+    private LinkedChannel loadChannelLinkFromConfig(@NonNull ConfigurationSection channelConfig) {
+        Objects.requireNonNull(channelConfig, "Config cannot be null");
+
+        long channelId = channelConfig.getLong(LinkedChannel.CHANNEL_ID, 0);
+        if (channelId == 0) {
+            return null;
+        }
+        
+        TextChannel textChannel = getTextChannel(channelId);
+        if (textChannel == null) {
+            return null;
+        }
+        
+        ConfigurationSection defaultConfig = DiscordCraft.instance().getGlobalConfiguration().getSection(LinkedChannel.DEFAULT_OPTIONS);
+
+        return new LinkedChannel(channelConfig, defaultConfig, textChannel);
     }
 
 }

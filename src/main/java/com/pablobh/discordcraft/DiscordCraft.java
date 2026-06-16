@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.config.GlobalConfiguration;
-import com.pablobh.discordcraft.discord.Discord;
+import com.pablobh.discordcraft.discord.DiscordService;
 import com.pablobh.discordcraft.discord.LinkedChannel;
 import com.pablobh.discordcraft.listeners.MinecraftChatListener;
 import com.pablobh.discordcraft.listeners.PlayerEventsListener;
@@ -31,6 +31,8 @@ public class DiscordCraft extends JavaPlugin {
 
     private GlobalConfiguration globalConfiguration;
 
+    private DiscordService discordService;
+
     private boolean enabled = false;
 
     @Override
@@ -44,7 +46,8 @@ public class DiscordCraft extends JavaPlugin {
 
         Messages.setup(messagesConfig);
 
-        if (!Discord.setup(botConfig)) {
+        discordService = new DiscordService();
+        if (!discordService.setup(botConfig)) {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -63,7 +66,9 @@ public class DiscordCraft extends JavaPlugin {
         }
 
         serverStopMessages();
-        Discord.shutdown();
+        if (discordService != null) {
+            discordService.shutdown();
+        }
 
         saveAllConfigurations();
 
@@ -101,12 +106,16 @@ public class DiscordCraft extends JavaPlugin {
         return discordCommandsConfig;
     }
 
+    public DiscordService getDiscordService() {
+        return discordService;
+    }
+
     // Notifications
 
     private void serverStartMessages() {
         String message = Messages.getMessage("server.start");
 
-        for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
+        for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
             if (linkedChannel.canSendServerStartMessages()) {
                 linkedChannel.sendMessage(message);
             }
@@ -116,7 +125,7 @@ public class DiscordCraft extends JavaPlugin {
     private void serverStopMessages() {
         String message = Messages.getMessage("server.stop");
 
-        for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
+        for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
             if (linkedChannel.canSendServerStopMessages()) {
                 linkedChannel.sendMessage(message);
             }
@@ -132,8 +141,8 @@ public class DiscordCraft extends JavaPlugin {
     // Listeners
 
     public void registerSpigotListeners() {
-        Bukkit.getPluginManager().registerEvents(new MinecraftChatListener(globalConfiguration), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerEventsListener(), this);
+        Bukkit.getPluginManager().registerEvents(new MinecraftChatListener(globalConfiguration, discordService), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerEventsListener(discordService), this);
     }
 
     // Logging
@@ -199,7 +208,8 @@ public class DiscordCraft extends JavaPlugin {
             return;
         }
 
-        TextChannel logChannel = Discord.getLogChannel();
+        DiscordService discordService = instance != null ? instance.discordService : null;
+        TextChannel logChannel = discordService != null ? discordService.getLogChannel() : null;
         if (logChannel != null) {
             logChannel.sendMessage("[INFO]: " + message).queue();
         }
@@ -212,7 +222,8 @@ public class DiscordCraft extends JavaPlugin {
             return;
         }
 
-        TextChannel logChannel = Discord.getLogChannel();
+        DiscordService discordService = instance != null ? instance.discordService : null;
+        TextChannel logChannel = discordService != null ? discordService.getLogChannel() : null;
         if (logChannel != null) {
             logChannel.sendMessage("[WARNING]: " + message).queue();
         }
@@ -225,7 +236,8 @@ public class DiscordCraft extends JavaPlugin {
             return;
         }
 
-        TextChannel logChannel = Discord.getLogChannel();
+        DiscordService discordService = instance != null ? instance.discordService : null;
+        TextChannel logChannel = discordService != null ? discordService.getLogChannel() : null;
         if (logChannel != null) {
             logChannel.sendMessage("[ERROR]: " + message).queue();
         }
@@ -238,7 +250,8 @@ public class DiscordCraft extends JavaPlugin {
             return;
         }
 
-        TextChannel logChannel = Discord.getLogChannel();
+        DiscordService discordService = instance != null ? instance.discordService : null;
+        TextChannel logChannel = discordService != null ? discordService.getLogChannel() : null;
         if (logChannel != null) {
             if (message != null && !message.isBlank()) {
                 logChannel.sendMessage("[ERROR]: " + message + " (Check Console for more Details)").queue();

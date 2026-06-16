@@ -12,10 +12,16 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.pablobh.discordcraft.Messages;
-import com.pablobh.discordcraft.discord.Discord;
+import com.pablobh.discordcraft.discord.DiscordService;
 import com.pablobh.discordcraft.discord.LinkedChannel;
 
 public class PlayerEventsListener implements Listener {
+
+    private final DiscordService discordService;
+
+    public PlayerEventsListener(DiscordService discordService) {
+        this.discordService = discordService;
+    }
 
     @EventHandler
     private void onPlayerJoin(PlayerJoinEvent event) {
@@ -28,7 +34,7 @@ public class PlayerEventsListener implements Listener {
             }
         }
 
-        for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
+        for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
             if (linkedChannel.canSendPlayerJoinMessages()) {
                 linkedChannel.getChannel().sendMessage(message).queue();
             }
@@ -39,7 +45,7 @@ public class PlayerEventsListener implements Listener {
     private void onPlayerLeft(PlayerQuitEvent event) {
         String message = Messages.getMessage("player.left", "player", event.getPlayer());
 
-        for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
+        for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
             if (linkedChannel.canSendPlayerLeaveMessages()) {
                 linkedChannel.getChannel().sendMessage(message).queue();
             }
@@ -60,7 +66,7 @@ public class PlayerEventsListener implements Listener {
 
             String finalMessage = Messages.getMessage("player.death", "player", player, "death_message", deathMessage);
 
-            for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
+            for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
                 if (linkedChannel.canSendPlayerDeathMessages()) {
                     linkedChannel.getChannel().sendMessage(finalMessage).queue();
                 }
@@ -87,7 +93,7 @@ public class PlayerEventsListener implements Listener {
                     String killMessage = Messages.getMessage("player.murder", "killer", killer, "victim", player);
 
                     // Send a message to the linked channels
-                    for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
+                    for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
                         if (linkedChannel.canSendPlayerMurderMessages()) {
                             linkedChannel.getChannel().sendMessage(killMessage).queue();
                         }

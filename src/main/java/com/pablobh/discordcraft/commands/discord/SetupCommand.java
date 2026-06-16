@@ -6,7 +6,7 @@ import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.StringUtils;
 import com.pablobh.discordcraft.config.Configuration;
-import com.pablobh.discordcraft.discord.Discord;
+import com.pablobh.discordcraft.discord.DiscordService;
 
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -17,8 +17,11 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class SetupCommand extends DiscordCommand {
 
-    public SetupCommand() {
+    private final DiscordService discordService;
+
+    public SetupCommand(DiscordService discordService) {
         super("setup", "This command is used for setting up the server and start configuration", "This command is used for setting up the server and start configuration", true, true);
+        this.discordService = discordService;
 
         setGlobal(true);
 
@@ -44,7 +47,7 @@ public class SetupCommand extends DiscordCommand {
     @Override
     public void onCommandInteraction(SlashCommandInteractionEvent event) {
         
-        if (Discord.getMainGuild() != null) {
+        if (discordService.getMainGuild() != null) {
             event.reply(Messages.getMessage("setup.already")).setEphemeral(true).queue();
             return;
         }
@@ -53,7 +56,7 @@ public class SetupCommand extends DiscordCommand {
 
         // Set guild
 
-        botConfig.set(Discord.GUILD_ID, event.getGuild().getIdLong());
+        botConfig.set(DiscordService.GUILD_ID, event.getGuild().getIdLong());
 
         // Activity
 
@@ -62,15 +65,15 @@ public class SetupCommand extends DiscordCommand {
         OptionMapping activityName = event.getOption("activity-name");
 
         if (showActivity != null) {
-            botConfig.set(Discord.ACTIVITY_ENABLED, showActivity.getAsBoolean());
+            botConfig.set(DiscordService.ACTIVITY_ENABLED, showActivity.getAsBoolean());
         }
 
         if (activityType != null) {
-            botConfig.set(Discord.ACTIVITY_TYPE, activityType.getAsString());
+            botConfig.set(DiscordService.ACTIVITY_TYPE, activityType.getAsString());
         }
 
         if (activityName != null) {
-            botConfig.set(Discord.ACTIVITY_NAME, activityName.getAsString());
+            botConfig.set(DiscordService.ACTIVITY_NAME, activityName.getAsString());
         }
 
         // Log Channel
@@ -78,7 +81,7 @@ public class SetupCommand extends DiscordCommand {
         OptionMapping logChannel = event.getOption("log-channel");
 
         if (logChannel != null) {
-            botConfig.set(Discord.LOG_CHANNEL, logChannel.getAsChannel().getIdLong());
+            botConfig.set(DiscordService.LOG_CHANNEL, logChannel.getAsChannel().getIdLong());
         }
 
         botConfig.save();
