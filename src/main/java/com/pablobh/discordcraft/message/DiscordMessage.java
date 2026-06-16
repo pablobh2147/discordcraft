@@ -3,6 +3,7 @@ package com.pablobh.discordcraft.message;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -110,11 +111,9 @@ public class DiscordMessage extends Message {
 
             if (config.isList("fields")) {
                 this.fields = new ArrayList<>();
-                List<?> fieldsList = config.getList("fields");
-                for (Object fieldObj : fieldsList) {
-                    if (fieldObj instanceof ConfigurationSection) {
-                        fields.add(new FieldData((ConfigurationSection) fieldObj));
-                    }
+                List<Map<?, ?>> fieldsList = config.getMapList("fields");
+                for (Map<?, ?> fieldMap : fieldsList) {
+                    fields.add(new FieldData(fieldMap));
                 }
             }
         }
@@ -238,10 +237,14 @@ public class DiscordMessage extends Message {
         String value;
         boolean inline;
 
-        FieldData(@Nonnull ConfigurationSection config) {
-            this.name = config.getString("name");
-            this.value = config.getString("value");
-            this.inline = config.getBoolean("inline", false);
+        FieldData(@Nonnull Map<?, ?> map) {
+            Object nameObj = map.get("name");
+            Object valueObj = map.get("value");
+            Object inlineObj = map.get("inline");
+
+            this.name = nameObj != null ? String.valueOf(nameObj) : null;
+            this.value = valueObj != null ? String.valueOf(valueObj) : null;
+            this.inline = inlineObj instanceof Boolean ? (Boolean) inlineObj : false;
         }
 
         void replace(String placeholder, String replaceValue) {
