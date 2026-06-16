@@ -27,9 +27,9 @@ public class MinecraftChatListener implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
+        URL avatarUrl = avatarProvider.getAvatarUrl(event.getPlayer(), globalConfig.getAvatarStyle(), AVATAR_SIZE);
         for (LinkedChannel channel : discordService.getLinkedChannels()) {
             if (channel.canSendMinecraftChatMessages()) {
-                URL avatarUrl = avatarProvider.getAvatarUrl(event.getPlayer(), globalConfig.getAvatarStyle(), AVATAR_SIZE);
                 channel.sendMessage(event.getPlayer().getName(), avatarUrl, event.getMessage());
             }
         }

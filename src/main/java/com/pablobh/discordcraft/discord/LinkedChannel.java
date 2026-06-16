@@ -9,7 +9,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import club.minnced.discord.webhook.external.JDAWebhookClient;
-import club.minnced.discord.webhook.send.WebhookMessage;
+import club.minnced.discord.webhook.send.AllowedMentions;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -66,16 +66,22 @@ public class LinkedChannel {
     // --------------------- Methods ---------------------
 
     public void sendMessage(@Nullable String username, @Nullable URL avatarUrl, @NonNull String message) {
+        sendMessage(username, avatarUrl, message, AllowedMentions.none());
+    }
+
+    public void sendMessage(@Nullable String username, @Nullable URL avatarUrl, @NonNull String message, @NonNull AllowedMentions mentions) {
         Objects.requireNonNull(message, "Message cannot be null");
+        Objects.requireNonNull(mentions, "Mentions cannot be null");
 
         if (webhookClient != null) {
-            WebhookMessage messageObj = new WebhookMessageBuilder()
-                .setUsername(username)
-                .setAvatarUrl(avatarUrl != null ? avatarUrl.toString() : null)
-                .setContent(message)
-                .build();
+            WebhookMessageBuilder msg = new WebhookMessageBuilder();
+
+            msg.setUsername(username);
+            msg.setAvatarUrl(avatarUrl != null ? avatarUrl.toString() : null);
+            msg.setContent(message);
+            msg.setAllowedMentions(mentions);
             
-            webhookClient.send(messageObj);
+            webhookClient.send(msg.build());
         }
 
     }
