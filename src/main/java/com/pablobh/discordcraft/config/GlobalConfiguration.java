@@ -1,69 +1,43 @@
 package com.pablobh.discordcraft.config;
 
-import com.pablobh.discordcraft.ConfigManager;
-import com.pablobh.discordcraft.DiscordCraft;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+
 import com.pablobh.discordcraft.avatar.AvatarStyle;
 
-public class GlobalConfiguration {
+public class GlobalConfiguration extends Configuration {
 
     private static final String KEY_AVATAR_STYLE = "avatar-style";
     private static final AvatarStyle DEFAULT_AVATAR_STYLE = AvatarStyle.BUST;
 
-    private final ConfigManager configManager;
-
     private AvatarStyle avatarStyle;
 
-    public GlobalConfiguration(ConfigManager configManager) {
-        this.configManager = configManager;
-        load();
+    public GlobalConfiguration(@NotNull JavaPlugin plugin, @NotNull String filename) {
+        super(plugin, filename);
+        loadConfiguration();
     }
 
-    private void load() {
-        avatarStyle = parseAvatarStyle(configManager.getConfig().getString(KEY_AVATAR_STYLE));
+    @Override
+    public void load() {
+        super.load();
+        loadConfiguration();
     }
-
-    public void reload() {
-        configManager.reloadConfig();
-        load();
+    
+    private void loadConfiguration() {
+        avatarStyle = getEnum(KEY_AVATAR_STYLE, AvatarStyle.class, DEFAULT_AVATAR_STYLE);
     }
-
-    public void save() {
-        configManager.getConfig().set(KEY_AVATAR_STYLE, avatarStyle.name().toLowerCase());
-        
-        configManager.saveConfig();
-    }
-
+    
     // --------------------- Getters ---------------------
-
+    
     public AvatarStyle getAvatarStyle() {
         return avatarStyle;
     }
-
+    
     // --------------------- Setters ---------------------
-
+    
     public void setAvatarStyle(AvatarStyle avatarStyle) {
         this.avatarStyle = avatarStyle;
-    }
-
-    // --------------------- Config manager access ---------------------
-
-    public ConfigManager getConfigManager() {
-        return configManager;
-    }
-
-    // --------------------- Parsing helpers ---------------------
-
-    private AvatarStyle parseAvatarStyle(String value) {
-        if (value == null || value.isBlank()) {
-            return DEFAULT_AVATAR_STYLE;
-        }
-
-        try {
-            return AvatarStyle.valueOf(value.toUpperCase().replace("-", "_"));
-        } catch (IllegalArgumentException e) {
-            DiscordCraft.logWarning("Invalid avatar-style '" + value + "' in config.yml, defaulting to " + DEFAULT_AVATAR_STYLE.name().toLowerCase());
-            return DEFAULT_AVATAR_STYLE;
-        }
+        set(KEY_AVATAR_STYLE, avatarStyle.name().toLowerCase());
     }
 
 }

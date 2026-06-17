@@ -1,12 +1,43 @@
-avatar-style: bust
+# ============================================================================
+#                       DISCORDCRAFT - CONFIGURATION
+# ============================================================================
+#
+# General settings for the DiscordCraft plugin.
+# For bot-specific settings (token, guild, etc.), see bot.yml.
+# For message customization, see messages.yml.
+#
+# ============================================================================
 
+# ----------------------------------------------------------------------------
+# Avatar Style
+# ----------------------------------------------------------------------------
+# The style used for player avatars in Discord webhook messages.
+# Options: face, bust, body
+avatar-style: "bust"
+
+# ----------------------------------------------------------------------------
+# Channel Defaults
+# ----------------------------------------------------------------------------
+# Default settings applied to all linked channels. Individual channels can
+# override these values in their own configuration (managed via Discord commands).
 channel-defaults:
+  # Relay Minecraft chat messages to Discord
   minecraft-chat-messages: true
+  # Send a message when a player joins the server
   player-join-messages: true
+  # Send a message when a player leaves the server
   player-leave-messages: true
+  # Send a message when a player dies (non-PvP)
   player-death-messages: true
+  # Send a message when a player is killed by another player
   player-murder-messages: true
+  # Send a message when a player unlocks an advancement
+  player-advancement-messages: true
+  # Relay Discord messages to Minecraft chat
   discord-messages: true
+  # Relay Discord system messages (pins, boosts, etc.) to Minecraft chat
   discord-system-messages: true
+  # Send a message when the server starts
   server-start: true
+  # Send a message when the server stops
   server-stop: true

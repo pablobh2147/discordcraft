@@ -7,9 +7,9 @@ import javax.annotation.Nonnull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.pablobh.discordcraft.Discord;
-import com.pablobh.discordcraft.LinkedChannel;
-import com.pablobh.discordcraft.Messages;
+import com.pablobh.discordcraft.discord.DiscordService;
+import com.pablobh.discordcraft.discord.LinkedChannel;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
@@ -24,6 +24,14 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class DiscordChatListener extends ListenerAdapter {
+
+    private final DiscordService discordService;
+    private final MessageService messageService;
+
+    public DiscordChatListener(DiscordService discordService, MessageService messageService) {
+        this.discordService = discordService;
+        this.messageService = messageService;
+    }
 
     @Override
     public void onMessageUpdate(@Nonnull MessageUpdateEvent event) {
@@ -53,7 +61,7 @@ public class DiscordChatListener extends ListenerAdapter {
             return;
         }
         
-        LinkedChannel linkedChannel = Discord.getLinkedChannel(message.getChannel().asTextChannel());
+        LinkedChannel linkedChannel = discordService.getLinkedChannel(message.getChannel().asTextChannel());
 
         // Ignore messages from channels that are not linked
         if (linkedChannel == null || !linkedChannel.canSendDiscordMessages()) { 
@@ -66,22 +74,21 @@ public class DiscordChatListener extends ListenerAdapter {
         }
 
         // Ignore messages from the bot itself
-        if (author.getIdLong() == Discord.getSelfUser().getIdLong()) { 
+        if (author.getIdLong() == discordService.getSelfUser().getIdLong()) { 
             return;
         }
 
         // Normal message broadcast
+        com.pablobh.discordcraft.message.Message rawMessage = messageService.getMessage(edited ? "chat.minecraft-edited-format" : "chat.minecraft-format");
 
-        String messageWithoutAttachments = Messages.applyMinecraftColorFormatting(Messages.getMessage(
-                edited ? "chat.minecraft-edited-format" : "chat.minecraft-format",
-                "username", author.getEffectiveName(),
-                "guild", message.getGuild().getName(),
-                "channel", message.getChannel().getName(),
-                "message", message.getContentDisplay()
-        ));
+        rawMessage.formatMinecraftColors();
+        rawMessage.replace("username", author.getEffectiveName());
+        rawMessage.replace("guild", message.getGuild().getName());
+        rawMessage.replace("channel", message.getChannel().getName());
+        rawMessage.replace("message", message.getContentDisplay());
 
         // Replace attachments placeholder
-        String[] parts = messageWithoutAttachments.split("%attachments%", 2);
+        String[] parts = rawMessage.toString().split("%attachments%", 2);
 
         ComponentBuilder finalMessageBuilder = new ComponentBuilder("");
 
@@ -118,7 +125,7 @@ public class DiscordChatListener extends ListenerAdapter {
                 Attachment attachment = attachmentns.get(i);
 
                 if (i != 0) {
-                    attachmentsBuilder.append(Messages.getMessageWithDefault("chat.attachment-separator", ", "));
+                    attachmentsBuilder.append(messageService.getPlainMessageOrDefault("chat.attachment-separator", ", "));
                 }
 
                 TextComponent attachmentComponent = new TextComponent(attachment.getFileName());
@@ -127,7 +134,7 @@ public class DiscordChatListener extends ListenerAdapter {
                 attachmentsBuilder.append(attachmentComponent);
 
                 if (attachment.isSpoiler()) {
-                    attachmentsBuilder.append(Messages.getMessageWithDefault("chat.attachment-spoiler", " (spoiler)"));
+                    attachmentsBuilder.append(messageService.getPlainMessageOrDefault("chat.attachment-spoiler", " (spoiler)"));
                 }
 
             }

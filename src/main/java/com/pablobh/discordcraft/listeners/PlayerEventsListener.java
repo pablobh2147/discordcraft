@@ -1,6 +1,10 @@
 package com.pablobh.discordcraft.listeners;
 
-import org.bukkit.entity.Entity;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import org.bukkit.advancement.Advancement;
+import org.bukkit.advancement.AdvancementDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -8,61 +12,102 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.pablobh.discordcraft.Discord;
-import com.pablobh.discordcraft.LinkedChannel;
-import com.pablobh.discordcraft.Messages;
+import com.pablobh.discordcraft.discord.DiscordService;
+import com.pablobh.discordcraft.discord.LinkedChannel;
+import com.pablobh.discordcraft.message.Message;
+import com.pablobh.discordcraft.message.MessageService;
 
 public class PlayerEventsListener implements Listener {
 
+    private final DiscordService discordService;
+    private final MessageService messageService;
+
+    public PlayerEventsListener(DiscordService discordService, MessageService messageService) {
+        this.discordService = discordService;
+        this.messageService = messageService;
+    }
+
     @EventHandler
     private void onPlayerJoin(PlayerJoinEvent event) {
-        String message = Messages.getMessage("player.join", "player", event.getPlayer());
+        Message message = messageService.getDiscordMessage("player.join");
 
         if (!event.getPlayer().hasPlayedBefore()) {
-            String firstJoinMessage = Messages.getMessageWithDefault("player.first-join", null, "player", event.getPlayer());
+            Message firstJoinMessage = messageService.getDiscordMessage("player.welcome");
             if (firstJoinMessage != null) {
                 message = firstJoinMessage;
             }
         }
 
-        for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
+        if (message == null) {
+            return;
+        }
+
+        message.replace("player", event.getPlayer());
+
+        for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
             if (linkedChannel.canSendPlayerJoinMessages()) {
-                linkedChannel.getChannel().sendMessage(message).queue();
+                linkedChannel.sendMessage(message);
             }
         }
     }
 
     @EventHandler
     private void onPlayerLeft(PlayerQuitEvent event) {
-        String message = Messages.getMessage("player.left", "player", event.getPlayer());
+        Message message = messageService.getDiscordMessage("player.left");
 
-        for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
+        if (message == null) {
+            return;
+        }
+
+        message.replace("player", event.getPlayer());
+
+        for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
             if (linkedChannel.canSendPlayerLeaveMessages()) {
-                linkedChannel.getChannel().sendMessage(message).queue();
+                linkedChannel.sendMessage(message);
             }
         }
     }
 
     @EventHandler
     private void onPlayerDied(PlayerDeathEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
+        Player player = event.getEntity();
+        EntityDamageEvent damageEvent = event.getEntity().getLastDamageCause();
 
-            EntityDamageEvent damageEvent = event.getEntity().getLastDamageCause();
-            String deathMessage = Messages.getMessageWithDefault("custom-death-messages." + damageEvent.getCause().name().toLowerCase(), null, "death_message", event.getDeathMessage());
+        Message deathMessage = null;
+        if (damageEvent != null) {
+            String deathMessageKey = "custom-death-messages." + damageEvent.getCause().name().toLowerCase();
+            deathMessage = messageService.getDiscordMessage(deathMessageKey);
+        }
 
-            if (deathMessage == null) {
-                deathMessage = event.getDeathMessage();
-            }
+        String deathMessageStr = event.getDeathMessage();
 
-            String finalMessage = Messages.getMessage("player.death", "player", player, "death_message", deathMessage);
+        if (deathMessage != null) {
+            deathMessage.replace("player", player);
+            deathMessage.replace("death_message", deathMessageStr);
+            deathMessageStr = deathMessage.toString();
+        }
 
-            for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
-                if (linkedChannel.canSendPlayerDeathMessages()) {
-                    linkedChannel.getChannel().sendMessage(finalMessage).queue();
+        Message finalDeathMessage = messageService.getDiscordMessage("player.death");
+        String finalDeathMessageStr = deathMessageStr;
+
+        if (finalDeathMessage != null) {
+            finalDeathMessage.replace("player", player);
+            finalDeathMessage.replace("death_message", deathMessageStr);
+            finalDeathMessageStr = finalDeathMessage.toString();
+        } else {
+            finalDeathMessageStr = deathMessageStr;
+        }
+
+        for (LinkedChannel channel : discordService.getLinkedChannels()) {
+            if (channel.canSendPlayerDeathMessages()) {
+                if (finalDeathMessage != null) {
+                    channel.sendMessage(finalDeathMessage);
+                } else {
+                    channel.sendMessage(finalDeathMessageStr);
                 }
             }
         }
@@ -70,26 +115,21 @@ public class PlayerEventsListener implements Listener {
 
     @EventHandler
     public void onPlayerMurder(EntityDeathEvent event) {
-        Entity entity = event.getEntity();
+        if (event.getEntity() instanceof Player player) {
+            if (player.getLastDamageCause() instanceof EntityDamageByEntityEvent lastDamageEvent) {
+                if (lastDamageEvent.getDamager() instanceof Player killer) {
+                    Message message = messageService.getDiscordMessage("player.murder");
 
-        // Check if the entity that died is a player
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+                    if (message == null) {
+                        return;
+                    }
 
-            // Check if the player was killed by another player
-            if (player.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-                EntityDamageByEntityEvent lastDamageEvent = (EntityDamageByEntityEvent) player.getLastDamageCause();
-                Entity damager = lastDamageEvent.getDamager();
+                    message.replace("killer", killer);
+                    message.replace("victim", player);
 
-                if (damager instanceof Player) {
-                    Player killer = (Player) damager;
-
-                    String killMessage = Messages.getMessage("player.murder", "killer", killer, "victim", player);
-
-                    // Send a message to the linked channels
-                    for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
-                        if (linkedChannel.canSendPlayerMurderMessages()) {
-                            linkedChannel.getChannel().sendMessage(killMessage).queue();
+                    for (LinkedChannel channel : discordService.getLinkedChannels()) {
+                        if (channel.canSendPlayerMurderMessages()) {
+                            channel.sendMessage(message.toString());
                         }
                     }
                 }
@@ -99,18 +139,54 @@ public class PlayerEventsListener implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        Entity damager = event.getDamager();
-        Entity damaged = event.getEntity();
-
-        // Check if the damaged entity is a player
-        if (damaged instanceof Player) {
-            Player damagedPlayer = (Player) damaged;
-
-            // Check if the damager is a player
-            if (damager instanceof Player) {
-                damagedPlayer.setLastDamageCause(event);
+        if (event.getEntity() instanceof Player damaged) {
+            if (event.getDamager() instanceof Player) {
+                damaged.setLastDamageCause(event);
             }
         }
+    }
+
+    private static final String ADVANCEMENT_API_ENDPOINT = "https://minecraft-api.com/api/achivements/{block}/{title}/{desc}";
+
+    private String getAdvancementDisplayURL(AdvancementDisplay display) {
+        String block = display.getIcon().getType().name().toLowerCase();
+        String title = "Advancement..Made";
+        String name = URLEncoder.encode(display.getTitle().replace(" ", ".."), StandardCharsets.UTF_8);
+
+        String url = ADVANCEMENT_API_ENDPOINT
+            .replace("{block}", block)
+            .replace("{title}", title)
+            .replace("{desc}", name);
+        
+        return url;
+    }
+
+    @EventHandler
+    public void onPlayerAdvancement(PlayerAdvancementDoneEvent event) {
+        Advancement advancement = event.getAdvancement();
+        AdvancementDisplay display = advancement.getDisplay();
+
+        // Skip hidden advancements (like recipe unlocks)
+        if (display == null) {
+            return;
+        }
+
+        Message message = messageService.getDiscordMessage("player.achivement-unlock");
+
+        if (message == null) {
+            return;
+        }
+
+        message.replace("advancement", display);
+        message.replace("player", event.getPlayer());
+        message.replace("display_url", getAdvancementDisplayURL(display));
+
+        for (LinkedChannel channel : discordService.getLinkedChannels()) {
+            if (channel.canSendPlayerAdvancementMessages()) {
+                channel.sendMessage(message);
+            }
+        }
+
     }
 
 }

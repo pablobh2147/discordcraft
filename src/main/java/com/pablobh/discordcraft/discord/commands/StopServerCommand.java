@@ -1,9 +1,14 @@
-package com.pablobh.discordcraft.commands.discord;
+package com.pablobh.discordcraft.discord.commands;
+
+import javax.annotation.Nonnull;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.pablobh.discordcraft.DiscordCraft;
+import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
+import com.pablobh.discordcraft.message.Message;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -11,11 +16,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 public class StopServerCommand extends DiscordCommand {
 
+    private static final String COMMAND_NAME = "stop";
+
     public static final int MINIMUM_DELAY = 5;
     public static final int MAXIMUM_DELAY = 60 * 10; // 10 minutes
 
-    public StopServerCommand() {
-        super("stop-server");
+    public StopServerCommand(@Nonnull DiscordCommandManager manager) {
+        super(COMMAND_NAME, manager);
 
         addOption(OptionType.INTEGER, "delay", "Delay in seconds", false)
         .setMinValue(MINIMUM_DELAY)
@@ -25,7 +32,6 @@ public class StopServerCommand extends DiscordCommand {
     @Override
     public void onCommandInteraction(SlashCommandInteractionEvent event) {
 
-        String message = getConfig().getString("message", "Server will stop in %seconds% seconds.");
         boolean isEphemeral = getConfig().getBoolean("is-ephemeral", false);
         boolean showTitle = getConfig().getBoolean("show-title", true);
 
@@ -49,19 +55,27 @@ public class StopServerCommand extends DiscordCommand {
             getConfig().set("delay", MAXIMUM_DELAY);
         }
 
-        message = message.replace("%seconds%", String.valueOf(delay));
+        String seconds = String.valueOf(delay);
 
-        event.reply(message).setEphemeral(isEphemeral).queue();
+        // Discord reply
+        Message discordMsg = getMessageService().getDiscordMessageOrDefault(getMessageKey("message"), "The server is stopping in %seconds% seconds");
+        discordMsg.replace("seconds", seconds);
+        event.reply(discordMsg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
 
+        // Minecraft title
         if (showTitle) {
+            String title = getMessageService().getPlainMessageOrDefault(getMessageKey("minecraft-title"), "Stopping Server");
+            String subtitle = getMessageService().getPlainMessageOrDefault(getMessageKey("minecraft-subtitle"), "The server is stopping in %seconds% seconds");
+            subtitle = subtitle.replace("%seconds%", seconds);
+
             for (Player player : Bukkit.getOnlinePlayers()) {
-                player.sendTitle("Stoping Server", message, 10, 60, 10); // Time in ticks
+                player.sendTitle(title, subtitle, 10, 60, 10); // Time in ticks
             }
         }
 
         DiscordCraft.discordLogInfo("Stopping server in " + delay + " seconds, requested by " + event.getUser().getAsMention());
 
-        Bukkit.getScheduler().runTaskLater(DiscordCraft.instance(), this::stopServer, delay * 20); // Time in ticks
+        Bukkit.getScheduler().runTaskLater(DiscordCraft.getInstance(), this::stopServer, delay * 20); // 20 ticks = 1 second
     }
 
     private void stopServer() {

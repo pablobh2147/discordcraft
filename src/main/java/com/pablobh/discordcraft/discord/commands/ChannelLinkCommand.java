@@ -1,8 +1,12 @@
-package com.pablobh.discordcraft.commands.discord;
+package com.pablobh.discordcraft.discord.commands;
 
-import com.pablobh.discordcraft.Discord;
-import com.pablobh.discordcraft.LinkedChannel;
-import com.pablobh.discordcraft.Messages;
+import javax.annotation.Nonnull;
+
+import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
+import com.pablobh.discordcraft.discord.DiscordService;
+import com.pablobh.discordcraft.discord.LinkedChannel;
+import com.pablobh.discordcraft.message.Message;
 
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -13,8 +17,14 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class ChannelLinkCommand extends DiscordCommand {
 
-    public ChannelLinkCommand() {
-        super("channel-link");
+    private static final String COMMAND_NAME = "link";
+
+    private final DiscordService discordService;
+
+    public ChannelLinkCommand(@Nonnull DiscordCommandManager manager, @Nonnull DiscordService discordService) {
+        super(COMMAND_NAME, manager);
+
+        this.discordService = discordService;
 
         // Subcommand "add"
         {
@@ -82,7 +92,7 @@ public class ChannelLinkCommand extends DiscordCommand {
                 subcommandConfig(event);
                 break;
             default:
-                event.reply(Messages.getMessage(CommandManager.COMMAND_INVALID_SUBCOMMAND)).setEphemeral(true).queue(); // Should never happen
+                event.reply(getMessageService().getDiscordMessage("commands.invalid-subcommand").toDiscordMessage()).setEphemeral(true).queue(); // Should never happen
                 break;
         }
     }
@@ -91,76 +101,76 @@ public class ChannelLinkCommand extends DiscordCommand {
         TextChannel channel = event.getOption("channel") == null ? event.getChannel().asTextChannel() : event.getOption("channel").getAsChannel().asTextChannel();
 
         if (channel == null) {
-            event.reply("An error occurred while getting the channel!").setEphemeral(true).queue();
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("channel-error"), "An error occurred while getting the channel!");
+            event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
-        if (channel.getGuild().getIdLong() != Discord.getMainGuild().getIdLong()) {
-
-            String channelNotInServerMessage = "The channel must be in the same server as the bot!";
-
-            event.reply(channelNotInServerMessage).setEphemeral(true).queue();
-
+        if (channel.getGuild().getIdLong() != discordService.getMainGuild().getIdLong()) {
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-in-server"), "The channel must be in the same server as the bot!");
+            event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
-        Discord.addLinkedChannel(channel);
+        discordService.addLinkedChannel(channel);
 
-        String channelAddedMessage = "Added a new channel %channel%";
-
-        event.reply(channelAddedMessage.replace("%channel%", channel.getAsMention())).setEphemeral(true).queue();
+        Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("added"), "Added a new channel %channel%");
+        msg.replace("channel", channel.getAsMention());
+        event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
     }
 
     private void subcommandRemove(SlashCommandInteractionEvent event) {
         TextChannel channel = event.getOption("channel") == null ? event.getChannel().asTextChannel() : event.getOption("channel").getAsChannel().asTextChannel();
 
         if (channel == null) {
-            event.reply("An error occurred while getting the channel!").setEphemeral(true).queue();
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("channel-error"), "An error occurred while getting the channel!");
+            event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
-        if (!Discord.isLinkedChannel(channel)) {
-
-            String channelNotWasLinkedMessage = "The channel was not linked!";
-
-            event.reply(channelNotWasLinkedMessage).setEphemeral(true).queue();
-
+        if (!discordService.isChannelLinked(channel)) {
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-linked"), "The channel is not linked!");
+            event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
-        Discord.removeLinkedChannel(channel);
+        discordService.removeChannelLink(channel);
 
-        String channelAddedMessage = "Removed channel %channel%";
-
-        event.reply(channelAddedMessage.replace("%channel%", channel.getAsMention())).setEphemeral(true).queue();
+        Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("removed"), "Removed channel %channel%");
+        msg.replace("channel", channel.getAsMention());
+        event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
     }
 
     private void subcommandConfig(SlashCommandInteractionEvent event) {
         TextChannel channel = event.getOption("channel") == null ? event.getChannel().asTextChannel() : event.getOption("channel").getAsChannel().asTextChannel();
 
         if (channel == null) {
-            event.reply("An error occurred while getting the channel!").setEphemeral(true).queue();
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("channel-error"), "An error occurred while getting the channel!");
+            event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
-        LinkedChannel linkedChannel = Discord.getLinkedChannel(channel);
+        LinkedChannel linkedChannel = discordService.getLinkedChannel(channel);
 
         if (linkedChannel == null) {
-            event.reply("The channel is not linked!").setEphemeral(true).queue();
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-linked"), "The channel is not linked!");
+            event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
         String option = event.getOption("option").getAsString();
 
         if (option == null) {
-            event.reply("An error occurred while getting the option!").setEphemeral(true).queue();
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("option-error"), "An error occurred while getting the option!");
+            event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
         String value = event.getOption("value").getAsString();
 
         if (value == null) {
-            event.reply("An error occurred while getting the value!").setEphemeral(true).queue();
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("value-error"), "An error occurred while getting the value!");
+            event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
@@ -206,13 +216,17 @@ public class ChannelLinkCommand extends DiscordCommand {
                 linkedChannel.setSendServerStopMessages(computedValue);
                 break;
             default:
-                event.reply("Invalid option!").setEphemeral(true).queue();
+                Message invalidMsg = getMessageService().getDiscordMessageOrDefault(getMessageKey("invalid-option"), "Invalid option!");
+                event.reply(invalidMsg.toDiscordMessage()).setEphemeral(true).queue();
                 return;
         }
 
-        LinkedChannel.saveChannelsConfig(); // Save the configuration
+        // Save the configuration
+        discordService.getBotConfig().save();
 
-        event.reply("Option " + option + " has been set to " + value + " for channel " + channel.getAsMention()).setEphemeral(true).queue();
+        Message successMsg = getMessageService().getDiscordMessageOrDefault(getMessageKey("config-success"), "Option %option% has been set to %value% for channel %channel%");
+        successMsg.replace("option", option).replace("value", value).replace("channel", channel.getAsMention());
+        event.reply(successMsg.toDiscordMessage()).setEphemeral(true).queue();
     }
 
 }

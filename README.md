@@ -13,7 +13,7 @@ A Discord integration plugin for Minecraft servers. Bridge your Minecraft server
 - **Discord slash commands** — Manage your server directly from Discord (`/ban`, `/pardon`, `/whitelist`, `/stop`, `/playerlist`, etc.)
 - **Channel linking** — Link multiple Discord channels with individual message-type filters
 - **Customizable messages** — Every message the bot sends is fully configurable via `messages.yml`
-- **Customizable commands** — Enable/disable and configure each Discord command in `discord-commands.yml`
+- **Customizable commands** — Enable/disable and configure each Discord command in `commands.yml`
 - **Bot activity** — Show a custom status on the bot (Playing, Watching, etc.)
 
 ## Requirements

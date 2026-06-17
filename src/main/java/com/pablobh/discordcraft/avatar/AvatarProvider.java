@@ -1,16 +1,15 @@
 package com.pablobh.discordcraft.avatar;
 
-import org.bukkit.entity.Player;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.UUID;
 
+import org.bukkit.entity.Player;
+
 public class AvatarProvider {
 
     private static final String BASE_URL = "https://render.crafty.gg/";
-    private static final String DEFAULT_AVATAR_HANDLE = "MHF_Stevee";
 
     private String getPlayerAvatarHandle(Player player) {
         return player.getUniqueId().toString();
@@ -20,12 +19,11 @@ public class AvatarProvider {
         switch (style) {
             case BODY:
                 return "3d/full";
-            case BUST:
-                return "3d/bust";
             case FACE:
                 return "2d/head";
+            case BUST:
             default:
-                throw new IllegalArgumentException("Invalid avatar style: " + style);
+                return "3d/bust";
         }
     }
    

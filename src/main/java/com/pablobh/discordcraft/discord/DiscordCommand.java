@@ -1,11 +1,15 @@
-package com.pablobh.discordcraft.commands.discord;
+package com.pablobh.discordcraft.discord;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import com.pablobh.discordcraft.DiscordCraft;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -37,49 +41,40 @@ public abstract class DiscordCommand {
     // Command Configuration
 
     private ConfigurationSection config = null;
+    private final MessageService messageService;
 
     // Constructors
 
-    public DiscordCommand(String configName) {
+    public DiscordCommand(@Nonnull String name, @Nonnull DiscordCommandManager manager) {
+        this(name, manager.getCommandConfig(name), manager.getMessageService());
+    }
 
-        // Initialize the configuration
+    public DiscordCommand(@Nonnull String name, @Nullable ConfigurationSection config, @Nonnull MessageService messageService) {
+        Objects.requireNonNull(name, "Command name cannot be null");
 
-        config = DiscordCraft.instance().getDiscordCommandsConfigManager().getConfig().getConfigurationSection("commands." + configName);
-
-        if (config == null) {
-            throw new IllegalArgumentException("Configuration section not found for command: " + configName);
-        }
-
-        // Load the configuration
+        this.config = config;
+        this.name = name;
+        this.messageService = messageService;
 
         enabled = getConfig().getBoolean("enabled", true);
-
-        name = getConfig().getString("command", configName.replaceAll("[^A-Za-z0-9 -]", "").toLowerCase());
         description = getConfig().getString("description", null);
         help = getConfig().getString("help", null);
 
         isAdministratorOnly = getConfig().getBoolean("admin-only", false);
-
-    }
-
-    public DiscordCommand(String name, String description, String help, boolean enabled, boolean isAdministratorOnly) {
-
-        this.config = null;
-
-        this.enabled = enabled;
-
-        this.name = name;
-        this.description = description;
-        this.help = help;
-
-        this.isAdministratorOnly = isAdministratorOnly;
-
     }
 
     // Configuration methods
 
     protected final ConfigurationSection getConfig() {
         return config;
+    }
+
+    protected final MessageService getMessageService() {
+        return messageService;
+    }
+
+    protected final String getMessageKey(@Nonnull String key) {
+        return "commands." + name + "." + key;
     }
 
     // Command options

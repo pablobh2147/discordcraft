@@ -3,163 +3,163 @@ package com.pablobh.discordcraft;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
+import javax.security.auth.login.LoginException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.config.GlobalConfiguration;
+import com.pablobh.discordcraft.discord.DiscordService;
+import com.pablobh.discordcraft.discord.LinkedChannel;
 import com.pablobh.discordcraft.listeners.MinecraftChatListener;
 import com.pablobh.discordcraft.listeners.PlayerEventsListener;
+import com.pablobh.discordcraft.message.Message;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class DiscordCraft extends JavaPlugin {
-    
-    // Instance
+
+    private static final String TOKEN_ENV_VAR_NAME = "DISCORDCRAFT_BOT_TOKEN";
 
     private static DiscordCraft instance;
     
-    // Flags
-
-    private boolean isDiscordCraftEnabled = false;
-    
-    // Configurations
-    
-    private ConfigManager mainConfig;
-    private ConfigManager messagesConfig;
-    private ConfigManager botConfig;
-    private ConfigManager discordCommandsConfig;
-
     private GlobalConfiguration globalConfiguration;
+    private Configuration messagesConfig;
+    private Configuration botConfig;
+    private Configuration commandsConfig;
+
+    private DiscordService discordService;
+    private MessageService messageService;
+
+    private boolean enabled = false;
+
+    // --------------------- Lifecycle ---------------------
 
     @Override
     public void onEnable() {
         instance = this;
 
-        // Load Configurations
-        mainConfig = new ConfigManager("config.yml", true);
-        messagesConfig = new ConfigManager("messages.yml", true);
-        botConfig = new ConfigManager("bot.yml", true);
-        discordCommandsConfig = new ConfigManager("discord-commands.yml", true);
+        globalConfiguration = new GlobalConfiguration(this, "config.yml");
+        messagesConfig = new Configuration(this, "messages.yml");
+        botConfig = new Configuration(this, "bot.yml");
+        commandsConfig = new Configuration(this, "commands.yml");
 
-        globalConfiguration = new GlobalConfiguration(mainConfig);
+        messageService = new MessageService(messagesConfig);
 
-        // Setup Messages
-        Messages.setup();
-
-        // Load Discord JDA
-        if (!Discord.setup()) {
+        if (!initializeDiscordService()) {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
-        // Register Listeners
         registerSpigotListeners();
-
-        isDiscordCraftEnabled = true;
-
-        // Start Messages
-        serverStartMessages();
+        sendServerStartNotification();
 
         DiscordCraft.logInfo(getDescription().getName() + " v" + getDescription().getVersion() + " has been enabled!");
+    
+        enabled = true;
     }
 
     @Override
     public void onDisable() {
-        // Check if DiscordCraft is enabled
-        if (!DiscordCraft.isDiscordCraftEnabled()) {
+        if (!enabled) {
             return;
         }
 
-        // Stop Messages
-        serverStopMessages();
+        sendServerStopNotification();
 
-        // Shutdown Discord JDA
-        Discord.shutdown();
+        if (discordService != null) {
+            discordService.shutdown();
+        }
 
-        // Save Configurations
-        mainConfig.saveConfig();
-        messagesConfig.saveConfig();
-        botConfig.saveConfig();
-        discordCommandsConfig.saveConfig();
+        saveAllConfigurations();
 
-        // Disable
         DiscordCraft.logInfo(getDescription().getName() + " v" + getDescription().getVersion() + " has been disabled!");
 
         instance = null;
-        isDiscordCraftEnabled = false;
+        enabled = false;
     }
 
-    // Notifications
+    // --------------------- Initialization ---------------------
 
-    private void serverStartMessages() {
-        String message = Messages.getMessage("server.start");
-
-        for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
-            if (linkedChannel.canSendServerStartMessages()) {
-                linkedChannel.getChannel().sendMessage(message).queue();
+    private boolean initializeDiscordService() {
+        String token = botConfig.getString("token", null);
+        if (token == null || token.isEmpty()) {
+            try {
+                token = System.getenv(TOKEN_ENV_VAR_NAME);
+                DiscordCraft.logInfo("Using bot token from environment variables.");
+            } catch (SecurityException e) {
+                DiscordCraft.logSevere("Security exception while reading " + TOKEN_ENV_VAR_NAME + " from environment variables.");
             }
+        } else {
+            DiscordCraft.logInfo("Using bot token from config.");
         }
-    }
 
-    private void serverStopMessages() {
-        String message = Messages.getMessage("server.stop");
-
-        for (LinkedChannel linkedChannel : Discord.getLinkedChannels()) {
-            if (linkedChannel.canSendServerStopMessages()) {
-                linkedChannel.getChannel().sendMessage(message).queue();
-            }
+        if (token == null || token.isEmpty()) {
+            DiscordCraft.logSevere("Bot token is not set in bot.yml nor in environment variables. Please set it and restart the server.");
+            return false;
         }
+
+        try {
+            discordService = new DiscordService(token, globalConfiguration, botConfig, commandsConfig, messageService);
+        } catch (LoginException e) {
+            DiscordCraft.logSevere("Failed to initialize Discord service: " + e.getMessage());
+            return false;
+        }
+
+        return true;
     }
 
-    // Instance
-
-    public static DiscordCraft instance() {
-        return instance;
+    private void registerSpigotListeners() {
+        Bukkit.getPluginManager().registerEvents(new MinecraftChatListener(globalConfiguration, discordService), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerEventsListener(discordService, messageService), this);
     }
 
-    // Listeners
+    // --------------------- Configuration ---------------------
 
-    public void registerSpigotListeners() {
-        Bukkit.getPluginManager().registerEvents(new MinecraftChatListener(globalConfiguration), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerEventsListener(), this);
+    public void saveAllConfigurations() {
+        globalConfiguration.save();
+        messagesConfig.save();
+        botConfig.save();
+        commandsConfig.save();
+
+        DiscordCraft.logInfo("All configurations saved.");
     }
-
-    // Configurations
 
     public void reloadConfig() {
-        globalConfiguration.reload();
+        globalConfiguration.load();
+        messagesConfig.load();
+        botConfig.load();
+        commandsConfig.load();
+
         DiscordCraft.logInfo("Configuration reloaded.");
     }
 
-    public GlobalConfiguration getGlobalConfiguration() {
-        return globalConfiguration;
+    // --------------------- Notifications ---------------------
+
+    private void sendServerStartNotification() {
+        Message msg = messageService.getDiscordMessage("server.start");
+        
+        for (LinkedChannel channel : discordService.getLinkedChannels()) {
+            if (channel.canSendServerStartMessages()) {
+                channel.sendMessage(msg);
+            }
+        }
     }
 
-    public ConfigManager getMainConfigManager() {
-        return mainConfig;
+    private void sendServerStopNotification() {
+        Message msg = messageService.getDiscordMessage("server.stop");
+
+        for (LinkedChannel channel : discordService.getLinkedChannels()) {
+            if (channel.canSendServerStopMessages()) {
+                channel.sendMessage(msg);
+            }
+        }
     }
 
-    public ConfigManager getMessagesConfigManager() {
-        return messagesConfig;
-    }
-
-    public ConfigManager getBotConfigManager() {
-        return botConfig;
-    }
-
-    public ConfigManager getDiscordCommandsConfigManager() {
-        return discordCommandsConfig;
-    }
-
-    // Checkers
-
-    public static boolean isDiscordCraftEnabled() {
-        return instance != null && instance.isDiscordCraftEnabled;
-    }
-
-    // Logging
+    // --------------------- Logging ---------------------
 
     public static Logger getDiscordCraftLogger() {
         if (instance == null) {
@@ -215,14 +215,15 @@ public class DiscordCraft extends JavaPlugin {
         }
     }
 
-    // Discord Logging
+    // --------------------- Discord logging ---------------------
 
     public static void discordLogInfo(@NotNull String message) {
         if (message == null || message.isBlank()) {
             return;
         }
 
-        TextChannel logChannel = Discord.getLogChannel();
+        DiscordService discordService = instance != null ? instance.discordService : null;
+        TextChannel logChannel = discordService != null ? discordService.getLogChannel() : null;
         if (logChannel != null) {
             logChannel.sendMessage("[INFO]: " + message).queue();
         }
@@ -235,7 +236,8 @@ public class DiscordCraft extends JavaPlugin {
             return;
         }
 
-        TextChannel logChannel = Discord.getLogChannel();
+        DiscordService discordService = instance != null ? instance.discordService : null;
+        TextChannel logChannel = discordService != null ? discordService.getLogChannel() : null;
         if (logChannel != null) {
             logChannel.sendMessage("[WARNING]: " + message).queue();
         }
@@ -248,7 +250,8 @@ public class DiscordCraft extends JavaPlugin {
             return;
         }
 
-        TextChannel logChannel = Discord.getLogChannel();
+        DiscordService discordService = instance != null ? instance.discordService : null;
+        TextChannel logChannel = discordService != null ? discordService.getLogChannel() : null;
         if (logChannel != null) {
             logChannel.sendMessage("[ERROR]: " + message).queue();
         }
@@ -261,7 +264,8 @@ public class DiscordCraft extends JavaPlugin {
             return;
         }
 
-        TextChannel logChannel = Discord.getLogChannel();
+        DiscordService discordService = instance != null ? instance.discordService : null;
+        TextChannel logChannel = discordService != null ? discordService.getLogChannel() : null;
         if (logChannel != null) {
             if (message != null && !message.isBlank()) {
                 logChannel.sendMessage("[ERROR]: " + message + " (Check Console for more Details)").queue();
@@ -271,6 +275,12 @@ public class DiscordCraft extends JavaPlugin {
         }
 
         logException(e, message);
+    }
+
+    // --------------------- Instance ---------------------
+
+    public static DiscordCraft getInstance() {
+        return instance;
     }
 
 }

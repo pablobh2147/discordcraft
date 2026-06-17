@@ -1,12 +1,14 @@
-package com.pablobh.discordcraft.commands.discord;
+package com.pablobh.discordcraft.discord.commands;
+
+import javax.annotation.Nonnull;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 
-import com.pablobh.discordcraft.Discord;
-import com.pablobh.discordcraft.DiscordCraft;
-import com.pablobh.discordcraft.Messages;
 import com.pablobh.discordcraft.StringUtils;
+import com.pablobh.discordcraft.config.Configuration;
+import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
+import com.pablobh.discordcraft.discord.DiscordService;
 
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -17,8 +19,14 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class SetupCommand extends DiscordCommand {
 
-    public SetupCommand() {
-        super("setup", "This command is used for setting up the server and start configuration", "This command is used for setting up the server and start configuration", true, true);
+    private static final String COMMAND_NAME = "setup";
+
+    private final DiscordService discordService;
+
+    public SetupCommand(@Nonnull DiscordCommandManager manager, @Nonnull DiscordService discordService) {
+        super(COMMAND_NAME, manager);
+
+        this.discordService = discordService;
 
         setGlobal(true);
 
@@ -44,16 +52,16 @@ public class SetupCommand extends DiscordCommand {
     @Override
     public void onCommandInteraction(SlashCommandInteractionEvent event) {
         
-        if (Discord.getMainGuild() != null) {
-            event.reply(Messages.getMessage("setup.already")).setEphemeral(true).queue();
+        if (discordService.getMainGuild() != null) {
+            event.reply(getMessageService().getDiscordMessage("setup.already").toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
-        ConfigurationSection botConfig = DiscordCraft.instance().getBotConfigManager().getConfig();
+        Configuration botConfig = discordService.getBotConfig();
 
         // Set guild
 
-        botConfig.set(Discord.GUILD_ID, event.getGuild().getIdLong());
+        botConfig.set(DiscordService.GUILD_ID, event.getGuild().getIdLong());
 
         // Activity
 
@@ -62,15 +70,15 @@ public class SetupCommand extends DiscordCommand {
         OptionMapping activityName = event.getOption("activity-name");
 
         if (showActivity != null) {
-            botConfig.set(Discord.ACTIVITY_ENABLED, showActivity.getAsBoolean());
+            botConfig.set(DiscordService.ACTIVITY_ENABLED, showActivity.getAsBoolean());
         }
 
         if (activityType != null) {
-            botConfig.set(Discord.ACTIVITY_TYPE, activityType.getAsString());
+            botConfig.set(DiscordService.ACTIVITY_TYPE, activityType.getAsString());
         }
 
         if (activityName != null) {
-            botConfig.set(Discord.ACTIVITY_NAME, activityName.getAsString());
+            botConfig.set(DiscordService.ACTIVITY_NAME, activityName.getAsString());
         }
 
         // Log Channel
@@ -78,17 +86,15 @@ public class SetupCommand extends DiscordCommand {
         OptionMapping logChannel = event.getOption("log-channel");
 
         if (logChannel != null) {
-            botConfig.set(Discord.LOG_CHANNEL, logChannel.getAsChannel().getIdLong());
+            botConfig.set(DiscordService.LOG_CHANNEL, logChannel.getAsChannel().getIdLong());
         }
 
-        // Save config
-        DiscordCraft.instance().getBotConfigManager().saveConfig();
+        botConfig.save();
 
-        // Reply
-        event.reply(Messages.getMessage("setup.complete")).setEphemeral(true).queue();
-
-        // Stop the server
-        Bukkit.getScheduler().runTaskLater(DiscordCraft.instance(), () -> Bukkit.shutdown(), 3 * 20); // 3 seconds delay to stop the server, because the bot needs to send the message
+        
+        event.reply(getMessageService().getDiscordMessage("setup.complete").toDiscordMessage()).setEphemeral(true).complete();
+        
+        Bukkit.shutdown();
     }
     
 

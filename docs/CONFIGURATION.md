@@ -8,7 +8,7 @@ This document covers the detailed configuration of the DiscordCraft plugin, incl
   - [bot.yml](#botyml)
   - [config.yml](#configyml)
   - [messages.yml](#messagesyml)
-  - [discord-commands.yml](#discord-commandsyml)
+  - [commands.yml](#commandsyml)
 - [Discord Commands](#discord-commands)
   - [/setup](#setup)
   - [/link](#link)
@@ -101,7 +101,7 @@ All messages sent by the bot are fully customizable. The file is organized into 
 
 See [Message Customization](#message-customization) for details on available placeholders.
 
-### discord-commands.yml
+### commands.yml
 
 Controls each Discord slash command's behavior. Every command supports these common fields:
 
@@ -158,7 +158,7 @@ Displays lists of players.
 - Operators
 - Banned players
 
-Each list can be individually enabled/disabled in `discord-commands.yml`.
+Each list can be individually enabled/disabled in `commands.yml`.
 
 ### /ban
 
@@ -193,7 +193,7 @@ Manages the server whitelist.
 
 Stops the Minecraft server with a configurable countdown delay.
 
-The delay (in seconds) and the countdown message can be configured in `discord-commands.yml`. A title is optionally shown to online players.
+The delay (in seconds) and the countdown message can be configured in `commands.yml`. A title is optionally shown to online players.
 
 **Requires:** Administrator
 
