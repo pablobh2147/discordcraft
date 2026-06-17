@@ -99,7 +99,11 @@ public class DiscordCommandManager extends ListenerAdapter {
                                 .toString()
                         );
 
-                        event.reply(messageService.getDiscordMessage("commands.internal-error").toDiscordMessage()).setEphemeral(true).queue();
+                        if (event.isAcknowledged()) {
+                            event.getHook().sendMessage(messageService.getDiscordMessage("commands.internal-error").toDiscordMessage()).queue();
+                        } else {
+                            event.reply(messageService.getDiscordMessage("commands.internal-error").toDiscordMessage()).setEphemeral(true).queue();
+                        }
                     }
 
                     return;

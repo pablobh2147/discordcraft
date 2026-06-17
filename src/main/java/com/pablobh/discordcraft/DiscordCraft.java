@@ -84,20 +84,36 @@ public class DiscordCraft extends JavaPlugin {
 
     // --------------------- Initialization ---------------------
 
-    private boolean initializeDiscordService() {
+    private boolean isTokenValid(@Nullable String token) {
+        return token != null && !token.isEmpty();
+    }
+
+    private String getBotToken() {
         String token = botConfig.getString("token", null);
-        if (token == null || token.isEmpty()) {
-            try {
-                token = System.getenv(TOKEN_ENV_VAR_NAME);
-                DiscordCraft.logInfo("Using bot token from environment variables.");
-            } catch (SecurityException e) {
-                DiscordCraft.logSevere("Security exception while reading " + TOKEN_ENV_VAR_NAME + " from environment variables.");
-            }
-        } else {
+
+        if (isTokenValid(token)) {
             DiscordCraft.logInfo("Using bot token from config.");
+            return token;
         }
 
-        if (token == null || token.isEmpty()) {
+        try {
+            token = System.getenv(TOKEN_ENV_VAR_NAME);
+
+            if (isTokenValid(token)) {
+                DiscordCraft.logInfo("Using bot token from environment variables.");
+                return token;
+            }
+        } catch (SecurityException e) {
+            DiscordCraft.logSevere("Security exception while reading " + TOKEN_ENV_VAR_NAME + " from environment variables.");
+        }
+
+        return null;
+    }
+
+    private boolean initializeDiscordService() {
+        String token = getBotToken();
+
+        if (token == null) {
             DiscordCraft.logSevere("Bot token is not set in bot.yml nor in environment variables. Please set it and restart the server.");
             return false;
         }

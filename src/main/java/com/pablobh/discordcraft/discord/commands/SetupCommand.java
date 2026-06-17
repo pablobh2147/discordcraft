@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import org.bukkit.Bukkit;
 
+import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.StringUtils;
 import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.discord.DiscordCommand;
@@ -57,6 +58,8 @@ public class SetupCommand extends DiscordCommand {
             return;
         }
 
+        event.deferReply(true).complete();
+
         Configuration botConfig = discordService.getBotConfig();
 
         // Set guild
@@ -90,13 +93,10 @@ public class SetupCommand extends DiscordCommand {
         }
 
         botConfig.save();
-
         
-        event.reply(getMessageService().getDiscordMessage("setup.complete").toDiscordMessage()).setEphemeral(true).complete();
+        event.getHook().sendMessage(getMessageService().getDiscordMessage("setup.complete").toDiscordMessage()).complete();
         
-        Bukkit.shutdown();
+        Bukkit.getScheduler().runTask(DiscordCraft.getInstance(), () -> Bukkit.shutdown());
     }
-    
-
 
 }

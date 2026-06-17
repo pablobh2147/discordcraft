@@ -68,7 +68,9 @@ public class DiscordService {
 
         mainGuild = getGuild(botConfig.getLong(GUILD_ID, 0));
         if (mainGuild == null) {
-            throw new LoginException("No server was found with the ID provided in the config! Please check the ID or run /setup command on Discord.");
+            DiscordCraft.logWarning("No server was found with the ID provided in the config. Please run /setup command on Discord.");
+            linkedChannels = new ArrayList<>();
+            return;
         }
 
         logChannel = getTextChannel(botConfig.getLong(LOG_CHANNEL, 0));
@@ -141,6 +143,14 @@ public class DiscordService {
     public void shutdown() {
         if (jda != null) {
             jda.shutdown();
+            try {
+                if (!jda.awaitShutdown(java.time.Duration.ofSeconds(10))) {
+                    jda.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                jda.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
