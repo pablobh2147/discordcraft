@@ -97,7 +97,7 @@ public class DiscordCraft extends JavaPlugin {
         }
 
         try {
-            discordService = new DiscordService(token, botConfig, discordCommandsConfig, messageService);
+            discordService = new DiscordService(token, globalConfiguration, botConfig, discordCommandsConfig, messageService);
         } catch (LoginException e) {
             DiscordCraft.logSevere("Failed to initialize Discord service: " + e.getMessage());
             return false;
@@ -159,17 +159,15 @@ public class DiscordCraft extends JavaPlugin {
         }
     }
 
-    // Instance
-
-    public static DiscordCraft instance() {
-        return instance;
-    }
-
     // Listeners
 
     private void registerSpigotListeners() {
         Bukkit.getPluginManager().registerEvents(new MinecraftChatListener(globalConfiguration, discordService), this);
         Bukkit.getPluginManager().registerEvents(new PlayerEventsListener(discordService, messageService), this);
+    }
+
+    public static DiscordCraft getInstance() {
+        return instance;
     }
 
     // Logging

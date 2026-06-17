@@ -12,6 +12,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.config.Configuration;
+import com.pablobh.discordcraft.config.GlobalConfiguration;
 import com.pablobh.discordcraft.listeners.DiscordChatListener;
 import com.pablobh.discordcraft.message.MessageService;
 
@@ -48,11 +49,14 @@ public class DiscordService {
 
     private TextChannel logChannel;
 
+    private GlobalConfiguration globalConfig;
     private Configuration botConfig;
     private Configuration commandConfig;
+
     private MessageService messageService;
 
-    public DiscordService(@Nonnull String token, @Nonnull Configuration botConfig, @Nonnull Configuration commandConfig, @Nonnull MessageService messageService) throws LoginException {
+    public DiscordService(@Nonnull String token, @Nonnull GlobalConfiguration globalConfig, @Nonnull Configuration botConfig, @Nonnull Configuration commandConfig, @Nonnull MessageService messageService) throws LoginException {
+        this.globalConfig = globalConfig;
         this.botConfig = botConfig;
         this.commandConfig = commandConfig;
         this.messageService = messageService;
@@ -210,13 +214,10 @@ public class DiscordService {
     }
 
     public void addLinkedChannel(TextChannel channel) {
-        if (isChannelLinked(channel)) {
-            return;
+        if (!isChannelLinked(channel)) {
+            linkedChannels.add(createChannelLink(channel));
+            botConfig.save();
         }
-
-        linkedChannels.add(createChannelLink(channel));
-
-        DiscordCraft.instance().getBotConfiguration().save();
     }
 
     public List<LinkedChannel> getLinkedChannels() {
@@ -248,7 +249,7 @@ public class DiscordService {
         return jda.getSelfUser();
     }
 
-    public Configuration getConfig() {
+    public Configuration getBotConfig() {
         return botConfig;
     }
 
@@ -261,7 +262,8 @@ public class DiscordService {
     public LinkedChannel createChannelLink(@Nonnull TextChannel textChannel) {
         Objects.requireNonNull(textChannel, "TextChannel cannot be null");
         
-        ConfigurationSection defaultConfig = DiscordCraft.instance().getGlobalConfiguration().getSection(LinkedChannel.DEFAULT_OPTIONS);
+        
+        ConfigurationSection defaultConfig = globalConfig.getSection("channel-defaults");
         ConfigurationSection channelConfig = botConfig.createSection(getChannelConfigPath(textChannel.getIdLong()));
 
         return new LinkedChannel(channelConfig, defaultConfig, textChannel);
@@ -329,7 +331,7 @@ public class DiscordService {
             return null;
         }
         
-        ConfigurationSection defaultConfig = DiscordCraft.instance().getGlobalConfiguration().getSection(LinkedChannel.DEFAULT_OPTIONS);
+        ConfigurationSection defaultConfig = globalConfig.getSection("channel-defaults");
 
         return new LinkedChannel(channelConfig, defaultConfig, textChannel);
     }

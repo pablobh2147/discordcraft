@@ -37,7 +37,7 @@ public class ConfigCommand extends DiscordCommand {
     }
 
     private void subcommandReload(SlashCommandInteractionEvent event) {
-        DiscordCraft.instance().reloadConfig();
+        DiscordCraft.getInstance().reloadConfig();
         event.reply(messageService.getDiscordMessage("config.reload").toDiscordMessage()).setEphemeral(true).queue();
     }
 

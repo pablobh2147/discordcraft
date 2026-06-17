@@ -21,7 +21,6 @@ public class LinkedChannel {
 
     // --------------------- Config Keys ---------------------
 
-    public static final String DEFAULT_OPTIONS = "channel-defaults";
     public static final String CHANNEL_LIST = "channels";
 
     public static final String CHANNEL_ID = "channel-id";

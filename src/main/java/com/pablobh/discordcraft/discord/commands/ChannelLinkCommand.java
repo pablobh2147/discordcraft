@@ -224,7 +224,7 @@ public class ChannelLinkCommand extends DiscordCommand {
         }
 
         // Save the configuration
-        discordService.getConfig().save();
+        discordService.getBotConfig().save();
 
         event.reply("Option " + option + " has been set to " + value + " for channel " + channel.getAsMention()).setEphemeral(true).queue();
     }

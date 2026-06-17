@@ -68,7 +68,7 @@ public class StopServerCommand extends DiscordCommand {
 
         DiscordCraft.discordLogInfo("Stopping server in " + delay + " seconds, requested by " + event.getUser().getAsMention());
 
-        Bukkit.getScheduler().runTaskLater(DiscordCraft.instance(), this::stopServer, delay * 20); // Time in ticks
+        Bukkit.getScheduler().runTaskLater(DiscordCraft.getInstance(), this::stopServer, delay * 20); // 20 ticks = 1 second
     }
 
     private void stopServer() {
