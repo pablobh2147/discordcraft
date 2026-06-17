@@ -124,6 +124,8 @@ public class DiscordCraft extends JavaPlugin {
         messagesConfig.save();
         botConfig.save();
         discordCommandsConfig.save();
+
+        DiscordCraft.logInfo("All configurations saved.");
     }
 
     public void reloadConfig() {
@@ -131,6 +133,7 @@ public class DiscordCraft extends JavaPlugin {
         messagesConfig.load();
         botConfig.load();
         discordCommandsConfig.load();
+
         DiscordCraft.logInfo("Configuration reloaded.");
     }
 
