@@ -12,6 +12,8 @@ import org.bukkit.profile.PlayerProfile;
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
+import com.pablobh.discordcraft.message.Message;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -19,10 +21,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 public class BanCommand extends DiscordCommand {
 
     private static final String COMMAND_NAME = "ban";
-    private static final String COMMAND_CONFIG_KEY = "ban";
 
-    public BanCommand(@Nonnull DiscordCommandManager manager) {
-        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
+    private final MessageService messageService;
+
+    public BanCommand(@Nonnull DiscordCommandManager manager, @Nonnull MessageService messageService) {
+        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_NAME));
+
+        this.messageService = messageService;
 
         addOption(OptionType.STRING, "player", "The player to ban", true);
         addOption(OptionType.STRING, "reason", "The reason for the ban", false);
@@ -31,13 +36,9 @@ public class BanCommand extends DiscordCommand {
     @Override
     public void onCommandInteraction(SlashCommandInteractionEvent event) {
 
-        String notFoundMessage = getConfig().getString("messages.not-found", "User %player% not found!");
-        String successMessage = getConfig().getString("messages.success", "The player %player% has been banned because %reason%!");
-        String alreadyBannedMessage = getConfig().getString("messages.already-banned", "The player %player% is already banned!");
-
         boolean isEphemeral = getConfig().getBoolean("is-ephemeral", false);
 
-        String player = event.getOption("player").getAsString();
+        String playerName = event.getOption("player").getAsString();
         String reason = event.getOption("reason") == null ? null : event.getOption("reason").getAsString();
 
         if (reason == null) {
@@ -46,24 +47,30 @@ public class BanCommand extends DiscordCommand {
 
         // Get offline player
         @SuppressWarnings("deprecation")
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
 
         if (offlinePlayer.getUniqueId() == null) {
-            event.reply(notFoundMessage.replace("%player%", player)).setEphemeral(isEphemeral).queue();
+            Message msg = messageService.getDiscordMessageOrDefault("commands.ban.not-found", "The player %player% was not found!");
+            msg.replace("player", playerName);
+            event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
         }
 
         if (offlinePlayer.isBanned()) {
-            event.reply(alreadyBannedMessage.replace("%player%", player)).setEphemeral(isEphemeral).queue();
+            Message msg = messageService.getDiscordMessageOrDefault("commands.ban.already-banned", "The player %player_name% is already banned!");
+            msg.replace("player", offlinePlayer);
+            event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
         }
 
         BanList<PlayerProfile> profileBanList = Bukkit.getBanList(BanList.Type.PROFILE);
         profileBanList.addBan(offlinePlayer.getPlayerProfile(), reason, (Instant) null, reason);
 
-        event.reply(successMessage.replace("%player%", player).replace("%reason%", reason)).setEphemeral(isEphemeral).queue();
+        Message msg = messageService.getDiscordMessageOrDefault("commands.ban.success", "The player %player_name% has been banned because %reason%!");
+        msg.replace("player", offlinePlayer).replace("reason", reason);
+        event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
 
-        DiscordCraft.logInfo("Player " + player + " has been banned from the server by " + event.getUser().getEffectiveName() + " because " + reason + "!");
+        DiscordCraft.logInfo("Player " + playerName + " has been banned from the server by " + event.getUser().getEffectiveName() + " because " + reason + "!");
     }
     
 }

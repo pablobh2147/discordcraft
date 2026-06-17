@@ -4,30 +4,32 @@ import javax.annotation.Nonnull;
 
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class HelpCommand extends DiscordCommand {
 
     private static final String COMMAND_NAME = "help";
-    private static final String COMMAND_CONFIG_KEY = "help";
 
-    private DiscordCommandManager commandManager;
+    private final DiscordCommandManager commandManager;
+    private final MessageService messageService;
 
-    public HelpCommand(@Nonnull DiscordCommandManager commandManager) {
-        super(COMMAND_NAME, commandManager.getCommandConfig(COMMAND_CONFIG_KEY));
+    public HelpCommand(@Nonnull DiscordCommandManager commandManager, @Nonnull MessageService messageService) {
+        super(COMMAND_NAME, commandManager.getCommandConfig(COMMAND_NAME));
         
         this.commandManager = commandManager;
+        this.messageService = messageService;
     }
 
     @Override
     public void onCommandInteraction(SlashCommandInteractionEvent event) {
         boolean isEphemeral = getConfig().getBoolean("is-ephemeral", true);
-        String rowFormat = getConfig().getString("row-format", "- %command%: %message%");
 
-        StringBuilder message = new StringBuilder(
-            getConfig().getString("message", "List of available commands:")
-        );
+        String header = messageService.getPlainMessageOrDefault("commands.help.header", "Here is the list of commands:");
+        String rowFormat = messageService.getPlainMessageOrDefault("commands.help.row-format", "- **%command%**: %message%");
+
+        StringBuilder message = new StringBuilder(header);
 
         for (DiscordCommand command : commandManager.getCommands()) {
             if (command.isEnabled()) {

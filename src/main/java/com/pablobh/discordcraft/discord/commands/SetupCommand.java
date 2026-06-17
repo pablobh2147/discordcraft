@@ -21,13 +21,12 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 public class SetupCommand extends DiscordCommand {
 
     private static final String COMMAND_NAME = "setup";
-    private static final String COMMAND_CONFIG_KEY = "setup";
 
     private final DiscordService discordService;
     private final MessageService messageService;
 
     public SetupCommand(@Nonnull DiscordCommandManager manager, @Nonnull DiscordService discordService, @Nonnull MessageService messageService) {
-        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_CONFIG_KEY));
+        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_NAME));
 
         this.discordService = discordService;
         this.messageService = messageService;

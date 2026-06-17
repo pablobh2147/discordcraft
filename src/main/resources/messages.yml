@@ -74,10 +74,10 @@ chat:
   attachment-separator: ", "
 
 # ----------------------------------------------------------------------------
-# Commands - Response messages for plugin commands
+# Commands - Response messages for Discord slash commands
 # ----------------------------------------------------------------------------
-# Placeholders: %command_name%, %member_mention% (only in errors.command-error)
 commands:
+  # -- General command responses --
   # Shown when a user lacks permission to run a command
   no-permission: "You don't have the required permissions to use this command!"
   # Shown when a command is disabled in the configuration
@@ -90,6 +90,99 @@ commands:
   main-guild-only: "This command can only be executed on the main server."
   # Shown when an invalid subcommand is provided
   invalid-subcommand: "Invalid subcommand. Use `/help` to see the available subcommands."
+
+  # -- /ban --
+  # Placeholders: %player_name%, %player_uuid%, %reason%
+  # Note: not-found only has %player% (raw input, player could not be resolved)
+  ban:
+    success:
+      embed:
+        title: "Player Banned"
+        description: "**%player_name%** has been banned because %reason%"
+        color: "#E74C3C"
+        thumbnail: "https://mc-heads.net/head/%player_uuid%/64"
+    already-banned:
+      embed:
+        title: "Already Banned"
+        description: "**%player_name%** is already banned!"
+        color: "#E67E22"
+        thumbnail: "https://mc-heads.net/head/%player_uuid%/64"
+    not-found: "The player %player% was not found!"
+
+  # -- /pardon --
+  # Placeholders: %player_name%, %player_uuid%
+  # Note: not-banned only has %player% (raw input, player may not be resolved)
+  pardon:
+    success:
+      embed:
+        title: "Player Unbanned"
+        description: "**%player_name%** has been unbanned!"
+        color: "#2ECC71"
+        thumbnail: "https://mc-heads.net/head/%player_uuid%/64"
+    not-banned: "The player %player% is not banned!"
+
+  # -- /whitelist --
+  # Placeholders: %player_name%, %player_uuid%
+  # Note: not-found and no-player-option only have %player% (raw input)
+  whitelist:
+    add-success:
+      embed:
+        title: "Whitelist Updated"
+        description: "**%player_name%** has been added to the whitelist!"
+        color: "#2ECC71"
+        thumbnail: "https://mc-heads.net/head/%player_uuid%/64"
+    remove-success:
+      embed:
+        title: "Whitelist Updated"
+        description: "**%player_name%** has been removed from the whitelist."
+        color: "#E74C3C"
+        thumbnail: "https://mc-heads.net/head/%player_uuid%/64"
+    already-whitelisted: "**%player_name%** is already whitelisted!"
+    not-whitelisted: "**%player_name%** is not whitelisted!"
+    not-found: "The player %player% was not found!"
+    no-player-option: "You must specify a player to add or remove from the whitelist!"
+    enabled: "The whitelist has been enabled!"
+    already-enabled: "The whitelist is already enabled!"
+    disabled: "The whitelist has been disabled!"
+    already-disabled: "The whitelist is already disabled!"
+
+  # -- /playerlist --
+  # Placeholders: %list_name%, %player_count%, %player%
+  playerlist:
+    list-disabled: "%list_name% players list is disabled!"
+    list-empty: "There are no %list_name% players online!"
+    list-header: "List of %list_name% players (%player_count%):"
+    list-row: "- ***%player%***"
+
+  # -- /stop --
+  # Placeholders: %seconds%
+  stop:
+    message: "The server is stopping in %seconds% seconds"
+    minecraft-title: "Stopping Server"
+    minecraft-subtitle: "The server is stopping in %seconds% seconds"
+
+  # -- /help --
+  # Placeholders: %command%, %message%
+  help:
+    header: "Here is the list of commands:"
+    row-format: "- **%command%**: %message%"
+
+  # -- /link --
+  # Placeholders: %channel%, %option%, %value%
+  link:
+    added: "Added a new channel %channel%"
+    removed: "Removed channel %channel%"
+    not-linked: "The channel is not linked!"
+    not-in-server: "The channel must be in the same server as the bot!"
+    channel-error: "An error occurred while getting the channel!"
+    option-error: "An error occurred while getting the option!"
+    value-error: "An error occurred while getting the value!"
+    invalid-option: "Invalid option!"
+    config-success: "Option %option% has been set to %value% for channel %channel%"
+
+  # -- /config --
+  config:
+    reload: "Configuration reloaded successfully!"
 
 # ----------------------------------------------------------------------------
 # Player - Discord messages for player events

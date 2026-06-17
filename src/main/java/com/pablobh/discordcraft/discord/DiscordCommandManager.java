@@ -49,11 +49,11 @@ public class DiscordCommandManager extends ListenerAdapter {
         
         try {
             registerCommand(new SetupCommand(this, discordService, messageService));
-            registerCommand(new HelpCommand(this));
-            registerCommand(new PlayerListCommand(this));
-            registerCommand(new StopServerCommand(this));
-            registerCommand(new BanCommand(this));
-            registerCommand(new PardonCommand(this));
+            registerCommand(new HelpCommand(this, messageService));
+            registerCommand(new PlayerListCommand(this, messageService));
+            registerCommand(new StopServerCommand(this, messageService));
+            registerCommand(new BanCommand(this, messageService));
+            registerCommand(new PardonCommand(this, messageService));
             registerCommand(new WhitelistCommand(this, messageService));
             registerCommand(new ChannelLinkCommand(this, discordService, messageService));
             registerCommand(new ConfigCommand(this, messageService));
