@@ -36,6 +36,8 @@ public class DiscordCraft extends JavaPlugin {
 
     private boolean enabled = false;
 
+    // --------------------- Lifecycle ---------------------
+
     @Override
     public void onEnable() {
         instance = this;
@@ -53,10 +55,11 @@ public class DiscordCraft extends JavaPlugin {
         }
 
         registerSpigotListeners();
-        serverStartMessages();
+        sendServerStartNotification();
 
-        enabled = true;
         DiscordCraft.logInfo(getDescription().getName() + " v" + getDescription().getVersion() + " has been enabled!");
+    
+        enabled = true;
     }
 
     @Override
@@ -65,7 +68,8 @@ public class DiscordCraft extends JavaPlugin {
             return;
         }
 
-        serverStopMessages();
+        sendServerStopNotification();
+
         if (discordService != null) {
             discordService.shutdown();
         }
@@ -77,6 +81,8 @@ public class DiscordCraft extends JavaPlugin {
         instance = null;
         enabled = false;
     }
+
+    // --------------------- Initialization ---------------------
 
     private boolean initializeDiscordService() {
         String token = botConfig.getString("token", null);
@@ -106,6 +112,13 @@ public class DiscordCraft extends JavaPlugin {
         return true;
     }
 
+    private void registerSpigotListeners() {
+        Bukkit.getPluginManager().registerEvents(new MinecraftChatListener(globalConfiguration, discordService), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerEventsListener(discordService, messageService), this);
+    }
+
+    // --------------------- Configuration ---------------------
+
     public void saveAllConfigurations() {
         globalConfiguration.save();
         messagesConfig.save();
@@ -121,25 +134,9 @@ public class DiscordCraft extends JavaPlugin {
         DiscordCraft.logInfo("Configuration reloaded.");
     }
 
-    public GlobalConfiguration getGlobalConfiguration() {
-        return globalConfiguration;
-    }
+    // --------------------- Notifications ---------------------
 
-    public Configuration getMessagesConfiguration() {
-        return messagesConfig;
-    }
-
-    public Configuration getBotConfiguration() {
-        return botConfig;
-    }
-
-    public Configuration getDiscordCommandsConfiguration() {
-        return discordCommandsConfig;
-    }
-
-    // Notifications
-
-    private void serverStartMessages() {
+    private void sendServerStartNotification() {
         Message msg = messageService.getDiscordMessage("server.start");
         
         for (LinkedChannel channel : discordService.getLinkedChannels()) {
@@ -149,7 +146,7 @@ public class DiscordCraft extends JavaPlugin {
         }
     }
 
-    private void serverStopMessages() {
+    private void sendServerStopNotification() {
         Message msg = messageService.getDiscordMessage("server.stop");
 
         for (LinkedChannel channel : discordService.getLinkedChannels()) {
@@ -159,18 +156,7 @@ public class DiscordCraft extends JavaPlugin {
         }
     }
 
-    // Listeners
-
-    private void registerSpigotListeners() {
-        Bukkit.getPluginManager().registerEvents(new MinecraftChatListener(globalConfiguration, discordService), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerEventsListener(discordService, messageService), this);
-    }
-
-    public static DiscordCraft getInstance() {
-        return instance;
-    }
-
-    // Logging
+    // --------------------- Logging ---------------------
 
     public static Logger getDiscordCraftLogger() {
         if (instance == null) {
@@ -226,7 +212,7 @@ public class DiscordCraft extends JavaPlugin {
         }
     }
 
-    // Discord Logging
+    // --------------------- Discord logging ---------------------
 
     public static void discordLogInfo(@NotNull String message) {
         if (message == null || message.isBlank()) {
@@ -286,6 +272,12 @@ public class DiscordCraft extends JavaPlugin {
         }
 
         logException(e, message);
+    }
+
+    // --------------------- Instance ---------------------
+
+    public static DiscordCraft getInstance() {
+        return instance;
     }
 
 }
