@@ -9,7 +9,6 @@ import com.pablobh.discordcraft.config.Configuration;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.discord.DiscordService;
-import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -23,13 +22,11 @@ public class SetupCommand extends DiscordCommand {
     private static final String COMMAND_NAME = "setup";
 
     private final DiscordService discordService;
-    private final MessageService messageService;
 
-    public SetupCommand(@Nonnull DiscordCommandManager manager, @Nonnull DiscordService discordService, @Nonnull MessageService messageService) {
-        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_NAME));
+    public SetupCommand(@Nonnull DiscordCommandManager manager, @Nonnull DiscordService discordService) {
+        super(COMMAND_NAME, manager);
 
         this.discordService = discordService;
-        this.messageService = messageService;
 
         setGlobal(true);
 
@@ -56,7 +53,7 @@ public class SetupCommand extends DiscordCommand {
     public void onCommandInteraction(SlashCommandInteractionEvent event) {
         
         if (discordService.getMainGuild() != null) {
-            event.reply(messageService.getDiscordMessage("setup.already").toDiscordMessage()).setEphemeral(true).queue();
+            event.reply(getMessageService().getDiscordMessage("setup.already").toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
@@ -95,7 +92,7 @@ public class SetupCommand extends DiscordCommand {
         botConfig.save();
 
         
-        event.reply(messageService.getDiscordMessage("setup.complete").toDiscordMessage()).setEphemeral(true).complete();
+        event.reply(getMessageService().getDiscordMessage("setup.complete").toDiscordMessage()).setEphemeral(true).complete();
         
         Bukkit.shutdown();
     }

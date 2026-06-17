@@ -48,15 +48,15 @@ public class DiscordCommandManager extends ListenerAdapter {
         this.messageService = messageService;
         
         try {
-            registerCommand(new SetupCommand(this, discordService, messageService));
-            registerCommand(new HelpCommand(this, messageService));
-            registerCommand(new PlayerListCommand(this, messageService));
-            registerCommand(new StopServerCommand(this, messageService));
-            registerCommand(new BanCommand(this, messageService));
-            registerCommand(new PardonCommand(this, messageService));
-            registerCommand(new WhitelistCommand(this, messageService));
-            registerCommand(new ChannelLinkCommand(this, discordService, messageService));
-            registerCommand(new ConfigCommand(this, messageService));
+            registerCommand(new SetupCommand(this, discordService));
+            registerCommand(new HelpCommand(this));
+            registerCommand(new PlayerListCommand(this));
+            registerCommand(new StopServerCommand(this));
+            registerCommand(new BanCommand(this));
+            registerCommand(new PardonCommand(this));
+            registerCommand(new WhitelistCommand(this));
+            registerCommand(new ChannelLinkCommand(this, discordService));
+            registerCommand(new ConfigCommand(this));
         } catch (Exception e) {
             DiscordCraft.logException(e, messageService.getPlainMessage("errors.command-registration-error"));
         }
@@ -183,13 +183,17 @@ public class DiscordCommandManager extends ListenerAdapter {
         return null;
     }
 
-    public ConfigurationSection getCommandConfig(String name) {
-        String path = "commands." + name;
+    public MessageService getMessageService() {
+        return messageService;
+    }
 
-        ConfigurationSection section = config.getSection(path);
+    public ConfigurationSection getCommandConfig(String name) {
+        String key = "commands." + name;
+
+        ConfigurationSection section = config.getSection(key);
         if (section == null) {
-            config.createSection(path);
-            section = config.getSection(path);
+            config.createSection(key);
+            section = config.getSection(key);
         }
 
         return section;

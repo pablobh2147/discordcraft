@@ -11,7 +11,6 @@ import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.message.Message;
-import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,12 +19,8 @@ public class PardonCommand extends DiscordCommand {
 
     private static final String COMMAND_NAME = "pardon";
 
-    private final MessageService messageService;
-
-    public PardonCommand(@Nonnull DiscordCommandManager manager, @Nonnull MessageService messageService) {
-        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_NAME));
-
-        this.messageService = messageService;
+    public PardonCommand(@Nonnull DiscordCommandManager manager) {
+        super(COMMAND_NAME, manager);
 
         addOption(OptionType.STRING, "player", "The player to pardon", true);
     }
@@ -42,7 +37,7 @@ public class PardonCommand extends DiscordCommand {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
 
         if (offlinePlayer == null || !offlinePlayer.isBanned()) {
-            Message msg = messageService.getDiscordMessageOrDefault("commands.pardon.not-banned", "The player %player% is not banned!");
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-banned"), "The player %player% is not banned!");
             msg.replace("player", player);
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
@@ -51,7 +46,7 @@ public class PardonCommand extends DiscordCommand {
         BanList<PlayerProfile> profileBanList = Bukkit.getBanList(BanList.Type.PROFILE);
         profileBanList.pardon(offlinePlayer.getPlayerProfile());
 
-        Message msg = messageService.getDiscordMessageOrDefault("commands.pardon.success", "The player %player_name% has been unbanned!");
+        Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("success"), "The player %player_name% has been unbanned!");
         msg.replace("player", offlinePlayer);
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
 

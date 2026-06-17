@@ -4,7 +4,6 @@ import javax.annotation.Nonnull;
 
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
-import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
@@ -13,21 +12,19 @@ public class HelpCommand extends DiscordCommand {
     private static final String COMMAND_NAME = "help";
 
     private final DiscordCommandManager commandManager;
-    private final MessageService messageService;
 
-    public HelpCommand(@Nonnull DiscordCommandManager commandManager, @Nonnull MessageService messageService) {
-        super(COMMAND_NAME, commandManager.getCommandConfig(COMMAND_NAME));
+    public HelpCommand(@Nonnull DiscordCommandManager commandManager) {
+        super(COMMAND_NAME, commandManager);
         
         this.commandManager = commandManager;
-        this.messageService = messageService;
     }
 
     @Override
     public void onCommandInteraction(SlashCommandInteractionEvent event) {
         boolean isEphemeral = getConfig().getBoolean("is-ephemeral", true);
 
-        String header = messageService.getPlainMessageOrDefault("commands.help.header", "Here is the list of commands:");
-        String rowFormat = messageService.getPlainMessageOrDefault("commands.help.row-format", "- **%command%**: %message%");
+        String header = getMessageService().getPlainMessageOrDefault(getMessageKey("header"), "Here is the list of commands:");
+        String rowFormat = getMessageService().getPlainMessageOrDefault(getMessageKey("row-format"), "- **%command%**: %message%");
 
         StringBuilder message = new StringBuilder(header);
 

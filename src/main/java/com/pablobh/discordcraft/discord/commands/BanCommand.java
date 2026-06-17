@@ -13,7 +13,6 @@ import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.message.Message;
-import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -22,12 +21,8 @@ public class BanCommand extends DiscordCommand {
 
     private static final String COMMAND_NAME = "ban";
 
-    private final MessageService messageService;
-
-    public BanCommand(@Nonnull DiscordCommandManager manager, @Nonnull MessageService messageService) {
-        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_NAME));
-
-        this.messageService = messageService;
+    public BanCommand(@Nonnull DiscordCommandManager manager) {
+        super(COMMAND_NAME, manager);
 
         addOption(OptionType.STRING, "player", "The player to ban", true);
         addOption(OptionType.STRING, "reason", "The reason for the ban", false);
@@ -50,14 +45,14 @@ public class BanCommand extends DiscordCommand {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
 
         if (offlinePlayer.getUniqueId() == null) {
-            Message msg = messageService.getDiscordMessageOrDefault("commands.ban.not-found", "The player %player% was not found!");
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-found"), "The player %player% was not found!");
             msg.replace("player", playerName);
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
         }
 
         if (offlinePlayer.isBanned()) {
-            Message msg = messageService.getDiscordMessageOrDefault("commands.ban.already-banned", "The player %player_name% is already banned!");
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("already-banned"), "The player %player_name% is already banned!");
             msg.replace("player", offlinePlayer);
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
@@ -66,7 +61,7 @@ public class BanCommand extends DiscordCommand {
         BanList<PlayerProfile> profileBanList = Bukkit.getBanList(BanList.Type.PROFILE);
         profileBanList.addBan(offlinePlayer.getPlayerProfile(), reason, (Instant) null, reason);
 
-        Message msg = messageService.getDiscordMessageOrDefault("commands.ban.success", "The player %player_name% has been banned because %reason%!");
+        Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("success"), "The player %player_name% has been banned because %reason%!");
         msg.replace("player", offlinePlayer).replace("reason", reason);
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
 

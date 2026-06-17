@@ -61,7 +61,7 @@ public class DiscordService {
         this.commandConfig = commandConfig;
         this.messageService = messageService;
 
-        boolean jdaLoaded = setupJDA(token);
+        boolean jdaLoaded = initializeJDA(token);
         if (!jdaLoaded) {
             throw new LoginException("Failed to load JDA");
         }
@@ -81,7 +81,7 @@ public class DiscordService {
         }
     }
 
-    private boolean setupJDA(String token) {
+    private boolean initializeJDA(String token) {
         try {
             JDABuilder builder = JDABuilder.createDefault(token);
 
@@ -131,11 +131,10 @@ public class DiscordService {
             ActivityType type = ActivityType.valueOf(activityType);
 
             if (type != null) {
-                builder.setActivity(Activity.of(type, activityName));
-            } else {
-                builder.setActivity(Activity.playing(activityName));
+                type = ActivityType.PLAYING;
             }
 
+            builder.setActivity(Activity.of(type, activityName));
         }
     }
 

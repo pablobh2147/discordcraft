@@ -8,7 +8,6 @@ import org.bukkit.OfflinePlayer;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.message.Message;
-import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,12 +16,8 @@ public class WhitelistCommand extends DiscordCommand {
 
     private static final String COMMAND_NAME = "whitelist";
 
-    private final MessageService messageService;
-
-    public WhitelistCommand(@Nonnull DiscordCommandManager manager, MessageService messageService) {
-        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_NAME));
-
-        this.messageService = messageService;
+    public WhitelistCommand(@Nonnull DiscordCommandManager manager) {
+        super(COMMAND_NAME, manager);
 
         boolean allowToggleWhitelist = getConfig().getBoolean("allow-toggle-whitelist", true);
         boolean allowModifyWhitelist = getConfig().getBoolean("allow-modify-whitelist", true);
@@ -61,7 +56,7 @@ public class WhitelistCommand extends DiscordCommand {
                 subcommandRemove(event, isEphemeral);
                 break;
             default:
-                event.reply(messageService.getDiscordMessage("commands.invalid-subcommand").toDiscordMessage()).setEphemeral(true).queue(); // Should never happen
+                event.reply(getMessageService().getDiscordMessage("commands.invalid-subcommand").toDiscordMessage()).setEphemeral(true).queue(); // Should never happen
                 break;
         }
     }
@@ -70,27 +65,27 @@ public class WhitelistCommand extends DiscordCommand {
 
     private void subcommandEnable(SlashCommandInteractionEvent event, boolean isEphemeral) {
         if (Bukkit.hasWhitelist()) {
-            Message msg = messageService.getDiscordMessageOrDefault("commands.whitelist.already-enabled", "The whitelist is already enabled!");
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("already-enabled"), "The whitelist is already enabled!");
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
         }
 
         Bukkit.setWhitelist(true);
 
-        Message msg = messageService.getDiscordMessageOrDefault("commands.whitelist.enabled", "The whitelist has been enabled!");
+        Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("enabled"), "The whitelist has been enabled!");
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
     }
 
     private void subcommandDisable(SlashCommandInteractionEvent event, boolean isEphemeral) {
         if (!Bukkit.hasWhitelist()) {
-            Message msg = messageService.getDiscordMessageOrDefault("commands.whitelist.already-disabled", "The whitelist is already disabled!");
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("already-disabled"), "The whitelist is already disabled!");
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
         }
 
         Bukkit.setWhitelist(false);
 
-        Message msg = messageService.getDiscordMessageOrDefault("commands.whitelist.disabled", "The whitelist has been disabled!");
+        Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("disabled"), "The whitelist has been disabled!");
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
     }
 
@@ -100,7 +95,7 @@ public class WhitelistCommand extends DiscordCommand {
         String player = event.getOption("player") == null ? null : event.getOption("player").getAsString();
         
         if (player == null) {
-            Message msg = messageService.getDiscordMessageOrDefault("commands.whitelist.no-player-option", "You must specify a player!");
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("no-player-option"), "You must specify a player!");
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return null;
         }
@@ -110,7 +105,7 @@ public class WhitelistCommand extends DiscordCommand {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
         
         if (offlinePlayer.getUniqueId() == null) {
-            Message msg = messageService.getDiscordMessageOrDefault("commands.whitelist.not-found", "The player %player% was not found!");
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-found"), "The player %player% was not found!");
             msg.replace("player", player);
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return null;
@@ -127,7 +122,7 @@ public class WhitelistCommand extends DiscordCommand {
         }
 
         if (offlinePlayer.isWhitelisted()) {
-            Message msg = messageService.getDiscordMessageOrDefault("commands.whitelist.already-whitelisted", "The player %player_name% is already whitelisted!");
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("already-whitelisted"), "The player %player_name% is already whitelisted!");
             msg.replace("player", offlinePlayer);
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
@@ -135,7 +130,7 @@ public class WhitelistCommand extends DiscordCommand {
 
         offlinePlayer.setWhitelisted(true);
 
-        Message msg = messageService.getDiscordMessageOrDefault("commands.whitelist.add-success", "The player %player_name% has been added to the whitelist!");
+        Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("add-success"), "The player %player_name% has been added to the whitelist!");
         msg.replace("player", offlinePlayer);
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
     }
@@ -148,7 +143,7 @@ public class WhitelistCommand extends DiscordCommand {
         }
 
         if (!offlinePlayer.isWhitelisted()) {
-            Message msg = messageService.getDiscordMessageOrDefault("commands.whitelist.not-whitelisted", "The player %player_name% is not whitelisted!");
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-whitelisted"), "The player %player_name% is not whitelisted!");
             msg.replace("player", offlinePlayer);
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
@@ -156,7 +151,7 @@ public class WhitelistCommand extends DiscordCommand {
 
         offlinePlayer.setWhitelisted(false);
 
-        Message msg = messageService.getDiscordMessageOrDefault("commands.whitelist.remove-success", "The player %player_name% has been removed from the whitelist!");
+        Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("remove-success"), "The player %player_name% has been removed from the whitelist!");
         msg.replace("player", offlinePlayer);
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
     }

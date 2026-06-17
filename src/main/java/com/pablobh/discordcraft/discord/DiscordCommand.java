@@ -9,6 +9,8 @@ import javax.annotation.Nullable;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import com.pablobh.discordcraft.message.MessageService;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -39,14 +41,20 @@ public abstract class DiscordCommand {
     // Command Configuration
 
     private ConfigurationSection config = null;
+    private final MessageService messageService;
 
     // Constructors
 
-    public DiscordCommand(@Nonnull String name, @Nullable ConfigurationSection config) {
+    public DiscordCommand(@Nonnull String name, @Nonnull DiscordCommandManager manager) {
+        this(name, manager.getCommandConfig(name), manager.getMessageService());
+    }
+
+    public DiscordCommand(@Nonnull String name, @Nullable ConfigurationSection config, @Nonnull MessageService messageService) {
         Objects.requireNonNull(name, "Command name cannot be null");
 
         this.config = config;
         this.name = name;
+        this.messageService = messageService;
 
         enabled = getConfig().getBoolean("enabled", true);
         description = getConfig().getString("description", null);
@@ -59,6 +67,14 @@ public abstract class DiscordCommand {
 
     protected final ConfigurationSection getConfig() {
         return config;
+    }
+
+    protected final MessageService getMessageService() {
+        return messageService;
+    }
+
+    protected final String getMessageKey(@Nonnull String key) {
+        return "commands." + name + "." + key;
     }
 
     // Command options

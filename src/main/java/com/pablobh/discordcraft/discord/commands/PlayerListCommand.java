@@ -14,7 +14,6 @@ import com.pablobh.discordcraft.StringUtils;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.message.Message;
-import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -51,12 +50,8 @@ public class PlayerListCommand extends DiscordCommand {
 
     }
 
-    private final MessageService messageService;
-
-    public PlayerListCommand(@Nonnull DiscordCommandManager manager, @Nonnull MessageService messageService) {
-        super(COMMAND_NAME, manager.getCommandConfig(COMMAND_NAME));
-
-        this.messageService = messageService;
+    public PlayerListCommand(@Nonnull DiscordCommandManager manager) {
+        super(COMMAND_NAME, manager);
 
         PlayerListData online = new PlayerListData(getConfig().getConfigurationSection("lists.online"), "online");
         PlayerListData whitelisted = new PlayerListData(getConfig().getConfigurationSection("lists.whitelisted"), "whitelisted");
@@ -100,7 +95,7 @@ public class PlayerListCommand extends DiscordCommand {
                 if (getConfig().getBoolean("lists." + listType + ".enabled", true)) {
                     players = getPlayerList(listType);
                 } else { // This should never happen but for safety
-                    Message msg = messageService.getDiscordMessageOrDefault("commands.playerlist.list-disabled", "%list_name% players list is disabled!");
+                    Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("list-disabled"), "%list_name% players list is disabled!");
                     msg.replace("list_name", listName);
                     event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
                     return;
@@ -115,13 +110,13 @@ public class PlayerListCommand extends DiscordCommand {
         boolean ephemeral = getConfig().getBoolean("is-ephemeral", false);
 
         if (players == null || players.isEmpty()) { // In case there is no players in the list
-            Message msg = messageService.getDiscordMessageOrDefault("commands.playerlist.list-empty", "There are no %list_name% players online!");
+            Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("list-empty"), "There are no %list_name% players online!");
             msg.replace("list_name", listName);
             event.reply(msg.toDiscordMessage()).setEphemeral(ephemeral).queue();
         } else { // If there are players in the list
 
-            String listHeaderMessage = messageService.getPlainMessageOrDefault("commands.playerlist.list-header", "List of %list_name% players (%player_count%):");
-            String rowFormat = messageService.getPlainMessageOrDefault("commands.playerlist.list-row", "- ***%player%***");
+            String listHeaderMessage = getMessageService().getPlainMessageOrDefault(getMessageKey("list-header"), "List of %list_name% players (%player_count%):");
+            String rowFormat = getMessageService().getPlainMessageOrDefault(getMessageKey("list-row"), "- ***%player%***");
 
             StringBuilder replyMessage = new StringBuilder();
 
