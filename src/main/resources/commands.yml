@@ -1,0 +1,144 @@
+# ============================================================================
+#                       DISCORDCRAFT - COMMANDS
+# ============================================================================
+#
+# Controls each Discord slash command's behavior.
+# For general plugin settings, see config.yml.
+# For bot-specific settings (token, guild, etc.), see bot.yml.
+# For message customization, see messages.yml.
+#
+# ----------------------------------------------------------------------------
+#  COMMON FIELDS
+# ----------------------------------------------------------------------------
+#
+# Every command supports these common fields:
+#
+#   enabled: true/false       — Whether the command is registered and usable.
+#   description: "..."        — Short description shown in Discord's command list.
+#   help: "..."               — Detailed help text shown by /help.
+#   admin-only: true/false    — Restrict the command to server administrators.
+#   is-ephemeral: true/false  — If true, responses are only visible to the
+#                                user who ran the command.
+#
+# Some commands have additional fields documented inline below.
+#
+# ============================================================================
+
+commands:
+  # --------------------------------------------------------------------------
+  # /set-global-channel — Sets the global channel
+  # --------------------------------------------------------------------------
+  set-global-channel:
+    enabled: true
+    description: Sets the global channel
+    help: Help message for set-global-channel
+    admin-only: true
+    is-ephemeral: false
+
+  # --------------------------------------------------------------------------
+  # /config — Configures the plugin
+  # --------------------------------------------------------------------------
+  config:
+    description: Configures the plugin
+    help: Help message for configure
+
+  # --------------------------------------------------------------------------
+  # /playerlist — Shows the list of players online
+  # --------------------------------------------------------------------------
+  playerlist:
+    enabled: true
+    description: Shows the list of players online
+    help: Help message for playerlist
+    admin-only: false
+    is-ephemeral: true
+    # Each list can be individually enabled or disabled.
+    # name: The display name shown in the list header.
+    lists:
+      online:
+        enabled: true
+        name: Online
+      whitelisted:
+        enabled: true
+        name: Whitelisted
+      operator:
+        enabled: true
+        name: Operators
+      banned:
+        enabled: true
+        name: Banned
+
+  # --------------------------------------------------------------------------
+  # /stop — Stops the Minecraft server
+  # --------------------------------------------------------------------------
+  stop:
+    enabled: true
+    description: Stops the minecraft server
+    help: Help message for stop-server
+    admin-only: true
+    delay: 10 # The delay in seconds before the server stops (minimum 5 seconds)
+    is-ephemeral: true
+    show-title: true
+
+  # --------------------------------------------------------------------------
+  # /link — Adds a channel to the list of linked channels
+  # --------------------------------------------------------------------------
+  link:
+    enabled: true
+    description: Adds a channel to the list of channels
+    help: Adds a channel to the list of channels
+    admin-only: true
+
+  # --------------------------------------------------------------------------
+  # /help — Shows the list of commands
+  # --------------------------------------------------------------------------
+  help: # TODO: Add a flag to show only the commands that the user can use
+    enabled: true
+    description: Shows the list of commands
+    help: If you need help to use this command you are a fool.
+    is-ephemeral: true
+    admin-only: false
+
+  # --------------------------------------------------------------------------
+  # /setup — Sets up the bot
+  # --------------------------------------------------------------------------
+  setup:
+    enabled: true
+    description: Sets up the bot
+    help: Sets up the bot
+    admin-only: true
+
+  # --------------------------------------------------------------------------
+  # /ban — Bans a player in the Minecraft server
+  # --------------------------------------------------------------------------
+  ban:
+    enabled: true
+    description: Bans a player in the minecraft server
+    help: Help message for ban
+    admin-only: true
+    is-ephemeral: true
+    # The default reason applied when no reason is specified
+    default-reason: You have been banned from the server!
+
+  # --------------------------------------------------------------------------
+  # /pardon — Unbans a player in the Minecraft server
+  # --------------------------------------------------------------------------
+  pardon:
+    enabled: true
+    description: Unbans a player in the minecraft server
+    help: Help message for pardon
+    admin-only: true
+    is-ephemeral: true
+
+  # --------------------------------------------------------------------------
+  # /whitelist — Adds or removes a player from the whitelist
+  # --------------------------------------------------------------------------
+  whitelist:
+    enabled: true
+    description: Adds or removes a player from the whitelist
+    help: Help message for whitelist
+    admin-only: true
+    is-ephemeral: true
+    # Whether the /whitelist toggle subcommand is available
+    allow-toggle-whitelist: true
+    # Whether the /whitelist add/remove subcommands are available
+    allow-modify-whitelist: true

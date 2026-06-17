@@ -315,7 +315,7 @@ setup:
       color: "#2ECC71"
       fields:
         - name: "Configuration Files"
-          value: "`config.yml` — General settings\n`discord-commands.yml` — Command configuration"
+          value: "`config.yml` — General settings\n`commands.yml` — Command configuration"
           inline: false
         - name: "Messages"
           value: "`messages.yml` — Customize Discord messages"

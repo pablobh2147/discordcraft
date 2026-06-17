@@ -29,7 +29,7 @@ public class DiscordCraft extends JavaPlugin {
     private GlobalConfiguration globalConfiguration;
     private Configuration messagesConfig;
     private Configuration botConfig;
-    private Configuration discordCommandsConfig;
+    private Configuration commandsConfig;
 
     private DiscordService discordService;
     private MessageService messageService;
@@ -45,7 +45,7 @@ public class DiscordCraft extends JavaPlugin {
         globalConfiguration = new GlobalConfiguration(this, "config.yml");
         messagesConfig = new Configuration(this, "messages.yml");
         botConfig = new Configuration(this, "bot.yml");
-        discordCommandsConfig = new Configuration(this, "discord-commands.yml");
+        commandsConfig = new Configuration(this, "commands.yml");
 
         messageService = new MessageService(messagesConfig);
 
@@ -103,7 +103,7 @@ public class DiscordCraft extends JavaPlugin {
         }
 
         try {
-            discordService = new DiscordService(token, globalConfiguration, botConfig, discordCommandsConfig, messageService);
+            discordService = new DiscordService(token, globalConfiguration, botConfig, commandsConfig, messageService);
         } catch (LoginException e) {
             DiscordCraft.logSevere("Failed to initialize Discord service: " + e.getMessage());
             return false;
@@ -123,7 +123,7 @@ public class DiscordCraft extends JavaPlugin {
         globalConfiguration.save();
         messagesConfig.save();
         botConfig.save();
-        discordCommandsConfig.save();
+        commandsConfig.save();
 
         DiscordCraft.logInfo("All configurations saved.");
     }
@@ -132,7 +132,7 @@ public class DiscordCraft extends JavaPlugin {
         globalConfiguration.load();
         messagesConfig.load();
         botConfig.load();
-        discordCommandsConfig.load();
+        commandsConfig.load();
 
         DiscordCraft.logInfo("Configuration reloaded.");
     }
