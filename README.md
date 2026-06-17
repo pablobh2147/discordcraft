@@ -16,6 +16,20 @@ A Discord integration plugin for Minecraft servers. Bridge your Minecraft server
 - **Customizable commands** — Enable/disable and configure each Discord command in `commands.yml`
 - **Bot activity** — Show a custom status on the bot (Playing, Watching, etc.)
 
+## Examples
+
+### Discord setup
+
+![Discord setup](docs/img/screenshot-discord-setup.png)
+
+### Discord chat
+
+![Discord chat](docs/img/screenshot-discord.png)
+
+### Minecraft chat
+
+![Minecraft chat](docs/img/screenshot-minecraft.png)
+
 ## Requirements
 
 - **Java** 17 or higher
