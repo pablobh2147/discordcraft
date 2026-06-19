@@ -44,9 +44,8 @@ The main bot configuration file. This file is created on first run and updated a
 | `guild` | long | The Discord server (guild) ID — set automatically by `/setup` |
 | `log-channel` | long | Channel ID for error/info logging — set via `/setup` |
 | `channels` | section | Linked channels configuration — managed via `/link` commands |
-| `account-links` | list | Discord-to-Minecraft account links |
 
-> **Note:** The `guild`, `channels`, and `account-links` fields are managed automatically. You should only manually edit `token`, `activity`, and `log-channel`.
+> **Note:** The `guild` and `channels` fields are managed automatically. You should only manually edit `token`, `activity`, and `log-channel`.
 
 ### config.yml
 
