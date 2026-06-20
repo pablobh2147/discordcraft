@@ -3,7 +3,9 @@
 [![License: MIT](https://img.shields.io/github/license/pablobh2147/discordcraft)](LICENSE)
 [![Latest Release](https://img.shields.io/github/v/release/pablobh2147/discordcraft)](https://github.com/pablobh2147/discordcraft/releases)
 
-A Discord integration plugin for Minecraft servers. Bridge your Minecraft server chat with Discord channels, manage your server from Discord with slash commands, and keep your community connected.
+A Discord integration plugin and mod for Minecraft servers. Bridge your Minecraft server chat with Discord channels, manage your server from Discord with slash commands, and keep your community connected.
+
+Currently supports Spigot and Spigot forks, with a platform-agnostic `common` core designed to support mod loaders in the future.
 
 ## Features
 
@@ -33,7 +35,7 @@ A Discord integration plugin for Minecraft servers. Bridge your Minecraft server
 ## Requirements
 
 - **Java** 17 or higher
-- **Minecraft server** running Spigot or any Spigot fork (Paper, Purpur, etc.) — version **1.13+**
+- **Minecraft server** running Spigot or any Spigot fork (Paper, Purpur, etc.) — version **1.13+** (mod loader support is planned)
 - A **Discord bot token** ([create one here](https://discord.com/developers/applications))
 
 ## Installation
@@ -55,7 +57,7 @@ A Discord integration plugin for Minecraft servers. Bridge your Minecraft server
 
 **Option A — Download a release**
 
-Download the latest `DiscordCraft-x.x.x.jar` from the [Releases page](https://github.com/pablobh2147/discordcraft/releases).
+Download the latest `DiscordCraft-<platform>-x.x.x.jar` from the [Releases page](https://github.com/pablobh2147/discordcraft/releases).
 
 **Option B — Build from source**
 
@@ -65,12 +67,16 @@ cd discordcraft
 ./gradlew build
 ```
 
-The compiled JAR will be at `build/libs/DiscordCraft-<version>.jar`.
+The build produces:
+- `common/build/libs/common-<version>.jar` — platform-agnostic shared library
+- `<platform>/build/libs/DiscordCraft-<platform>-<version>.jar` — the platform-specific plugin/mod
+
+Use the `<platform>/...` JAR for the `<platform>` server.
 
 ### 3. Install the Plugin
 
-1. Copy the JAR file into your Minecraft server's `plugins/` folder.
-2. Start (or restart) the server. The plugin will generate its configuration files and then **disable itself** because no bot token is set yet.
+1. Copy the `DiscordCraft-<platform>-<version>.jar` JAR file into your `<platform>` server's `plugins/` (or `mods/`) folder (or `<platform>/server/plugins/` for the built-in test server).
+2. Start (or restart) the server. The plugin/mod will generate its configuration files and then **disable itself** because no bot token is set yet.
 
 ### 4. Configure the Bot Token
 
@@ -99,10 +105,17 @@ For detailed configuration, available commands, channel linking, and message cus
 
 ## Building for Development
 
+Useful Gradle commands:
+
 ```bash
-# Build and deploy to a local test server (server/plugins/)
-./gradlew dev
+./gradlew build                # build everything
+./gradlew :common:build        # build only the common library
+./gradlew :<platform>:build   # build only the platform-specific plugin/mod
+./gradlew :<platform>:dev     # build + deploy to <platform>/server/plugins/
+./gradlew dev                  # root convenience task delegating to the active platform
 ```
+
+Replace `<platform>` with `spigot`, `neoforge`, `fabric`, etc. To build and deploy to the local test server in one step, run `./gradlew dev`.
 
 ## License
 
