@@ -22,4 +22,5 @@ public interface Configuration extends ConfigurationSection {
             return defaultValue;
         }
     }
+    
 }

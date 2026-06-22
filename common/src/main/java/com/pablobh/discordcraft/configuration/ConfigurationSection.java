@@ -66,4 +66,5 @@ public interface ConfigurationSection {
     boolean isSection(@Nonnull String path);
 
     boolean isList(@Nonnull String path);
+    
 }
