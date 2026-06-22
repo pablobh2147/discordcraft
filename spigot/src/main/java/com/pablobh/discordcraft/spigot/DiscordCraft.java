@@ -9,10 +9,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import com.pablobh.discordcraft.discord.DiscordService;
+import com.pablobh.discordcraft.discord.LinkedChannel;
 import com.pablobh.discordcraft.spigot.config.Configuration;
 import com.pablobh.discordcraft.spigot.config.GlobalConfiguration;
-import com.pablobh.discordcraft.spigot.discord.DiscordService;
-import com.pablobh.discordcraft.spigot.discord.LinkedChannel;
 import com.pablobh.discordcraft.spigot.listeners.MinecraftChatListener;
 import com.pablobh.discordcraft.spigot.listeners.PlayerEventsListener;
 import com.pablobh.discordcraft.spigot.message.Message;

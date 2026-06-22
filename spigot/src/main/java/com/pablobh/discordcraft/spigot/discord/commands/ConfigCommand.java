@@ -2,9 +2,9 @@ package com.pablobh.discordcraft.spigot.discord.commands;
 
 import javax.annotation.Nonnull;
 
+import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.spigot.DiscordCraft;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommand;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommandManager;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 

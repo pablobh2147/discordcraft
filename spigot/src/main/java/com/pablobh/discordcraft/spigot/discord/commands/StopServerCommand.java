@@ -5,10 +5,10 @@ import javax.annotation.Nonnull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
+import com.pablobh.discordcraft.message.Message;
 import com.pablobh.discordcraft.spigot.DiscordCraft;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommand;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommandManager;
-import com.pablobh.discordcraft.spigot.message.Message;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;

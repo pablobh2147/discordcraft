@@ -16,10 +16,11 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.pablobh.discordcraft.spigot.discord.DiscordService;
-import com.pablobh.discordcraft.spigot.discord.LinkedChannel;
-import com.pablobh.discordcraft.spigot.message.Message;
-import com.pablobh.discordcraft.spigot.message.MessageService;
+import com.pablobh.discordcraft.discord.DiscordService;
+import com.pablobh.discordcraft.discord.LinkedChannel;
+import com.pablobh.discordcraft.message.Message;
+import com.pablobh.discordcraft.message.MessageService;
+import com.pablobh.discordcraft.spigot.message.SpigotPlaceholder;
 
 public class PlayerEventsListener implements Listener {
 
@@ -46,7 +47,7 @@ public class PlayerEventsListener implements Listener {
             return;
         }
 
-        message.replace("player", event.getPlayer());
+        message.replace("player", SpigotPlaceholder.player(event.getPlayer()));
 
         for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
             if (linkedChannel.canSendPlayerJoinMessages()) {
@@ -63,7 +64,7 @@ public class PlayerEventsListener implements Listener {
             return;
         }
 
-        message.replace("player", event.getPlayer());
+        message.replace("player", SpigotPlaceholder.player(event.getPlayer()));
 
         for (LinkedChannel linkedChannel : discordService.getLinkedChannels()) {
             if (linkedChannel.canSendPlayerLeaveMessages()) {
@@ -86,7 +87,7 @@ public class PlayerEventsListener implements Listener {
         String deathMessageStr = event.getDeathMessage();
 
         if (deathMessage != null) {
-            deathMessage.replace("player", player);
+            deathMessage.replace("player", SpigotPlaceholder.player(player));
             deathMessage.replace("death_message", deathMessageStr);
             deathMessageStr = deathMessage.toString();
         }
@@ -95,7 +96,7 @@ public class PlayerEventsListener implements Listener {
         String finalDeathMessageStr = deathMessageStr;
 
         if (finalDeathMessage != null) {
-            finalDeathMessage.replace("player", player);
+            finalDeathMessage.replace("player", SpigotPlaceholder.player(player));
             finalDeathMessage.replace("death_message", deathMessageStr);
             finalDeathMessageStr = finalDeathMessage.toString();
         } else {
@@ -124,8 +125,8 @@ public class PlayerEventsListener implements Listener {
                         return;
                     }
 
-                    message.replace("killer", killer);
-                    message.replace("victim", player);
+                    message.replace("killer", SpigotPlaceholder.player(killer));
+                    message.replace("victim", SpigotPlaceholder.player(player));
 
                     for (LinkedChannel channel : discordService.getLinkedChannels()) {
                         if (channel.canSendPlayerMurderMessages()) {
@@ -177,8 +178,8 @@ public class PlayerEventsListener implements Listener {
             return;
         }
 
-        message.replace("advancement", display);
-        message.replace("player", event.getPlayer());
+        message.replace("advancement", SpigotPlaceholder.advancement(display));
+        message.replace("player", SpigotPlaceholder.player(event.getPlayer()));
         message.replace("display_url", getAdvancementDisplayURL(display));
 
         for (LinkedChannel channel : discordService.getLinkedChannels()) {

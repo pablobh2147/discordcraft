@@ -8,12 +8,12 @@ import javax.annotation.Nonnull;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.ConfigurationSection;
 
 import com.pablobh.discordcraft.StringUtils;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommand;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommandManager;
-import com.pablobh.discordcraft.spigot.message.Message;
+import com.pablobh.discordcraft.configuration.ConfigurationSection;
+import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
+import com.pablobh.discordcraft.message.Message;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -53,10 +53,10 @@ public class PlayerListCommand extends DiscordCommand {
     public PlayerListCommand(@Nonnull DiscordCommandManager manager) {
         super(COMMAND_NAME, manager);
 
-        PlayerListData online = new PlayerListData(getConfig().getConfigurationSection("lists.online"), "online");
-        PlayerListData whitelisted = new PlayerListData(getConfig().getConfigurationSection("lists.whitelisted"), "whitelisted");
-        PlayerListData banned = new PlayerListData(getConfig().getConfigurationSection("lists.banned"), "banned");
-        PlayerListData operator = new PlayerListData(getConfig().getConfigurationSection("lists.operator"), "operator");
+        PlayerListData online = new PlayerListData(getConfig().getSection("lists.online"), "online");
+        PlayerListData whitelisted = new PlayerListData(getConfig().getSection("lists.whitelisted"), "whitelisted");
+        PlayerListData banned = new PlayerListData(getConfig().getSection("lists.banned"), "banned");
+        PlayerListData operator = new PlayerListData(getConfig().getSection("lists.operator"), "operator");
 
         if (!online.isEnabled() && !whitelisted.isEnabled() && !banned.isEnabled() && !operator.isEnabled()) {
             this.setEnabled(false); // Disable the command if all lists are disabled

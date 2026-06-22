@@ -1,4 +1,4 @@
-package com.pablobh.discordcraft.spigot.listeners;
+package com.pablobh.discordcraft.listener;
 
 import java.util.List;
 
@@ -7,9 +7,9 @@ import javax.annotation.Nonnull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.pablobh.discordcraft.spigot.discord.DiscordService;
-import com.pablobh.discordcraft.spigot.discord.LinkedChannel;
-import com.pablobh.discordcraft.spigot.message.MessageService;
+import com.pablobh.discordcraft.discord.DiscordService;
+import com.pablobh.discordcraft.discord.LinkedChannel;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;

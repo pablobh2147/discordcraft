@@ -7,10 +7,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.profile.PlayerProfile;
 
+import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
+import com.pablobh.discordcraft.message.Message;
 import com.pablobh.discordcraft.spigot.DiscordCraft;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommand;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommandManager;
-import com.pablobh.discordcraft.spigot.message.Message;
+import com.pablobh.discordcraft.spigot.message.SpigotPlaceholder;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -47,7 +48,7 @@ public class PardonCommand extends DiscordCommand {
         profileBanList.pardon(offlinePlayer.getPlayerProfile());
 
         Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("success"), "The player %player_name% has been unbanned!");
-        msg.replace("player", offlinePlayer);
+        msg.replace("player", SpigotPlaceholder.player(offlinePlayer));
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
 
         DiscordCraft.logInfo("Player " + player + " has been pardoned from the server by " + event.getUser().getEffectiveName() + "!");

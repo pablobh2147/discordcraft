@@ -1,4 +1,4 @@
-package com.pablobh.discordcraft.spigot.discord;
+package com.pablobh.discordcraft.discord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,14 +7,11 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
 
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-
-import com.pablobh.discordcraft.spigot.DiscordCraft;
-import com.pablobh.discordcraft.spigot.config.Configuration;
-import com.pablobh.discordcraft.spigot.config.GlobalConfiguration;
-import com.pablobh.discordcraft.spigot.listeners.DiscordChatListener;
-import com.pablobh.discordcraft.spigot.message.MessageService;
+import com.pablobh.discordcraft.configuration.Configuration;
+import com.pablobh.discordcraft.configuration.ConfigurationSection;
+import com.pablobh.discordcraft.listener.DiscordChatListener;
+import com.pablobh.discordcraft.logging.PluginLogger;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -49,16 +46,22 @@ public class DiscordService {
 
     private TextChannel logChannel;
 
-    private GlobalConfiguration globalConfig;
+    private final PluginLogger logger;
+
+    private Configuration globalConfig;
     private Configuration botConfig;
     private Configuration commandConfig;
 
     private MessageService messageService;
 
-    public DiscordService(@Nonnull String token, @Nonnull GlobalConfiguration globalConfig, @Nonnull Configuration botConfig, @Nonnull Configuration commandConfig, @Nonnull MessageService messageService) throws LoginException {
+
+    public DiscordService(@Nonnull String token, @Nonnull Configuration globalConfig, @Nonnull Configuration botConfig, @Nonnull Configuration commandConfig, @Nonnull MessageService messageService, @Nonnull PluginLogger logger) throws LoginException {
+        this.logger = logger;
+
         this.globalConfig = globalConfig;
         this.botConfig = botConfig;
         this.commandConfig = commandConfig;
+
         this.messageService = messageService;
 
         boolean jdaLoaded = initializeJDA(token);
@@ -68,7 +71,7 @@ public class DiscordService {
 
         mainGuild = getGuild(botConfig.getLong(GUILD_ID, 0));
         if (mainGuild == null) {
-            DiscordCraft.logWarning("No server was found with the ID provided in the config. Please run /setup command on Discord.");
+            logger.warning("No server was found with the ID provided in the config. Please run /setup command on Discord.");
             linkedChannels = new ArrayList<>();
             return;
         }
@@ -77,9 +80,9 @@ public class DiscordService {
 
         linkedChannels = loadChannelLinks();
 
-        DiscordCraft.logInfo("Loaded " + linkedChannels.size() + " linked channels.");
+        logger.info("Loaded " + linkedChannels.size() + " linked channels.");
         for (LinkedChannel channel : linkedChannels) {
-            DiscordCraft.logInfo("Loaded linked channel: " + channel.getChannel().getName() + " in guild: " + channel.getChannel().getGuild().getName());
+            logger.info("Loaded linked channel: " + channel.getChannel().getName() + " in guild: " + channel.getChannel().getGuild().getName());
         }
     }
 
@@ -102,7 +105,7 @@ public class DiscordService {
 
             return true;
         } catch (Exception e) {
-            DiscordCraft.logWarning("An error occurred while setting up Discord!");
+            logger.warning("An error occurred while setting up Discord!");
             e.printStackTrace();
             return false;
         }
@@ -126,8 +129,8 @@ public class DiscordService {
         String activityType = botConfig.getString(ACTIVITY_TYPE);
         String activityName = botConfig.getString(ACTIVITY_NAME);
 
-        DiscordCraft.logInfo("Activity type: " + activityType);
-        DiscordCraft.logInfo("Activity name: " + activityName);
+        logger.info("Activity type: " + activityType);
+        logger.info("Activity name: " + activityName);
 
         if (activityName != null) {
             ActivityType type = ActivityType.valueOf(activityType);
@@ -158,10 +161,10 @@ public class DiscordService {
         if (id != 0) {
             TextChannel channel = mainGuild.getTextChannelById(id);
             if (channel != null) {
-                Bukkit.getConsoleSender().sendMessage("Found text channel: " + channel.getName());
+                logger.info("Found text channel: " + channel.getName());
                 return channel;
             }
-            Bukkit.getConsoleSender().sendMessage("Could not find text channel with ID: " + id);
+            logger.warning("Could not find text channel with ID: " + id);
         }
         return null;
     }
@@ -170,10 +173,10 @@ public class DiscordService {
         if (id != 0) {
             VoiceChannel channel = mainGuild.getVoiceChannelById(id);
             if (channel != null) {
-                Bukkit.getConsoleSender().sendMessage("Found voice channel: " + channel.getName());
+                logger.info("Found voice channel: " + channel.getName());
                 return channel;
             }
-            Bukkit.getConsoleSender().sendMessage("Could not find voice channel with ID: " + id);
+            logger.warning("Could not find voice channel with ID: " + id);
         }
         return null;
     }
@@ -182,10 +185,10 @@ public class DiscordService {
         if (id != 0) {
             Category category = mainGuild.getCategoryById(id);
             if (category != null) {
-                Bukkit.getConsoleSender().sendMessage("Found category: " + category.getName());
+                logger.info("Found category: " + category.getName());
                 return category;
             }
-            Bukkit.getConsoleSender().sendMessage("Could not find category with ID: " + id);
+            logger.warning("Could not find category with ID: " + id);
         }
         return null;
     }
@@ -194,10 +197,10 @@ public class DiscordService {
         if (id != 0) {
             Guild guild = jda.getGuildById(id);
             if (guild != null) {
-                Bukkit.getConsoleSender().sendMessage("Found guild: " + guild.getName());
+                logger.info("Found guild: " + guild.getName());
                 return guild;
             }
-            Bukkit.getConsoleSender().sendMessage("Could not find guild with ID: " + id);
+            logger.warning("Could not find guild with ID: " + id);
         }
         return null;
     }
@@ -206,10 +209,10 @@ public class DiscordService {
         if (id != 0) {
             Role role = mainGuild.getRoleById(id);
             if (role != null) {
-                Bukkit.getConsoleSender().sendMessage("Found role: " + role.getName());
+                logger.info("Found role: " + role.getName());
                 return role;
             }
-            Bukkit.getConsoleSender().sendMessage("Could not find role with ID: " + id);
+            logger.warning("Could not find role with ID: " + id);
         }
         return null;
     }
@@ -308,10 +311,10 @@ public class DiscordService {
             return list;
         }
 
-        DiscordCraft.logInfo("Loading " + channelsConfig.getKeys(false).size() + " linked channels.");
+        logger.info("Loading " + channelsConfig.getKeys(false).size() + " linked channels.");
 
         for (String key : channelsConfig.getKeys(false)) {
-            ConfigurationSection section = channelsConfig.getConfigurationSection(key);
+            ConfigurationSection section = channelsConfig.getSection(key);
             if (section == null) {
                 continue;
             }
@@ -320,7 +323,7 @@ public class DiscordService {
             if (channel != null) {
                 list.add(channel);
             } else {
-                DiscordCraft.logWarning("Failed to load linked channel: " + key);
+                logger.warning("Failed to load linked channel: " + key);
             }
         }
 

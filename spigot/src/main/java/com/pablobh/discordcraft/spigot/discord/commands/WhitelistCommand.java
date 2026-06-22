@@ -5,9 +5,10 @@ import javax.annotation.Nonnull;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
-import com.pablobh.discordcraft.spigot.discord.DiscordCommand;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommandManager;
-import com.pablobh.discordcraft.spigot.message.Message;
+import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
+import com.pablobh.discordcraft.message.Message;
+import com.pablobh.discordcraft.spigot.message.SpigotPlaceholder;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -123,7 +124,7 @@ public class WhitelistCommand extends DiscordCommand {
 
         if (offlinePlayer.isWhitelisted()) {
             Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("already-whitelisted"), "The player %player_name% is already whitelisted!");
-            msg.replace("player", offlinePlayer);
+            msg.replace("player", SpigotPlaceholder.player(offlinePlayer));
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
         }
@@ -131,7 +132,7 @@ public class WhitelistCommand extends DiscordCommand {
         offlinePlayer.setWhitelisted(true);
 
         Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("add-success"), "The player %player_name% has been added to the whitelist!");
-        msg.replace("player", offlinePlayer);
+        msg.replace("player", SpigotPlaceholder.player(offlinePlayer));
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
     }
 
@@ -144,7 +145,7 @@ public class WhitelistCommand extends DiscordCommand {
 
         if (!offlinePlayer.isWhitelisted()) {
             Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-whitelisted"), "The player %player_name% is not whitelisted!");
-            msg.replace("player", offlinePlayer);
+            msg.replace("player", SpigotPlaceholder.player(offlinePlayer));
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
         }
@@ -152,7 +153,7 @@ public class WhitelistCommand extends DiscordCommand {
         offlinePlayer.setWhitelisted(false);
 
         Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("remove-success"), "The player %player_name% has been removed from the whitelist!");
-        msg.replace("player", offlinePlayer);
+        msg.replace("player", SpigotPlaceholder.player(offlinePlayer));
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
     }
 

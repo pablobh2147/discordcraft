@@ -9,10 +9,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.profile.PlayerProfile;
 
+import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
+import com.pablobh.discordcraft.message.Message;
 import com.pablobh.discordcraft.spigot.DiscordCraft;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommand;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommandManager;
-import com.pablobh.discordcraft.spigot.message.Message;
+import com.pablobh.discordcraft.spigot.message.SpigotPlaceholder;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -53,7 +54,7 @@ public class BanCommand extends DiscordCommand {
 
         if (offlinePlayer.isBanned()) {
             Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("already-banned"), "The player %player_name% is already banned!");
-            msg.replace("player", offlinePlayer);
+            msg.replace("player", SpigotPlaceholder.player(offlinePlayer));
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
         }
@@ -62,7 +63,7 @@ public class BanCommand extends DiscordCommand {
         profileBanList.addBan(offlinePlayer.getPlayerProfile(), reason, (Instant) null, reason);
 
         Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("success"), "The player %player_name% has been banned because %reason%!");
-        msg.replace("player", offlinePlayer).replace("reason", reason);
+        msg.replace("player", SpigotPlaceholder.player(offlinePlayer)).replace("reason", reason);
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
 
         DiscordCraft.logInfo("Player " + playerName + " has been banned from the server by " + event.getUser().getEffectiveName() + " because " + reason + "!");

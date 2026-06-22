@@ -1,4 +1,4 @@
-package com.pablobh.discordcraft.spigot.discord;
+package com.pablobh.discordcraft.discord;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,9 +7,8 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.bukkit.configuration.ConfigurationSection;
-
-import com.pablobh.discordcraft.spigot.message.MessageService;
+import com.pablobh.discordcraft.configuration.ConfigurationSection;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

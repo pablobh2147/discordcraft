@@ -1,4 +1,4 @@
-package com.pablobh.discordcraft.spigot.discord;
+package com.pablobh.discordcraft.discord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,21 +6,14 @@ import java.util.Objects;
 
 import javax.annotation.Nullable;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
-import com.pablobh.discordcraft.spigot.DiscordCraft;
-import com.pablobh.discordcraft.spigot.config.Configuration;
-import com.pablobh.discordcraft.spigot.discord.commands.BanCommand;
-import com.pablobh.discordcraft.spigot.discord.commands.ChannelLinkCommand;
-import com.pablobh.discordcraft.spigot.discord.commands.ConfigCommand;
-import com.pablobh.discordcraft.spigot.discord.commands.HelpCommand;
-import com.pablobh.discordcraft.spigot.discord.commands.PardonCommand;
-import com.pablobh.discordcraft.spigot.discord.commands.PlayerListCommand;
-import com.pablobh.discordcraft.spigot.discord.commands.SetupCommand;
-import com.pablobh.discordcraft.spigot.discord.commands.StopServerCommand;
-import com.pablobh.discordcraft.spigot.discord.commands.WhitelistCommand;
-import com.pablobh.discordcraft.spigot.message.MessageService;
+import com.pablobh.discordcraft.DiscordCraft;
+import com.pablobh.discordcraft.configuration.Configuration;
+import com.pablobh.discordcraft.configuration.ConfigurationSection;
+import com.pablobh.discordcraft.message.MessageService;
+import com.pablobh.discordcraft.discord.DiscordService;
+import com.pablobh.discordcraft.logging.PluginLogger;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -36,29 +29,32 @@ public class DiscordCommandManager extends ListenerAdapter {
     
     private List<DiscordCommand> commands = new ArrayList<>();
 
+    private final PluginLogger logger;
+
     private final Configuration config;
     
     private final DiscordService discordService;
     private final MessageService messageService;
 
-    public DiscordCommandManager(DiscordService discordService, MessageService messageService, Configuration config) {
+    public DiscordCommandManager(PluginLogger logger, DiscordService discordService, MessageService messageService, Configuration config) {
+        this.logger = logger;
         this.config = config;
 
         this.discordService = discordService;
         this.messageService = messageService;
         
         try {
-            registerCommand(new SetupCommand(this, discordService));
-            registerCommand(new HelpCommand(this));
-            registerCommand(new PlayerListCommand(this));
-            registerCommand(new StopServerCommand(this));
-            registerCommand(new BanCommand(this));
-            registerCommand(new PardonCommand(this));
-            registerCommand(new WhitelistCommand(this));
-            registerCommand(new ChannelLinkCommand(this, discordService));
-            registerCommand(new ConfigCommand(this));
+            // registerCommand(new SetupCommand(this, discordService));
+            // registerCommand(new HelpCommand(this));
+            // registerCommand(new PlayerListCommand(this));
+            // registerCommand(new StopServerCommand(this));
+            // registerCommand(new BanCommand(this));
+            // registerCommand(new PardonCommand(this));
+            // registerCommand(new WhitelistCommand(this));
+            // registerCommand(new ChannelLinkCommand(this, discordService));
+            // registerCommand(new ConfigCommand(this));
         } catch (Exception e) {
-            DiscordCraft.logException(e, messageService.getPlainMessage("errors.command-registration-error"));
+            logger.exception(e, "Failed to register commands");
         }
 
     }
@@ -91,13 +87,13 @@ public class DiscordCommandManager extends ListenerAdapter {
                         command.onCommandInteraction(event);
                         return;
                     } catch (Exception e) {
-                        
-                        DiscordCraft.discordLogException(e,
-                            messageService.getMessage("errors.command-error")
-                                .replace("command_name", command.getName())
-                                .replace("member", event.getMember())
-                                .toString()
-                        );
+                        logger.exception(e, "Failed to execute command: " + command.getName());
+                        // DiscordCraft.discordLogException(e,
+                        //     messageService.getMessage("errors.command-error")
+                        //         .replace("command_name", command.getName())
+                        //         .replace("member", event.getMember())
+                        //         .toString()
+                        // );
 
                         if (event.isAcknowledged()) {
                             event.getHook().sendMessage(messageService.getDiscordMessage("commands.internal-error").toDiscordMessage()).queue();
@@ -122,7 +118,7 @@ public class DiscordCommandManager extends ListenerAdapter {
     private void registerCommands(Guild guild) {
         // Register commands
 
-        DiscordCraft.logInfo("Registering commands for guild \"" + guild.getName() + "\"");
+        logger.info("Registering commands for guild \"" + guild.getName() + "\"");
 
         List<CommandData> commandDataList = new ArrayList<>();
 
@@ -133,7 +129,7 @@ public class DiscordCommandManager extends ListenerAdapter {
                 continue;
             }
 
-            DiscordCraft.logInfo("Registering command: \"" + command.getName() + "\" is enabled: \"" + command.isEnabled() + "\"");
+            logger.info("Registering command: \"" + command.getName() + "\" is enabled: \"" + command.isEnabled() + "\"");
 
             if (command.isEnabled()) {
                 SlashCommandData data = Commands.slash(command.getName(), command.getDescription());

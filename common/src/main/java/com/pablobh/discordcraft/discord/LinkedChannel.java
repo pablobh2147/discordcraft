@@ -1,4 +1,4 @@
-package com.pablobh.discordcraft.spigot.discord;
+package com.pablobh.discordcraft.discord;
 
 import java.net.URL;
 import java.util.List;
@@ -7,9 +7,8 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.bukkit.configuration.ConfigurationSection;
-
-import com.pablobh.discordcraft.spigot.message.Message;
+import com.pablobh.discordcraft.configuration.ConfigurationSection;
+import com.pablobh.discordcraft.message.Message;
 
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import club.minnced.discord.webhook.send.AllowedMentions;
@@ -44,6 +43,7 @@ public class LinkedChannel {
 
     private ConfigurationSection config;
     private TextChannel channel;
+
     private JDAWebhookClient webhookClient;
     private Webhook webhook;
 
@@ -90,7 +90,7 @@ public class LinkedChannel {
 
     }
 
-    public void sendMessage(@javax.annotation.Nullable String message) {
+    public void sendMessage(@Nullable String message) {
         if (message != null && !message.isEmpty()) {
             channel.sendMessage(message).queue();
         }

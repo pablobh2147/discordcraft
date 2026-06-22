@@ -4,12 +4,12 @@ import javax.annotation.Nonnull;
 
 import org.bukkit.Bukkit;
 
-import com.pablobh.discordcraft.spigot.DiscordCraft;
 import com.pablobh.discordcraft.StringUtils;
-import com.pablobh.discordcraft.spigot.config.Configuration;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommand;
-import com.pablobh.discordcraft.spigot.discord.DiscordCommandManager;
-import com.pablobh.discordcraft.spigot.discord.DiscordService;
+import com.pablobh.discordcraft.configuration.Configuration;
+import com.pablobh.discordcraft.discord.DiscordCommand;
+import com.pablobh.discordcraft.discord.DiscordCommandManager;
+import com.pablobh.discordcraft.discord.DiscordService;
+import com.pablobh.discordcraft.spigot.DiscordCraft;
 
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
