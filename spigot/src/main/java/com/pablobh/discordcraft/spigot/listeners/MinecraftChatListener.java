@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import com.pablobh.discordcraft.spigot.avatar.AvatarProvider;
+import com.pablobh.discordcraft.avatar.AvatarProvider;
 import com.pablobh.discordcraft.spigot.config.GlobalConfiguration;
 import com.pablobh.discordcraft.spigot.discord.DiscordService;
 import com.pablobh.discordcraft.spigot.discord.LinkedChannel;
@@ -27,7 +27,7 @@ public class MinecraftChatListener implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
-        URL avatarUrl = avatarProvider.getAvatarUrl(event.getPlayer(), globalConfig.getAvatarStyle(), AVATAR_SIZE);
+        URL avatarUrl = avatarProvider.getAvatarUrl(event.getPlayer().getUniqueId(), globalConfig.getAvatarStyle(), AVATAR_SIZE);
         for (LinkedChannel channel : discordService.getLinkedChannels()) {
             if (channel.canSendMinecraftChatMessages()) {
                 channel.sendMessage(event.getPlayer().getName(), avatarUrl, event.getMessage());

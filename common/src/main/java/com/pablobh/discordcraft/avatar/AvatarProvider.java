@@ -1,21 +1,13 @@
-package com.pablobh.discordcraft.spigot.avatar;
+package com.pablobh.discordcraft.avatar;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.UUID;
 
-import org.bukkit.entity.Player;
-
-import com.pablobh.discordcraft.avatar.AvatarStyle;
-
 public class AvatarProvider {
 
     private static final String BASE_URL = "https://render.crafty.gg/";
-
-    private String getPlayerAvatarHandle(Player player) {
-        return player.getUniqueId().toString();
-    }
 
     private String getAvatarPath(AvatarStyle style) {
         switch (style) {
@@ -31,11 +23,6 @@ public class AvatarProvider {
    
     public URL getAvatarUrl(UUID uuid, AvatarStyle style, int size) {
         return getAvatarUrl(uuid.toString(), style, size);
-    }
-
-    public URL getAvatarUrl(Player player, AvatarStyle style, int size) {
-        String handle = getPlayerAvatarHandle(player);
-        return getAvatarUrl(handle, style, size);
     }
 
     private URL getAvatarUrl(String handle, AvatarStyle style, int size) {
