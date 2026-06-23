@@ -7,6 +7,7 @@ import javax.security.auth.login.LoginException;
 import com.pablobh.discordcraft.configuration.Configuration;
 import com.pablobh.discordcraft.discord.DiscordService;
 import com.pablobh.discordcraft.discord.LinkedChannel;
+import com.pablobh.discordcraft.logging.DiscordLogger;
 import com.pablobh.discordcraft.logging.PluginLogger;
 import com.pablobh.discordcraft.message.Message;
 import com.pablobh.discordcraft.message.MessageService;
@@ -55,24 +56,43 @@ public class DiscordCraft {
         return logger;
     }
 
-    // --------------------- Configuration ---------------------
-
-    public void saveConfigurations() {
-        globalConfig.save();
-        messagesConfig.save();
-        botConfig.save();
-        commandsConfig.save();
-
-        logger.info("All configurations saved.");
+    @Nonnull
+    public DiscordLogger getDiscordLogger() {
+        return discordService.getDiscordLogger();
     }
 
-    public void reloadConfigurations() {
-        globalConfig.reload();
-        messagesConfig.reload();
-        botConfig.reload();
-        commandsConfig.reload();
+    // --------------------- Configuration ---------------------
 
-        logger.info("All configurations reloaded.");
+    public boolean saveConfigurations() {
+        boolean success = true;
+        success &= globalConfig.save();
+        success &= messagesConfig.save();
+        success &= botConfig.save();
+        success &= commandsConfig.save();
+
+        if (!success) {
+            logger.warning("Failed to save one or more configurations");
+        } else {
+            logger.info("All configurations saved.");
+        }
+        
+        return success;
+    }
+
+    public boolean reloadConfigurations() {
+        boolean success = true;
+        success &= globalConfig.reload();
+        success &= messagesConfig.reload();
+        success &= botConfig.reload();
+        success &= commandsConfig.reload();
+
+        if (!success) {
+            logger.warning("Failed to reload one or more configurations");
+        } else {
+            logger.info("All configurations reloaded.");
+        }
+        
+        return success;
     }
 
     @Nonnull

@@ -8,9 +8,9 @@ import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
 
 import com.pablobh.discordcraft.DiscordCraft;
-import com.pablobh.discordcraft.configuration.Configuration;
 import com.pablobh.discordcraft.configuration.ConfigurationSection;
 import com.pablobh.discordcraft.listener.DiscordChatListener;
+import com.pablobh.discordcraft.logging.DiscordLogger;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -41,7 +41,7 @@ public class DiscordService {
     private final DiscordCraft discordCraft;
 
     private Guild mainGuild;
-    private TextChannel logChannel;
+    private DiscordLogger discordLogger;
 
     private List<LinkedChannel> linkedChannels;
 
@@ -60,7 +60,7 @@ public class DiscordService {
             return;
         }
 
-        logChannel = getTextChannel(discordCraft.getBotConfig().getLong(LOG_CHANNEL, 0));
+        discordLogger = new DiscordLogger(getTextChannel(discordCraft.getBotConfig().getLong(LOG_CHANNEL, 0)));
 
         linkedChannels = loadChannelLinks();
 
@@ -78,7 +78,7 @@ public class DiscordService {
             configureActivity(builder);
 
             builder.addEventListeners(new DiscordChatListener(this, discordCraft.getMessageService()));
-            builder.addEventListeners(new DiscordCommandManager(discordCraft.getLogger(), this, discordCraft.getMessageService(), discordCraft.getCommandsConfig()));
+            builder.addEventListeners(new DiscordCommandManager(discordCraft));
 
             jda = builder.build();
             if (jda == null) {
@@ -237,16 +237,8 @@ public class DiscordService {
         return linkedChannels.stream().anyMatch(channel -> channel.getChannel().getIdLong() == message.getChannel().getIdLong());
     }
 
-    public TextChannel getLogChannel() {
-        return logChannel;
-    }
-
     public SelfUser getSelfUser() {
         return jda.getSelfUser();
-    }
-
-    public Configuration getBotConfig() {
-        return discordCraft.getBotConfig();
     }
 
     // --------------------- Channel Link Management ---------------------
@@ -330,6 +322,12 @@ public class DiscordService {
         ConfigurationSection defaultConfig = discordCraft.getGlobalConfig().getSection("channel-defaults");
 
         return new LinkedChannel(channelConfig, defaultConfig, textChannel);
+    }
+
+    // --------------------- Logging ---------------------
+
+    public DiscordLogger getDiscordLogger() {
+        return discordLogger;
     }
 
 }

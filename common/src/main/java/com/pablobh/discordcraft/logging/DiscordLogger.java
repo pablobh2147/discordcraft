@@ -3,6 +3,8 @@ package com.pablobh.discordcraft.logging;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.pablobh.discordcraft.message.Message;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class DiscordLogger {
@@ -18,14 +20,25 @@ public class DiscordLogger {
         this.channel = channel;
     }
 
-    private void log(@Nonnull String message) {
+    @Nullable
+    public TextChannel getChannel() {
+        return channel;
+    }
+
+    private void sendMessage(@Nonnull String message) {
         if (channel != null) {
             channel.sendMessage(message).queue();
         }
     }
 
+    public void sendMessage(@Nonnull Message message) {
+        if (channel != null) {
+            channel.sendMessage(message.toDiscordMessage()).queue();
+        }
+    }
+
     private void log(@Nonnull String prefix, @Nonnull String message) {
-        log("[" + prefix + "]: " + message);
+        sendMessage("[" + prefix + "]: " + message);
     }
    
     public void info(@Nonnull String message) {
