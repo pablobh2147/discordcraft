@@ -77,7 +77,7 @@ public class DiscordService {
             configureMemoryUsage(builder);
             configureActivity(builder);
 
-            builder.addEventListeners(new DiscordChatListener(this, discordCraft.getMessageService()));
+            builder.addEventListeners(new DiscordChatListener(discordCraft));
             builder.addEventListeners(new DiscordCommandManager(discordCraft));
 
             jda = builder.build();

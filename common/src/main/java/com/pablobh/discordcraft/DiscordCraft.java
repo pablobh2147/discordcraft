@@ -11,12 +11,15 @@ import com.pablobh.discordcraft.logging.DiscordLogger;
 import com.pablobh.discordcraft.logging.PluginLogger;
 import com.pablobh.discordcraft.message.Message;
 import com.pablobh.discordcraft.message.MessageService;
+import com.pablobh.discordcraft.platform.MinecraftServer;
 
 public class DiscordCraft {
 
     private static final String TOKEN_ENV_VAR_NAME = "DISCORDCRAFT_BOT_TOKEN";
 
     private final PluginLogger logger;
+
+    private final MinecraftServer minecraftServer;
 
     private final Configuration globalConfig;
     private final Configuration messagesConfig;
@@ -28,13 +31,16 @@ public class DiscordCraft {
    
     public DiscordCraft(
         PluginLogger logger,
+        MinecraftServer minecraftServer,
         Configuration globalConfig,
         Configuration messagesConfig,
         Configuration botConfig,
         Configuration commandsConfig
     ) throws LoginException {
         this.logger = logger;
-        
+
+        this.minecraftServer = minecraftServer;
+
         this.globalConfig = globalConfig;
         this.messagesConfig = messagesConfig;
         this.botConfig = botConfig;
@@ -192,6 +198,12 @@ public class DiscordCraft {
 
     public void shutdown() {
         discordService.shutdown();
+    }
+
+    // --------------------- Getters ---------------------
+
+    public MinecraftServer getServer() {
+        return minecraftServer;
     }
 
 }
