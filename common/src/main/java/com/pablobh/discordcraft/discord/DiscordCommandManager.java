@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.pablobh.discordcraft.configuration.Configuration;
+import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.configuration.ConfigurationSection;
-import com.pablobh.discordcraft.logging.PluginLogger;
 import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.Permission;
@@ -27,19 +27,10 @@ public class DiscordCommandManager extends ListenerAdapter {
     
     private List<DiscordCommand> commands = new ArrayList<>();
 
-    private final PluginLogger logger;
+    private final DiscordCraft discordCraft;
 
-    private final Configuration config;
-    
-    private final DiscordService discordService;
-    private final MessageService messageService;
-
-    public DiscordCommandManager(PluginLogger logger, DiscordService discordService, MessageService messageService, Configuration config) {
-        this.logger = logger;
-        this.config = config;
-
-        this.discordService = discordService;
-        this.messageService = messageService;
+    public DiscordCommandManager(@Nonnull DiscordCraft discordCraft) {
+        this.discordCraft = discordCraft;
         
         try {
             // registerCommand(new SetupCommand(this, discordService));
@@ -52,7 +43,7 @@ public class DiscordCommandManager extends ListenerAdapter {
             // registerCommand(new ChannelLinkCommand(this, discordService));
             // registerCommand(new ConfigCommand(this));
         } catch (Exception e) {
-            logger.exception(e, "Failed to register commands");
+            discordCraft.getLogger().exception(e, "Failed to register commands");
         }
 
     }
@@ -67,14 +58,14 @@ public class DiscordCommandManager extends ListenerAdapter {
 
                         // Check if the command was executed in the main server
 
-                        if (!command.isGlobal() && !event.getGuild().equals(discordService.getMainGuild())) {
-                            event.reply(messageService.getPlainMessage("commands.main-guild-only")).setEphemeral(true).queue();
+                        if (!command.isGlobal() && !event.getGuild().equals(discordCraft.getDiscordService().getMainGuild())) {
+                            event.reply(discordCraft.getMessageService().getPlainMessage("commands.main-guild-only")).setEphemeral(true).queue();
                             return;
                         }
 
                         // Check if the user has the required permissions
                         if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-                            event.reply(messageService.getPlainMessage("commands.no-permission")).setEphemeral(true).queue();
+                            event.reply(discordCraft.getMessageService().getPlainMessage("commands.no-permission")).setEphemeral(true).queue();
                             return;
                         }
                     }
@@ -85,7 +76,7 @@ public class DiscordCommandManager extends ListenerAdapter {
                         command.onCommandInteraction(event);
                         return;
                     } catch (Exception e) {
-                        logger.exception(e, "Failed to execute command: " + command.getName());
+                        discordCraft.getLogger().exception(e, "Failed to execute command: " + command.getName());
                         // DiscordCraft.discordLogException(e,
                         //     messageService.getMessage("errors.command-error")
                         //         .replace("command_name", command.getName())
@@ -94,40 +85,42 @@ public class DiscordCommandManager extends ListenerAdapter {
                         // );
 
                         if (event.isAcknowledged()) {
-                            event.getHook().sendMessage(messageService.getDiscordMessage("commands.internal-error").toDiscordMessage()).queue();
+                            event.getHook().sendMessage(discordCraft.getMessageService().getDiscordMessage("commands.internal-error").toDiscordMessage()).queue();
                         } else {
-                            event.reply(messageService.getDiscordMessage("commands.internal-error").toDiscordMessage()).setEphemeral(true).queue();
+                            event.reply(discordCraft.getMessageService().getDiscordMessage("commands.internal-error").toDiscordMessage()).setEphemeral(true).queue();
                         }
                     }
 
                     return;
                 } else {
                     // Command is disabled
-                    event.reply(messageService.getPlainMessage("commands.disabled")).setEphemeral(true).queue(); // Should never happen because the command should not be registered
+                    // Should never happen because the command should not be registered
+                    event.reply(discordCraft.getMessageService().getPlainMessage("commands.disabled")).setEphemeral(true).queue();
                     return;
                 }
             }
         }
 
         // Command not found
-        event.reply(messageService.getPlainMessage("commands.not-found")).setEphemeral(true).queue(); // Should never happen because the command should not be registered
+        // Should never happen because the command should not be registered
+        event.reply(discordCraft.getMessageService().getPlainMessage("commands.not-found")).setEphemeral(true).queue();
     }
 
     private void registerCommands(Guild guild) {
         // Register commands
 
-        logger.info("Registering commands for guild \"" + guild.getName() + "\"");
+        discordCraft.getLogger().info("Registering commands for guild \"" + guild.getName() + "\"");
 
         List<CommandData> commandDataList = new ArrayList<>();
 
         for (DiscordCommand command : commands) {
 
-            if (!command.isGlobal() && guild.getIdLong() != discordService.getBotConfig().getLong(DiscordService.GUILD_ID)) {
+            if (!command.isGlobal() && guild.getIdLong() != discordCraft.getBotConfig().getLong(DiscordService.GUILD_ID)) {
                 // Skip if the command is not global and the guild is not the main server
                 continue;
             }
 
-            logger.info("Registering command: \"" + command.getName() + "\" is enabled: \"" + command.isEnabled() + "\"");
+            discordCraft.getLogger().info("Registering command: \"" + command.getName() + "\" is enabled: \"" + command.isEnabled() + "\"");
 
             if (command.isEnabled()) {
                 SlashCommandData data = Commands.slash(command.getName(), command.getDescription());
@@ -181,20 +174,22 @@ public class DiscordCommandManager extends ListenerAdapter {
         return null;
     }
 
-    public MessageService getMessageService() {
-        return messageService;
-    }
-
     public ConfigurationSection getCommandConfig(String name) {
-        String key = "commands." + name;
+        String path = "commands." + name;
 
-        ConfigurationSection section = config.getSection(key);
+        ConfigurationSection configuration = discordCraft.getCommandsConfig();
+
+        ConfigurationSection section = configuration.getSection(path);
         if (section == null) {
-            config.createSection(key);
-            section = config.getSection(key);
+            configuration.createSection(path);
+            section = configuration.getSection(path);
         }
 
         return section;
+    }
+
+    public MessageService getMessageService() {
+        return discordCraft.getMessageService();
     }
 
 }
