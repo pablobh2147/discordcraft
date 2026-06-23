@@ -2,9 +2,9 @@ package com.pablobh.discordcraft.spigot.discord.commands;
 
 import javax.annotation.Nonnull;
 
+import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
-import com.pablobh.discordcraft.discord.DiscordService;
 import com.pablobh.discordcraft.discord.LinkedChannel;
 import com.pablobh.discordcraft.message.Message;
 
@@ -19,12 +19,11 @@ public class ChannelLinkCommand extends DiscordCommand {
 
     private static final String COMMAND_NAME = "link";
 
-    private final DiscordService discordService;
+    private final DiscordCraft discordCraft;
 
-    public ChannelLinkCommand(@Nonnull DiscordCommandManager manager, @Nonnull DiscordService discordService) {
+    public ChannelLinkCommand(@Nonnull DiscordCommandManager manager, @Nonnull DiscordCraft discordCraft) {
         super(COMMAND_NAME, manager);
-
-        this.discordService = discordService;
+        this.discordCraft = discordCraft;
 
         // Subcommand "add"
         {
@@ -106,13 +105,13 @@ public class ChannelLinkCommand extends DiscordCommand {
             return;
         }
 
-        if (channel.getGuild().getIdLong() != discordService.getMainGuild().getIdLong()) {
+        if (channel.getGuild().getIdLong() != discordCraft.getDiscordService().getMainGuild().getIdLong()) {
             Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-in-server"), "The channel must be in the same server as the bot!");
             event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
-        discordService.addLinkedChannel(channel);
+        discordCraft.getDiscordService().addLinkedChannel(channel);
 
         Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("added"), "Added a new channel %channel%");
         msg.replace("channel", channel.getAsMention());
@@ -128,13 +127,13 @@ public class ChannelLinkCommand extends DiscordCommand {
             return;
         }
 
-        if (!discordService.isChannelLinked(channel)) {
+        if (!discordCraft.getDiscordService().isChannelLinked(channel)) {
             Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-linked"), "The channel is not linked!");
             event.reply(msg.toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
-        discordService.removeChannelLink(channel);
+        discordCraft.getDiscordService().removeChannelLink(channel);
 
         Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("removed"), "Removed channel %channel%");
         msg.replace("channel", channel.getAsMention());
@@ -150,7 +149,7 @@ public class ChannelLinkCommand extends DiscordCommand {
             return;
         }
 
-        LinkedChannel linkedChannel = discordService.getLinkedChannel(channel);
+        LinkedChannel linkedChannel = discordCraft.getDiscordService().getLinkedChannel(channel);
 
         if (linkedChannel == null) {
             Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-linked"), "The channel is not linked!");
@@ -222,7 +221,7 @@ public class ChannelLinkCommand extends DiscordCommand {
         }
 
         // Save the configuration
-        discordService.getBotConfig().save();
+        discordCraft.getBotConfig().save();
 
         Message successMsg = getMessageService().getDiscordMessageOrDefault(getMessageKey("config-success"), "Option %option% has been set to %value% for channel %channel%");
         successMsg.replace("option", option).replace("value", value).replace("channel", channel.getAsMention());

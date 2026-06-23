@@ -2,14 +2,12 @@ package com.pablobh.discordcraft.spigot.discord.commands;
 
 import javax.annotation.Nonnull;
 
-import org.bukkit.Bukkit;
-
+import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.StringUtils;
 import com.pablobh.discordcraft.configuration.Configuration;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.discord.DiscordService;
-import com.pablobh.discordcraft.spigot.DiscordCraft;
 
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -22,12 +20,12 @@ public class SetupCommand extends DiscordCommand {
 
     private static final String COMMAND_NAME = "setup";
 
-    private final DiscordService discordService;
+    private final DiscordCraft discordCraft;
 
-    public SetupCommand(@Nonnull DiscordCommandManager manager, @Nonnull DiscordService discordService) {
+    public SetupCommand(@Nonnull DiscordCommandManager manager, @Nonnull DiscordCraft discordCraft) {
         super(COMMAND_NAME, manager);
 
-        this.discordService = discordService;
+        this.discordCraft = discordCraft;
 
         setGlobal(true);
 
@@ -53,14 +51,14 @@ public class SetupCommand extends DiscordCommand {
     @Override
     public void onCommandInteraction(SlashCommandInteractionEvent event) {
         
-        if (discordService.getMainGuild() != null) {
+        if (discordCraft.getDiscordService().getMainGuild() != null) {
             event.reply(getMessageService().getDiscordMessage("setup.already").toDiscordMessage()).setEphemeral(true).queue();
             return;
         }
 
         event.deferReply(true).complete();
 
-        Configuration botConfig = discordService.getBotConfig();
+        Configuration botConfig = discordCraft.getBotConfig();
 
         // Set guild
 
@@ -96,7 +94,7 @@ public class SetupCommand extends DiscordCommand {
         
         event.getHook().sendMessage(getMessageService().getDiscordMessage("setup.complete").toDiscordMessage()).complete();
         
-        Bukkit.getScheduler().runTask(DiscordCraft.getInstance(), () -> Bukkit.shutdown());
+        // Bukkit.getScheduler().runTask(DiscordCraftPlugin.getInstance(), () -> Bukkit.shutdown());
     }
 
 }

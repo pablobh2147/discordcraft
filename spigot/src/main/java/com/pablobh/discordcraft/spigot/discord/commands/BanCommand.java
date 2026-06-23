@@ -9,10 +9,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.profile.PlayerProfile;
 
+import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.message.Message;
-import com.pablobh.discordcraft.spigot.DiscordCraft;
 import com.pablobh.discordcraft.spigot.message.SpigotPlaceholder;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -22,8 +22,11 @@ public class BanCommand extends DiscordCommand {
 
     private static final String COMMAND_NAME = "ban";
 
-    public BanCommand(@Nonnull DiscordCommandManager manager) {
+    private final DiscordCraft discordCraft;
+
+    public BanCommand(@Nonnull DiscordCommandManager manager, @Nonnull DiscordCraft discordCraft) {
         super(COMMAND_NAME, manager);
+        this.discordCraft = discordCraft;
 
         addOption(OptionType.STRING, "player", "The player to ban", true);
         addOption(OptionType.STRING, "reason", "The reason for the ban", false);
@@ -66,7 +69,7 @@ public class BanCommand extends DiscordCommand {
         msg.replace("player", SpigotPlaceholder.player(offlinePlayer)).replace("reason", reason);
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
 
-        DiscordCraft.logInfo("Player " + playerName + " has been banned from the server by " + event.getUser().getEffectiveName() + " because " + reason + "!");
+        discordCraft.getLogger().info("Player " + playerName + " has been banned from the server by " + event.getUser().getEffectiveName() + " because " + reason + "!");
     }
     
 }
