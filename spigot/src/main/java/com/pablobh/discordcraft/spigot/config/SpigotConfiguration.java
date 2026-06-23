@@ -68,8 +68,9 @@ public class SpigotConfiguration implements Configuration {
     }
 
     @Override
-    public void reload() {
+    public boolean reload() {
         configObj = YamlConfiguration.loadConfiguration(configFile);
+        return true;
     }
 
     // --------------------- Core Methods ---------------------

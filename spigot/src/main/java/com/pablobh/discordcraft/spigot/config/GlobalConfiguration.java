@@ -1,7 +1,8 @@
 package com.pablobh.discordcraft.spigot.config;
 
+import javax.annotation.Nonnull;
+
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
 import com.pablobh.discordcraft.avatar.AvatarStyle;
 
@@ -12,15 +13,16 @@ public class GlobalConfiguration extends SpigotConfiguration {
 
     private AvatarStyle avatarStyle;
 
-    public GlobalConfiguration(@NotNull JavaPlugin plugin, @NotNull String filename) {
+    public GlobalConfiguration(@Nonnull JavaPlugin plugin, @Nonnull String filename) {
         super(plugin, filename);
         loadConfiguration();
     }
 
     @Override
-    public void reload() {
-        super.reload();
+    public boolean reload() {
+        boolean success = super.reload();
         loadConfiguration();
+        return success;
     }
     
     private void loadConfiguration() {

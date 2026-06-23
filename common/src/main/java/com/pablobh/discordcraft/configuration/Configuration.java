@@ -6,7 +6,7 @@ public interface Configuration extends ConfigurationSection {
 
     boolean save();
 
-    void reload();
+    boolean reload();
 
     @Nonnull
     default <T extends Enum<T>> T getEnum(@Nonnull String path, @Nonnull Class<T> enumClass, @Nonnull T defaultValue) {
