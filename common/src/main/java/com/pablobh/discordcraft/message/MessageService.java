@@ -8,7 +8,7 @@ import com.pablobh.discordcraft.configuration.ConfigurationSection;
 
 public class MessageService {
    
-    private Configuration config;
+    private final Configuration config;
 
     public MessageService(Configuration config) {
         this.config = config;

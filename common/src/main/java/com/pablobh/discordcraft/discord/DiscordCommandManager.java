@@ -8,12 +8,10 @@ import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.configuration.Configuration;
 import com.pablobh.discordcraft.configuration.ConfigurationSection;
-import com.pablobh.discordcraft.message.MessageService;
-import com.pablobh.discordcraft.discord.DiscordService;
 import com.pablobh.discordcraft.logging.PluginLogger;
+import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
