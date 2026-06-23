@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.pablobh.discordcraft.avatar.AvatarStyle;
 
-public class GlobalConfiguration extends Configuration {
+public class GlobalConfiguration extends SpigotConfiguration {
 
     private static final String KEY_AVATAR_STYLE = "avatar-style";
     private static final AvatarStyle DEFAULT_AVATAR_STYLE = AvatarStyle.BUST;
@@ -18,8 +18,8 @@ public class GlobalConfiguration extends Configuration {
     }
 
     @Override
-    public void load() {
-        super.load();
+    public void reload() {
+        super.reload();
         loadConfiguration();
     }
     

@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 
 public interface Configuration extends ConfigurationSection {
 
-    void save();
+    boolean save();
 
     void reload();
 
