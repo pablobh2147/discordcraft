@@ -13,6 +13,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.pablobh.discordcraft.platform.MinecraftPlayer;
 import com.pablobh.discordcraft.platform.MinecraftPlayerProfile;
 import com.pablobh.discordcraft.platform.MinecraftServer;
+import com.pablobh.discordcraft.platform.component.MinecraftComponent;
+import com.pablobh.discordcraft.platform.component.MinecraftComponentBuilder;
+import com.pablobh.discordcraft.spigot.platform.component.SpigotComponent;
+import com.pablobh.discordcraft.spigot.platform.component.SpigotComponentBuilder;
 
 public class SpigotServer implements MinecraftServer {
 
@@ -158,6 +162,22 @@ public class SpigotServer implements MinecraftServer {
     public void broadcastMessage(@Nonnull String message) {
         message = ChatColor.translateAlternateColorCodes('&', message);
         Bukkit.broadcastMessage(message);
+    }
+
+    @Override
+    public void broadcastComponent(@Nonnull MinecraftComponent component) {
+        if (component instanceof SpigotComponent spigotComponent) {
+            for (var player : Bukkit.getOnlinePlayers()) {
+                player.spigot().sendMessage(spigotComponent.getComponents());
+            }
+            Bukkit.getConsoleSender().spigot().sendMessage(spigotComponent.getComponents());
+        }
+    }
+
+    @Nonnull
+    @Override
+    public MinecraftComponentBuilder createComponentBuilder() {
+        return new SpigotComponentBuilder();
     }
 
     @Override

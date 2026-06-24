@@ -6,6 +6,9 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.pablobh.discordcraft.platform.component.MinecraftComponent;
+import com.pablobh.discordcraft.platform.component.MinecraftComponentBuilder;
+
 public interface MinecraftServer {
 
     // --------------------- Players ---------------------
@@ -63,7 +66,12 @@ public interface MinecraftServer {
 
     void broadcastMessage(@Nonnull String message);
 
+    void broadcastComponent(@Nonnull MinecraftComponent component);
+
     void broadcastTitle(@Nonnull String title, @Nonnull String subtitle);
+
+    @Nonnull
+    MinecraftComponentBuilder createComponentBuilder();
 
     // --------------------- Whitelist ---------------------
 
