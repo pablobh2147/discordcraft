@@ -20,10 +20,10 @@ subprojects {
 
     extensions.configure<JavaPluginExtension> {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(21))
+            languageVersion.set(JavaLanguageVersion.of(25))
         }
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
     }
 
     tasks.withType<JavaCompile> {
@@ -36,4 +36,10 @@ tasks.register("dev") {
     dependsOn(":spigot:dev")
     group = "development"
     description = "Build and deploy the Spigot plugin to the test server"
+}
+
+tasks.register("devNeoForge") {
+    dependsOn(":neoforge:dev")
+    group = "development"
+    description = "Build and deploy the NeoForge mod to the test server"
 }
