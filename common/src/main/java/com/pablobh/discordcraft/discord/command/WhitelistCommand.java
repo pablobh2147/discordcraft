@@ -1,14 +1,12 @@
-package com.pablobh.discordcraft.spigot.discord.commands;
+package com.pablobh.discordcraft.discord.command;
 
 import javax.annotation.Nonnull;
-
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.message.Message;
-import com.pablobh.discordcraft.spigot.message.SpigotPlaceholder;
+import com.pablobh.discordcraft.platform.MinecraftPlayerProfile;
+import com.pablobh.discordcraft.platform.MinecraftServer;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,8 +15,11 @@ public class WhitelistCommand extends DiscordCommand {
 
     private static final String COMMAND_NAME = "whitelist";
 
-    public WhitelistCommand(@Nonnull DiscordCommandManager manager) {
+    private final MinecraftServer minecraftServer;
+
+    public WhitelistCommand(@Nonnull DiscordCommandManager manager, @Nonnull MinecraftServer minecraftServer) {
         super(COMMAND_NAME, manager);
+        this.minecraftServer = minecraftServer;
 
         boolean allowToggleWhitelist = getConfig().getBoolean("allow-toggle-whitelist", true);
         boolean allowModifyWhitelist = getConfig().getBoolean("allow-modify-whitelist", true);
@@ -65,26 +66,26 @@ public class WhitelistCommand extends DiscordCommand {
     // Enable and disable whitelist
 
     private void subcommandEnable(SlashCommandInteractionEvent event, boolean isEphemeral) {
-        if (Bukkit.hasWhitelist()) {
+        if (minecraftServer.isWhitelistEnabled()) {
             Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("already-enabled"), "The whitelist is already enabled!");
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
         }
 
-        Bukkit.setWhitelist(true);
+        minecraftServer.setWhitelistEnabled(true);
 
         Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("enabled"), "The whitelist has been enabled!");
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
     }
 
     private void subcommandDisable(SlashCommandInteractionEvent event, boolean isEphemeral) {
-        if (!Bukkit.hasWhitelist()) {
+        if (!minecraftServer.isWhitelistEnabled()) {
             Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("already-disabled"), "The whitelist is already disabled!");
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
         }
 
-        Bukkit.setWhitelist(false);
+        minecraftServer.setWhitelistEnabled(false);
 
         Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("disabled"), "The whitelist has been disabled!");
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
@@ -92,68 +93,65 @@ public class WhitelistCommand extends DiscordCommand {
 
     // Modify whitelist
 
-    private OfflinePlayer getOfflinePlayer(SlashCommandInteractionEvent event, boolean isEphemeral) {
-        String player = event.getOption("player") == null ? null : event.getOption("player").getAsString();
+    private MinecraftPlayerProfile getOfflinePlayer(SlashCommandInteractionEvent event, boolean isEphemeral) {
+        String playerName = event.getOption("player") == null ? null : event.getOption("player").getAsString();
         
-        if (player == null) {
+        if (playerName == null) {
             Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("no-player-option"), "You must specify a player!");
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return null;
         }
 
-        // Get offline player
-        @SuppressWarnings("deprecation")
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
-        
-        if (offlinePlayer.getUniqueId() == null) {
+        MinecraftPlayerProfile playerProfile = minecraftServer.getPlayerProfile(playerName);
+        if (playerProfile == null) {
             Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-found"), "The player %player% was not found!");
-            msg.replace("player", player);
+            msg.replace("player", playerName);
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return null;
         }
 
-        return offlinePlayer;
+        return playerProfile;
     }
 
     private void subcommandAdd(SlashCommandInteractionEvent event, boolean isEphemeral) {
-        OfflinePlayer offlinePlayer = getOfflinePlayer(event, isEphemeral);
+        MinecraftPlayerProfile playerProfile = getOfflinePlayer(event, isEphemeral);
 
-        if (offlinePlayer == null) {
+        if (playerProfile == null) {
             return;
         }
 
-        if (offlinePlayer.isWhitelisted()) {
+        if (playerProfile.isWhitelisted()) {
             Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("already-whitelisted"), "The player %player_name% is already whitelisted!");
-            msg.replace("player", SpigotPlaceholder.player(offlinePlayer));
+            msg.replace("player", playerProfile);
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
         }
 
-        offlinePlayer.setWhitelisted(true);
+        playerProfile.setWhitelisted(true);
 
         Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("add-success"), "The player %player_name% has been added to the whitelist!");
-        msg.replace("player", SpigotPlaceholder.player(offlinePlayer));
+        msg.replace("player", playerProfile);
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
     }
 
     private void subcommandRemove(SlashCommandInteractionEvent event, boolean isEphemeral) {
-        OfflinePlayer offlinePlayer = getOfflinePlayer(event, isEphemeral);
+        MinecraftPlayerProfile playerProfile = getOfflinePlayer(event, isEphemeral);
 
-        if (offlinePlayer == null) {
+        if (playerProfile == null) {
             return;
         }
 
-        if (!offlinePlayer.isWhitelisted()) {
+        if (!playerProfile.isWhitelisted()) {
             Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("not-whitelisted"), "The player %player_name% is not whitelisted!");
-            msg.replace("player", SpigotPlaceholder.player(offlinePlayer));
+            msg.replace("player", playerProfile);
             event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
             return;
         }
 
-        offlinePlayer.setWhitelisted(false);
+        playerProfile.setWhitelisted(false);
 
         Message msg = getMessageService().getDiscordMessageOrDefault(getMessageKey("remove-success"), "The player %player_name% has been removed from the whitelist!");
-        msg.replace("player", SpigotPlaceholder.player(offlinePlayer));
+        msg.replace("player", playerProfile);
         event.reply(msg.toDiscordMessage()).setEphemeral(isEphemeral).queue();
     }
 

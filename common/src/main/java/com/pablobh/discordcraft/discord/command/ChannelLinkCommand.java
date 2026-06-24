@@ -1,4 +1,4 @@
-package com.pablobh.discordcraft.spigot.discord.commands;
+package com.pablobh.discordcraft.discord.command;
 
 import javax.annotation.Nonnull;
 

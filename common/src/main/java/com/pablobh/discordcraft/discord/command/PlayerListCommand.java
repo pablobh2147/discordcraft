@@ -1,19 +1,15 @@
-package com.pablobh.discordcraft.spigot.discord.commands;
+package com.pablobh.discordcraft.discord.command;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
 
 import javax.annotation.Nonnull;
-
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 
 import com.pablobh.discordcraft.StringUtils;
 import com.pablobh.discordcraft.configuration.ConfigurationSection;
 import com.pablobh.discordcraft.discord.DiscordCommand;
 import com.pablobh.discordcraft.discord.DiscordCommandManager;
 import com.pablobh.discordcraft.message.Message;
+import com.pablobh.discordcraft.platform.MinecraftServer;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -50,8 +46,11 @@ public class PlayerListCommand extends DiscordCommand {
 
     }
 
-    public PlayerListCommand(@Nonnull DiscordCommandManager manager) {
+    private final MinecraftServer minecraftServer;
+
+    public PlayerListCommand(@Nonnull DiscordCommandManager manager, @Nonnull MinecraftServer minecraftServer) {
         super(COMMAND_NAME, manager);
+        this.minecraftServer = minecraftServer;
 
         PlayerListData online = new PlayerListData(getConfig().getSection("lists.online"), "online");
         PlayerListData whitelisted = new PlayerListData(getConfig().getSection("lists.whitelisted"), "whitelisted");
@@ -84,7 +83,7 @@ public class PlayerListCommand extends DiscordCommand {
         String listType = event.getOption("list").getAsString();
         String listName = getConfig().getString("lists." + listType + ".name", StringUtils.capitalize(listType));
 
-        List<String> players = null;
+        Collection<String> players = null;
 
         switch (listType) {
             case "online":
@@ -135,56 +134,19 @@ public class PlayerListCommand extends DiscordCommand {
 
     }
 
-    // List of player names
-
-    private List<String> getPlayerList(String listType) {
+    private Collection<String> getPlayerList(String listType) {
         switch (listType) {
             case "online":
-                return getOnlinePlayers();
+                return minecraftServer.getOnlinePlayerNames();
             case "whitelisted":
-                return getWhitelistedPlayers();
+                return minecraftServer.getWhitelistedPlayerNames();
             case "banned":
-                return getBannedPlayers();
+                return minecraftServer.getBannedPlayerNames();
             case "operator":
-                return getOperatorPlayers();
+                return minecraftServer.getOperatorPlayerNames();
             default:
                 return null;
         }
-    }
-
-    public static List<String> getWhitelistedPlayers() {
-        Set<OfflinePlayer> whitelistedPlayers = Bukkit.getWhitelistedPlayers();
-        List<String> whitelistedPlayerNames = new ArrayList<>();
-        for (OfflinePlayer player : whitelistedPlayers) {
-            whitelistedPlayerNames.add(player.getName());
-        }
-        return whitelistedPlayerNames;
-    }
-
-    public static List<String> getBannedPlayers() {
-        Set<OfflinePlayer> bannedPlayers = Bukkit.getBannedPlayers();
-        List<String> bannedPlayerNames = new ArrayList<>();
-        for (OfflinePlayer player : bannedPlayers) {
-            bannedPlayerNames.add(player.getName());
-        }
-        return bannedPlayerNames;
-    }
-
-    public static List<String> getOperatorPlayers() {
-        Set<OfflinePlayer> operatorPlayers = Bukkit.getOperators();
-        List<String> operatorPlayerNames = new ArrayList<>();
-        for (OfflinePlayer player : operatorPlayers) {
-            operatorPlayerNames.add(player.getName());
-        }
-        return operatorPlayerNames;
-    }
-
-    public static List<String> getOnlinePlayers() {
-        List<String> onlinePlayerNames = new ArrayList<>();
-        for (OfflinePlayer player : Bukkit.getOnlinePlayers()) {
-            onlinePlayerNames.add(player.getName());
-        }
-        return onlinePlayerNames;
     }
 
 }

@@ -1,9 +1,6 @@
-package com.pablobh.discordcraft.spigot.discord.commands;
+package com.pablobh.discordcraft.discord.command;
 
 import javax.annotation.Nonnull;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.discord.DiscordCommand;
@@ -28,8 +25,8 @@ public class StopServerCommand extends DiscordCommand {
         this.discordCraft = discordCraft;
 
         addOption(OptionType.INTEGER, "delay", "Delay in seconds", false)
-        .setMinValue(MINIMUM_DELAY)
-        .setMaxValue(MAXIMUM_DELAY);
+            .setMinValue(MINIMUM_DELAY)
+            .setMaxValue(MAXIMUM_DELAY);
     }
 
     @Override
@@ -71,18 +68,16 @@ public class StopServerCommand extends DiscordCommand {
             String subtitle = getMessageService().getPlainMessageOrDefault(getMessageKey("minecraft-subtitle"), "The server is stopping in %seconds% seconds");
             subtitle = subtitle.replace("%seconds%", seconds);
 
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.sendTitle(title, subtitle, 10, 60, 10); // Time in ticks
-            }
+            discordCraft.getServer().broadcastTitle(title, subtitle);
         }
 
         discordCraft.getDiscordLogger().info("Stopping server in " + delay + " seconds, requested by " + event.getUser().getAsMention());
 
-        // Bukkit.getScheduler().runTaskLater(DiscordCraftPlugin.getInstance(), this::stopServer, delay * 20); // 20 ticks = 1 second
+        discordCraft.getServer().runTaskLater(this::stopServer, delay * 20);
     }
 
     private void stopServer() {
-        Bukkit.getServer().shutdown();
+        discordCraft.getServer().shutdown();
     }
 
 }
