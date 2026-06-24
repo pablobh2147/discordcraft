@@ -205,7 +205,7 @@ public class SpigotServer implements MinecraftServer {
 
     @Override
     public boolean isWhitelistEnabled() {
-        return Bukkit.isWhitelistEnforced();
+        return Bukkit.hasWhitelist();
     }
 
     @Override
