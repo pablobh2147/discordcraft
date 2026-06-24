@@ -32,7 +32,7 @@ public class SpigotLogger implements PluginLogger {
 
     @Override
     public void exception(@Nonnull Exception e, @Nullable String message) {
-        if (message != null && message.isBlank()) {
+        if (message != null && !message.isBlank()) {
             logger.severe(message);
         }
         e.printStackTrace();
