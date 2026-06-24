@@ -24,7 +24,7 @@ public abstract class DiscordCommand {
 
     // Basic command information
 
-    private String name = "";
+    private String name;
     private String description = "";
     private String help = "";
 
@@ -39,7 +39,7 @@ public abstract class DiscordCommand {
 
     // Command Configuration
 
-    private ConfigurationSection config = null;
+    private final ConfigurationSection config;
     private final MessageService messageService;
 
     // Constructors
@@ -51,8 +51,8 @@ public abstract class DiscordCommand {
     public DiscordCommand(@Nonnull String name, @Nullable ConfigurationSection config, @Nonnull MessageService messageService) {
         Objects.requireNonNull(name, "Command name cannot be null");
 
-        this.config = config;
         this.name = name;
+        this.config = config;
         this.messageService = messageService;
 
         enabled = getConfig().getBoolean("enabled", true);

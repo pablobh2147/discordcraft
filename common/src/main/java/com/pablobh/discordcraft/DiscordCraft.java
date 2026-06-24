@@ -51,8 +51,9 @@ public class DiscordCraft {
             throw new LoginException("Bot token is not set. Please set it in the config or as an environment variable.");
         }
         
-        this.discordService = new DiscordService(this, token);
+        // MessageService must be created before DiscordService
         this.messageService = new MessageService(messagesConfig);
+        this.discordService = new DiscordService(this, token);
     }
 
     // --------------------- Logging ---------------------

@@ -11,6 +11,15 @@ import org.jetbrains.annotations.NotNull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.configuration.ConfigurationSection;
+import com.pablobh.discordcraft.discord.command.BanCommand;
+import com.pablobh.discordcraft.discord.command.ChannelLinkCommand;
+import com.pablobh.discordcraft.discord.command.ConfigCommand;
+import com.pablobh.discordcraft.discord.command.HelpCommand;
+import com.pablobh.discordcraft.discord.command.PardonCommand;
+import com.pablobh.discordcraft.discord.command.PlayerListCommand;
+import com.pablobh.discordcraft.discord.command.SetupCommand;
+import com.pablobh.discordcraft.discord.command.StopServerCommand;
+import com.pablobh.discordcraft.discord.command.WhitelistCommand;
 import com.pablobh.discordcraft.message.MessageService;
 
 import net.dv8tion.jda.api.Permission;
@@ -33,15 +42,15 @@ public class DiscordCommandManager extends ListenerAdapter {
         this.discordCraft = discordCraft;
         
         try {
-            // registerCommand(new SetupCommand(this, discordService));
-            // registerCommand(new HelpCommand(this));
-            // registerCommand(new PlayerListCommand(this));
-            // registerCommand(new StopServerCommand(this));
-            // registerCommand(new BanCommand(this));
-            // registerCommand(new PardonCommand(this));
-            // registerCommand(new WhitelistCommand(this));
-            // registerCommand(new ChannelLinkCommand(this, discordService));
-            // registerCommand(new ConfigCommand(this));
+            registerCommand(new SetupCommand(this, discordCraft));
+            registerCommand(new HelpCommand(this));
+            registerCommand(new PlayerListCommand(this, discordCraft.getServer()));
+            registerCommand(new StopServerCommand(this, discordCraft));
+            registerCommand(new BanCommand(this, discordCraft.getServer()));
+            registerCommand(new PardonCommand(this, discordCraft.getServer()));
+            registerCommand(new WhitelistCommand(this, discordCraft.getServer()));
+            registerCommand(new ChannelLinkCommand(this, discordCraft));
+            registerCommand(new ConfigCommand(this, discordCraft));
         } catch (Exception e) {
             discordCraft.getLogger().exception(e, "Failed to register commands");
         }
