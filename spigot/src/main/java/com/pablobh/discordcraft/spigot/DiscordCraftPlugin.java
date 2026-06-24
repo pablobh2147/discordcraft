@@ -7,10 +7,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.pablobh.discordcraft.DiscordCraft;
+import com.pablobh.discordcraft.listener.ChatEventHandler;
+import com.pablobh.discordcraft.listener.PlayerEventHandler;
 import com.pablobh.discordcraft.spigot.config.GlobalConfiguration;
 import com.pablobh.discordcraft.spigot.config.SpigotConfiguration;
-import com.pablobh.discordcraft.spigot.listeners.MinecraftChatListener;
-import com.pablobh.discordcraft.spigot.listeners.PlayerEventsListener;
+import com.pablobh.discordcraft.spigot.listeners.SpigotChatAdapter;
+import com.pablobh.discordcraft.spigot.listeners.SpigotPlayerEventsAdapter;
 import com.pablobh.discordcraft.spigot.logging.SpigotLogger;
 import com.pablobh.discordcraft.spigot.platform.SpigotServer;
 
@@ -57,8 +59,11 @@ public class DiscordCraftPlugin extends JavaPlugin {
     }
 
     private void registerEventListeners(@Nonnull GlobalConfiguration globalConfiguration) {
-        Bukkit.getPluginManager().registerEvents(new MinecraftChatListener(globalConfiguration, discordCraft.getDiscordService()), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerEventsListener(discordCraft.getDiscordService(), discordCraft.getMessageService()), this);
+        ChatEventHandler chatHandler = new ChatEventHandler(discordCraft.getDiscordService(), globalConfiguration.getAvatarStyle());
+        PlayerEventHandler playerHandler = new PlayerEventHandler(discordCraft.getDiscordService(), discordCraft.getMessageService());
+        
+        Bukkit.getPluginManager().registerEvents(new SpigotChatAdapter(chatHandler), this);
+        Bukkit.getPluginManager().registerEvents(new SpigotPlayerEventsAdapter(playerHandler), this);
     }
 
 }
