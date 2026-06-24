@@ -8,17 +8,22 @@ import javax.annotation.Nullable;
 
 public interface MinecraftServer {
 
-    @Nonnull
-    Collection<? extends MinecraftPlayer> getOnlinePlayers();
-
+    // --------------------- Players ---------------------
+    
     @Nullable
     MinecraftPlayer getPlayer(@Nonnull UUID uuid);
-
+    
     @Nullable
-    MinecraftPlayer getOfflinePlayer(@Nonnull UUID uuid);
-
+    MinecraftPlayer getPlayer(@Nonnull String name);
+    
+    @Nullable
+    MinecraftPlayerProfile getPlayerProfile(@Nonnull UUID uuid);
+    
+    @Nullable
+    MinecraftPlayerProfile getPlayerProfile(@Nonnull String name);
+    
     @Nonnull
-    Collection<UUID> getWhitelistedPlayers();
+    Collection<? extends MinecraftPlayer> getOnlinePlayers();
 
     @Nonnull
     Collection<UUID> getBannedPlayers();
@@ -26,7 +31,13 @@ public interface MinecraftServer {
     @Nonnull
     Collection<UUID> getOperators();
 
+    // --------------------- Misc ---------------------
+
     void executeCommand(@Nonnull String command);
+    
+    void shutdown();
+
+    // --------------------- Async Tasks ---------------------
 
     void runTask(@Nonnull Runnable task);
 
@@ -34,5 +45,19 @@ public interface MinecraftServer {
 
     void runTaskAsync(@Nonnull Runnable task);
 
+    // --------------------- Broadcast ---------------------
+
     void broadcastMessage(@Nonnull String message);
+
+    void broadcastTitle(@Nonnull String title, @Nonnull String subtitle);
+
+    // --------------------- Whitelist ---------------------
+
+    @Nonnull
+    Collection<UUID> getWhitelistedPlayers();
+
+    boolean isWhitelistEnabled();
+
+    void setWhitelistEnabled(boolean enabled);
+
 }

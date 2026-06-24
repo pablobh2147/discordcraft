@@ -1,16 +1,13 @@
 package com.pablobh.discordcraft.platform;
 
 import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.pablobh.discordcraft.message.Placeholdable;
-
-public interface MinecraftPlayer extends Placeholdable {
+public interface MinecraftPlayer extends MinecraftPlayerProfile {
 
     @Nonnull
     UUID getUniqueId();
@@ -34,10 +31,9 @@ public interface MinecraftPlayer extends Placeholdable {
     @Nonnull
     @Override
     default Map<String, String> toPlaceholders() {
-        Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("name", getName());
+        Map<String, String> placeholders = MinecraftPlayerProfile.super.toPlaceholders();
+        
         placeholders.put("displayname", getDisplayName());
-        placeholders.put("uuid", getUniqueId().toString());
         
         String ip = getIpAddress();
         if (ip != null) {
@@ -46,4 +42,5 @@ public interface MinecraftPlayer extends Placeholdable {
         
         return placeholders;
     }
+
 }
