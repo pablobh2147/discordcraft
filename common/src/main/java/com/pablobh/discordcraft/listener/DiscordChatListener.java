@@ -1,11 +1,17 @@
 package com.pablobh.discordcraft.listener;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import com.pablobh.discordcraft.DiscordCraft;
 import com.pablobh.discordcraft.discord.LinkedChannel;
+import com.pablobh.discordcraft.platform.component.ClickAction;
+import com.pablobh.discordcraft.platform.component.MinecraftComponent;
+import com.pablobh.discordcraft.platform.component.MinecraftComponentBuilder;
 
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
@@ -61,74 +67,56 @@ public class DiscordChatListener extends ListenerAdapter {
         if (author.getIdLong() == discordCraft.getDiscordService().getSelfUser().getIdLong()) { 
             return;
         }
-
-        // Normal message broadcast
+        
         com.pablobh.discordcraft.message.Message rawMessage = discordCraft.getMessageService().getMessage(edited ? "chat.minecraft-edited-format" : "chat.minecraft-format");
 
-        // rawMessage.formatMinecraftColors();
         rawMessage.replace("username", author.getEffectiveName());
         rawMessage.replace("guild", message.getGuild().getName());
         rawMessage.replace("channel", message.getChannel().getName());
         rawMessage.replace("message", message.getContentDisplay());
 
-        // // Replace attachments placeholder
-        // String[] parts = rawMessage.toString().split("%attachments%", 2);
+        String[] parts = rawMessage.toString().split("%attachments%", 2);
 
-        // ComponentBuilder finalMessageBuilder = new ComponentBuilder("");
+        MinecraftComponentBuilder builder = discordCraft.getServer().createComponentBuilder();
 
-        // if (parts.length > 0) {
-        //     finalMessageBuilder.append(parts[0]);
-        // }
+        if (parts.length > 0) {
+            builder.append(parts[0]);
+        }
 
-        // if (parts.length >= 2) { // if there is a %attachments% placeholder
-        //     ComponentBuilder attachmentsBuilder = getAttachmentsComponent(message);
-        //     finalMessageBuilder.append(attachmentsBuilder.create());
+        if (parts.length >= 2) {
+            builder.append(getAttachmentsComponent(message));
+            builder.append(parts[1]);
+        }
 
-        //     finalMessageBuilder.append(parts[1]);
-        // }
-
-        // Send message to all online players
-        // for (Player player : Bukkit.getOnlinePlayers()) {
-        //     player.spigot().sendMessage(finalMessageBuilder.create());
-        // }
-
-        discordCraft.getServer().broadcastMessage(rawMessage.toString());
+        discordCraft.getServer().broadcastComponent(builder.build());
     }
 
-    // Creation of attachments component
+    private MinecraftComponent getAttachmentsComponent(Message message) {
+        MinecraftComponentBuilder builder = discordCraft.getServer().createComponentBuilder();
 
-    // private ComponentBuilder getAttachmentsComponent(Message message) {
+        List<Attachment> attachments = message.getAttachments();
+        if (!attachments.isEmpty()) {
+            builder.append("[");
 
-    //     ComponentBuilder attachmentsBuilder = new ComponentBuilder("");
+            for (int i = 0; i < attachments.size(); i++) {
+                Attachment attachment = attachments.get(i);
 
-    //     if (!message.getAttachments().isEmpty()) {
+                if (i != 0) {
+                    builder.append(discordCraft.getMessageService().getPlainMessageOrDefault("chat.attachment-separator", ", "));
+                }
 
-    //         attachmentsBuilder.append("[");
+                builder.append(attachment.getFileName())
+                       .setClickEvent(ClickAction.OPEN_URL, attachment.getUrl());
 
-    //         List<Attachment> attachmentns = message.getAttachments();
-    //         for (int i = 0; i < attachmentns.size(); i++) {
+                if (attachment.isSpoiler()) {
+                    builder.append(discordCraft.getMessageService().getPlainMessageOrDefault("chat.attachment-spoiler", " (spoiler)"));
+                }
+            }
 
-    //             Attachment attachment = attachmentns.get(i);
+            builder.append("]");
+        }
 
-    //             if (i != 0) {
-    //                 attachmentsBuilder.append(discordCraft.getMessageService().getPlainMessageOrDefault("chat.attachment-separator", ", "));
-    //             }
-
-    //             TextComponent attachmentComponent = new TextComponent(attachment.getFileName());
-    //             attachmentComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, attachment.getUrl()));
-
-    //             attachmentsBuilder.append(attachmentComponent);
-
-    //             if (attachment.isSpoiler()) {
-    //                 attachmentsBuilder.append(discordCraft.getMessageService().getPlainMessageOrDefault("chat.attachment-spoiler", " (spoiler)"));
-    //             }
-
-    //         }
-
-    //         attachmentsBuilder.append("]");
-    //     }
-
-    //     return attachmentsBuilder;
-    // }
+        return builder.build();
+    }
 
 }

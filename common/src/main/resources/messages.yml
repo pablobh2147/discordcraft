@@ -65,9 +65,9 @@
 # Placeholders: %username%, %message%, %attachments%, %guild%, %channel%
 chat:
   # Format for messages relayed from Discord to Minecraft
-  minecraft-format: "&9[Discord] &b%username% &8» &f%message%&7%attachments%"
+  minecraft-format: "&9[Discord] &b%username% &8» &f%message% &7%attachments%"
   # Format for edited messages relayed from Discord to Minecraft
-  minecraft-edited-format: "&9[Discord] &b%username% &8» &f%message%&7%attachments% &8(edited)"
+  minecraft-edited-format: "&9[Discord] &b%username% &8» &f%message% &7%attachments% &8(edited)"
   # Text appended to spoiler attachments
   attachment-spoiler: " (spoiler)"
   # Separator between multiple attachments
