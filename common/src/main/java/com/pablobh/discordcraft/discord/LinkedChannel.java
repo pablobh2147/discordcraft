@@ -117,7 +117,7 @@ public class LinkedChannel {
         List<Webhook> webhooks = channel.retrieveWebhooks().complete();
 
         webhook = webhooks.stream()
-            .filter(w -> w.getName().equals(WEBHOOK_NAME))
+            .filter(w -> w.getName().equals(WEBHOOK_NAME) && w.getToken() != null)
             .findFirst()
             .orElseGet(() -> channel.createWebhook(WEBHOOK_NAME).complete());
 
