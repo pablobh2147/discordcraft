@@ -1,8 +1,0 @@
-name: DiscordCraft
-version: ${version}
-main: com.pablobh.discordcraft.DiscordCraft
-api-version: 1.13
-author: pablobh2147
-description: Discord integration plugin for Minecraft servers
-load: STARTUP
-website: https://github.com/pablobh2147/discordcraft

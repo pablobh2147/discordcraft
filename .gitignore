@@ -2,7 +2,7 @@
 .vscode/*
 
 # Development server
-/server/
+/*/server/
 
 # Gradle
 .gradle/
