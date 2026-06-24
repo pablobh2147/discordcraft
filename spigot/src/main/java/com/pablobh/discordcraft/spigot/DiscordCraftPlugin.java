@@ -7,9 +7,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.pablobh.discordcraft.DiscordCraft;
+import com.pablobh.discordcraft.avatar.AvatarStyle;
 import com.pablobh.discordcraft.listener.ChatEventHandler;
 import com.pablobh.discordcraft.listener.PlayerEventHandler;
-import com.pablobh.discordcraft.spigot.config.GlobalConfiguration;
 import com.pablobh.discordcraft.spigot.config.SpigotConfiguration;
 import com.pablobh.discordcraft.spigot.listeners.SpigotChatAdapter;
 import com.pablobh.discordcraft.spigot.listeners.SpigotPlayerEventsAdapter;
@@ -24,7 +24,7 @@ public class DiscordCraftPlugin extends JavaPlugin {
     public void onEnable() {
         SpigotLogger logger = new SpigotLogger(getLogger());
 
-        GlobalConfiguration globalConfiguration = new GlobalConfiguration(this, "config.yml");
+        SpigotConfiguration globalConfig = new SpigotConfiguration(this, "config.yml");
         SpigotConfiguration messagesConfig = new SpigotConfiguration(this, "messages.yml");
         SpigotConfiguration botConfig = new SpigotConfiguration(this, "bot.yml");
         SpigotConfiguration commandsConfig = new SpigotConfiguration(this, "commands.yml");
@@ -32,14 +32,15 @@ public class DiscordCraftPlugin extends JavaPlugin {
         SpigotServer spigotServer = new SpigotServer(this);
 
         try {
-            discordCraft = new DiscordCraft(logger, spigotServer, globalConfiguration, messagesConfig, botConfig, commandsConfig);
+            discordCraft = new DiscordCraft(logger, spigotServer, globalConfig, messagesConfig, botConfig, commandsConfig);
         } catch (LoginException e) {
             logger.severe(e.getMessage());
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
-        registerEventListeners(globalConfiguration);
+        AvatarStyle avatarStyle = globalConfig.getEnum("avatar-style", AvatarStyle.class, AvatarStyle.BUST);
+        registerEventListeners(avatarStyle);
 
         discordCraft.notifyServerStart();
         discordCraft.getLogger().info(getDescription().getName() + " v" + getDescription().getVersion() + " has been enabled!");
@@ -58,8 +59,8 @@ public class DiscordCraftPlugin extends JavaPlugin {
         discordCraft.shutdown();
     }
 
-    private void registerEventListeners(@Nonnull GlobalConfiguration globalConfiguration) {
-        ChatEventHandler chatHandler = new ChatEventHandler(discordCraft.getDiscordService(), globalConfiguration.getAvatarStyle());
+    private void registerEventListeners(@Nonnull AvatarStyle avatarStyle) {
+        ChatEventHandler chatHandler = new ChatEventHandler(discordCraft.getDiscordService(), avatarStyle);
         PlayerEventHandler playerHandler = new PlayerEventHandler(discordCraft.getDiscordService(), discordCraft.getMessageService());
         
         Bukkit.getPluginManager().registerEvents(new SpigotChatAdapter(chatHandler), this);
