@@ -12,6 +12,7 @@ import com.pablobh.discordcraft.spigot.config.SpigotConfiguration;
 import com.pablobh.discordcraft.spigot.listeners.MinecraftChatListener;
 import com.pablobh.discordcraft.spigot.listeners.PlayerEventsListener;
 import com.pablobh.discordcraft.spigot.logging.SpigotLogger;
+import com.pablobh.discordcraft.spigot.platform.SpigotServer;
 
 public class DiscordCraftPlugin extends JavaPlugin {
 
@@ -26,8 +27,10 @@ public class DiscordCraftPlugin extends JavaPlugin {
         SpigotConfiguration botConfig = new SpigotConfiguration(this, "bot.yml");
         SpigotConfiguration commandsConfig = new SpigotConfiguration(this, "commands.yml");
 
+        SpigotServer spigotServer = new SpigotServer(this);
+
         try {
-            discordCraft = new DiscordCraft(logger, globalConfiguration, messagesConfig, botConfig, commandsConfig);
+            discordCraft = new DiscordCraft(logger, spigotServer, globalConfiguration, messagesConfig, botConfig, commandsConfig);
         } catch (LoginException e) {
             logger.severe(e.getMessage());
             Bukkit.getPluginManager().disablePlugin(this);
