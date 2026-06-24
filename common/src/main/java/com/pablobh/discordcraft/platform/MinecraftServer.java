@@ -31,6 +31,20 @@ public interface MinecraftServer {
     @Nonnull
     Collection<UUID> getOperators();
 
+    // --------------------- Player Names ---------------------
+
+    @Nonnull
+    Collection<String> getWhitelistedPlayerNames();
+
+    @Nonnull
+    Collection<String> getBannedPlayerNames();
+
+    @Nonnull
+    Collection<String> getOperatorPlayerNames();
+
+    @Nonnull
+    Collection<String> getOnlinePlayerNames();
+
     // --------------------- Misc ---------------------
 
     void executeCommand(@Nonnull String command);

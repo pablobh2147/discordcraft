@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.pablobh.discordcraft.message.Placeholdable;
 
@@ -19,6 +20,10 @@ public interface MinecraftPlayerProfile extends Placeholdable {
     boolean isWhitelisted();
 
     void setWhitelisted(boolean whitelisted);
+
+    boolean isBanned();
+
+    void setBanned(boolean banned, @Nullable String reason);
 
     @Nonnull
     @Override
