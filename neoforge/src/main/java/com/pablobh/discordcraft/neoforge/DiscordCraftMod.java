@@ -79,9 +79,8 @@ public class DiscordCraftMod {
         if (playerAdapter != null) NeoForge.EVENT_BUS.unregister(playerAdapter);
 
         discordCraft.saveConfigurations();
-        logger.info("DiscordCraft v2.0.0 has been disabled!");
-
         discordCraft.shutdown();
+        logger.info("DiscordCraft v2.0.0 has been disabled!");
     }
 
 }
