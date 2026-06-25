@@ -75,7 +75,7 @@ public class DiscordChatListener extends ListenerAdapter {
         rawMessage.replace("channel", message.getChannel().getName());
         rawMessage.replace("message", message.getContentDisplay());
 
-        String[] parts = rawMessage.toString().split("%attachments%", 2);
+        String[] parts = rawMessage.getContent().split("%attachments%", 2);
 
         MinecraftComponentBuilder builder = discordCraft.getServer().createComponentBuilder();
 

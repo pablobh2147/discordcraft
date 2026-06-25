@@ -250,7 +250,6 @@ public class DiscordService {
     public LinkedChannel createChannelLink(@Nonnull TextChannel textChannel) {
         Objects.requireNonNull(textChannel, "TextChannel cannot be null");
         
-        
         ConfigurationSection defaultConfig = discordCraft.getGlobalConfig().getSection("channel-defaults");
         ConfigurationSection channelConfig = discordCraft.getBotConfig().createSection(getChannelConfigPath(textChannel.getIdLong()));
 
@@ -320,6 +319,10 @@ public class DiscordService {
         }
         
         ConfigurationSection defaultConfig = discordCraft.getGlobalConfig().getSection("channel-defaults");
+
+        if (defaultConfig == null) {
+            defaultConfig = discordCraft.getGlobalConfig().createSection("channel-defaults");
+        }
 
         return new LinkedChannel(channelConfig, defaultConfig, textChannel);
     }

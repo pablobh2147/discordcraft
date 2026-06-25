@@ -55,6 +55,12 @@ public class DiscordMessage extends Message {
 
     @Nonnull
     @Override
+    public String getContent() {
+        return content != null ? content : "";
+    }
+
+    @Nonnull
+    @Override
     public String toString() {
         if (content != null) {
             return content;

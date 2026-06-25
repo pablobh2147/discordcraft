@@ -240,7 +240,7 @@ player:
   #               %advancement_type%, %advancement_title%, %advancement_description%, %display_url%
   achivement-unlock:
     embed:
-      title: "%advancement_type%: %advancement_title%"
+      title: "%advancement_title%"
       description: "%advancement_description%"
       color: "#9B59B6"
       thumbnail: "https://mc-heads.net/head/%player_uuid%/64"

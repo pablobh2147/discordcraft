@@ -5,9 +5,11 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.mojang.authlib.GameProfile;
+import com.pablobh.discordcraft.neoforge.platform.component.NeoForgeComponentParser;
 import com.pablobh.discordcraft.platform.MinecraftPlayer;
 
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.UserBanListEntry;
@@ -47,7 +49,8 @@ public class NeoForgePlayer implements MinecraftPlayer {
 
     @Override
     public void sendMessage(String message) {
-        player.sendSystemMessage(ColorCodeParser.parse(message));
+        Component component = NeoForgeComponentParser.parse(MiniMessage.miniMessage().deserialize(message));
+        player.sendSystemMessage(component);
     }
 
     private NameAndId getNameAndId() {

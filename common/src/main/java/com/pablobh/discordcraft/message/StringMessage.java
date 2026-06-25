@@ -28,6 +28,7 @@ public class StringMessage extends Message {
     }
 
     @Nonnull
+    @Override
     public String getContent() {
         return content;
     }

@@ -25,6 +25,9 @@ public class DiscordCraftMod {
     private DiscordCraft discordCraft = null;
     private NeoForgeLogger logger;
 
+    private NeoForgeChatAdapter chatAdapter;
+    private NeoForgePlayerEventsAdapter playerAdapter;
+
     public DiscordCraftMod(IEventBus modEventBus) {
         modEventBus.addListener(this::onServerStarted);
         NeoForge.EVENT_BUS.addListener(this::onServerStopping);
@@ -58,8 +61,11 @@ public class DiscordCraftMod {
         ChatEventHandler chatHandler = new ChatEventHandler(discordCraft.getDiscordService(), avatarStyle);
         PlayerEventHandler playerHandler = new PlayerEventHandler(discordCraft.getDiscordService(), discordCraft.getMessageService());
         
-        NeoForge.EVENT_BUS.register(new NeoForgeChatAdapter(chatHandler));
-        NeoForge.EVENT_BUS.register(new NeoForgePlayerEventsAdapter(playerHandler));
+        chatAdapter = new NeoForgeChatAdapter(chatHandler);
+        playerAdapter = new NeoForgePlayerEventsAdapter(playerHandler);
+
+        NeoForge.EVENT_BUS.register(chatAdapter);
+        NeoForge.EVENT_BUS.register(playerAdapter);
     }
 
     private void onServerStopping(ServerStoppingEvent event) {
@@ -68,6 +74,10 @@ public class DiscordCraftMod {
         }
 
         discordCraft.notifyServerStop();
+
+        if (chatAdapter != null) NeoForge.EVENT_BUS.unregister(chatAdapter);
+        if (playerAdapter != null) NeoForge.EVENT_BUS.unregister(playerAdapter);
+
         discordCraft.saveConfigurations();
         logger.info("DiscordCraft v2.0.0 has been disabled!");
 

@@ -19,9 +19,22 @@ dependencies {
     // YAML configuration
     implementation("org.yaml:snakeyaml:2.3")
 
+    // Kyori Adventure & MiniMessage
+    val adventureVersion = "4.17.0"
+    implementation("net.kyori:adventure-api:$adventureVersion")
+    implementation("net.kyori:adventure-text-minimessage:$adventureVersion")
+    implementation("net.kyori:adventure-text-serializer-json:$adventureVersion")
+    implementation("net.kyori:adventure-text-serializer-gson:$adventureVersion")
+
     // Libraries to bundle into the mod jar
     shade(project(":common"))
     shade("org.yaml:snakeyaml:2.3")
+    shade("net.kyori:adventure-api:$adventureVersion")
+    shade("net.kyori:adventure-text-minimessage:$adventureVersion")
+    shade("net.kyori:adventure-text-serializer-json:$adventureVersion")
+    shade("net.kyori:adventure-text-serializer-gson:$adventureVersion") {
+        exclude(group = "com.google.code.gson", module = "gson")
+    }
 
     // Annotations
     compileOnly("org.jetbrains:annotations:24.0.1")

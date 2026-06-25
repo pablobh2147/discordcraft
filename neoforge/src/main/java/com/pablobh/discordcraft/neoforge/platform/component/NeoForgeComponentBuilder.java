@@ -6,6 +6,7 @@ import com.pablobh.discordcraft.platform.component.ClickAction;
 import com.pablobh.discordcraft.platform.component.MinecraftComponent;
 import com.pablobh.discordcraft.platform.component.MinecraftComponentBuilder;
 
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -21,7 +22,8 @@ public class NeoForgeComponentBuilder implements MinecraftComponentBuilder {
     @Nonnull
     @Override
     public MinecraftComponentBuilder append(@Nonnull String text) {
-        component = component.append(Component.literal(text));
+        Component parsedComponent = NeoForgeComponentParser.parse(MiniMessage.miniMessage().deserialize(text));
+        component = component.append(parsedComponent);
         return this;
     }
 

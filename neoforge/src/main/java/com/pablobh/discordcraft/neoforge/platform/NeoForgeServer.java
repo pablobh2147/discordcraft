@@ -7,14 +7,15 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.pablobh.discordcraft.platform.MinecraftPlayer;
-import com.pablobh.discordcraft.platform.MinecraftPlayerProfile;
-import com.pablobh.discordcraft.platform.MinecraftServer;
-import com.pablobh.discordcraft.platform.component.MinecraftComponent;
-import com.pablobh.discordcraft.platform.component.MinecraftComponentBuilder;
 import com.pablobh.discordcraft.neoforge.platform.component.NeoForgeComponent;
 import com.pablobh.discordcraft.neoforge.platform.component.NeoForgeComponentBuilder;
+import com.pablobh.discordcraft.neoforge.platform.component.NeoForgeComponentParser;
+import com.pablobh.discordcraft.platform.MinecraftPlayer;
+import com.pablobh.discordcraft.platform.MinecraftPlayerProfile;
+import com.pablobh.discordcraft.platform.component.MinecraftComponent;
+import com.pablobh.discordcraft.platform.component.MinecraftComponentBuilder;
 
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -25,7 +26,6 @@ import net.minecraft.server.players.UserWhiteList;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 public class NeoForgeServer implements com.pablobh.discordcraft.platform.MinecraftServer {
-
 
     @Nullable
     @Override
@@ -215,7 +215,7 @@ public class NeoForgeServer implements com.pablobh.discordcraft.platform.Minecra
     public void broadcastMessage(@Nonnull String message) {
         net.minecraft.server.MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) {
-            Component component = ColorCodeParser.parse(message);
+            Component component = NeoForgeComponentParser.parse(MiniMessage.miniMessage().deserialize(message));
             server.getPlayerList().broadcastSystemMessage(component, false);
         }
     }
@@ -234,8 +234,8 @@ public class NeoForgeServer implements com.pablobh.discordcraft.platform.Minecra
     public void broadcastTitle(@Nonnull String title, @Nonnull String subtitle) {
         net.minecraft.server.MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) {
-            Component titleComponent = ColorCodeParser.parse(title);
-            Component subtitleComponent = ColorCodeParser.parse(subtitle);
+            Component titleComponent = NeoForgeComponentParser.parse(MiniMessage.miniMessage().deserialize(title));
+            Component subtitleComponent = NeoForgeComponentParser.parse(MiniMessage.miniMessage().deserialize(subtitle));
             
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 player.sendSystemMessage(titleComponent);
