@@ -49,6 +49,16 @@ The main bot configuration file. This file is created on first run and updated a
 
 > **Note:** The `guild` and `channels` fields are managed automatically. You should only manually edit `token`, `activity`, and `log-channel`.
 
+#### Environment Variable
+
+Instead of storing the token in `bot.yml`, you can use the `DISCORDCRAFT_BOT_TOKEN` environment variable:
+
+```bash
+export DISCORDCRAFT_BOT_TOKEN='YOUR_BOT_TOKEN_HERE'
+```
+
+The environment variable takes precedence over the `bot.yml` file. This is more secure and recommended for production deployments.
+
 ### config.yml
 
 Default settings applied to newly linked channels. Each option controls which event types are forwarded to Discord.

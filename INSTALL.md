@@ -59,7 +59,11 @@ Use the platform-specific JAR file for your server.
 
 ## Step 4: Configure the Bot Token
 
-### For Spigot/Paper/Purpur:
+You can configure the bot token in two ways:
+
+### Option A: Configuration File (Recommended)
+
+**For Spigot/Paper/Purpur:**
 1. Open `plugins/DiscordCraft/bot.yml`.
 2. Paste your bot token in the `token` field:
    ```yaml
@@ -67,13 +71,28 @@ Use the platform-specific JAR file for your server.
    ```
 3. Save the file and **restart the server**. The bot should now come online in Discord.
 
-### For NeoForge:
+**For NeoForge:**
 1. Open `config/DiscordCraft/bot.yml`.
 2. Paste your bot token in the `token` field:
    ```yaml
    token: 'YOUR_BOT_TOKEN_HERE'
    ```
 3. Save the file and **restart the server**. The bot should now come online in Discord.
+
+### Option B: Environment Variable
+
+Alternatively, you can set the bot token using an environment variable:
+
+```bash
+export DISCORDCRAFT_BOT_TOKEN='YOUR_BOT_TOKEN_HERE'
+```
+
+Then start your server. The environment variable takes precedence over the `bot.yml` file.
+
+**Benefits:**
+- More secure (token not stored in a file)
+- Easier for containerized deployments (Docker, Kubernetes)
+- Better for CI/CD pipelines
 
 ## Step 5: Run the Setup Command
 
