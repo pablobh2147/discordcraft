@@ -39,14 +39,17 @@
 #   **bold**, *italic*, __underline__, ~~strikethrough~~, `code`, ```code block```
 #
 # ----------------------------------------------------------------------------
-#  MINECRAFT COLOR CODES
+#  MINECRAFT COLOR FORMATTING
 # ----------------------------------------------------------------------------
 #
-# Messages displayed in Minecraft chat support color codes using '&':
-#   &0-&9, &a-&f (colors), &l (bold), &o (italic), &n (underline),
-#   &m (strikethrough), &k (obfuscated), &r (reset)
+# Messages displayed in Minecraft chat use MiniMessage format:
+#   <red>, <green>, <blue>, <yellow>, <aqua>, <white>, <gray>, <dark_gray>, etc.
+#   <bold>, <italic>, <underlined>, <strikethrough>, <obfuscated>, <reset>
+#   <#RRGGBB> for hex colors, e.g. <#2ECC71>
+#   Gradients: <gradient:#FF0000:#0000FF>text</gradient>
+#   Full reference: https://docs.advntr.dev/minimessage/format.html
 #
-# Fields that support Minecraft color codes:
+# Fields that support MiniMessage formatting:
 #   - chat.minecraft-format
 #   - chat.minecraft-edited-format
 #
@@ -65,9 +68,9 @@
 # Placeholders: %username%, %message%, %attachments%, %guild%, %channel%
 chat:
   # Format for messages relayed from Discord to Minecraft
-  minecraft-format: "&9[Discord] &b%username% &8» &f%message% &7%attachments%"
+  minecraft-format: "<blue>[Discord]</blue> <aqua>%username%</aqua> <dark_gray>»</dark_gray> <white>%message%</white> <gray>%attachments% </gray>"
   # Format for edited messages relayed from Discord to Minecraft
-  minecraft-edited-format: "&9[Discord] &b%username% &8» &f%message% &7%attachments% &8(edited)"
+  minecraft-edited-format: "<blue>[Discord]</blue> <aqua>%username%</aqua> <dark_gray>»</dark_gray> <white>%message%</white> <gray>%attachments% </gray> <dark_gray>(edited)</dark_gray>"
   # Text appended to spoiler attachments
   attachment-spoiler: " (spoiler)"
   # Separator between multiple attachments
