@@ -2,8 +2,9 @@
 
 ## Requirements
 
-- **Java** 17 or higher
-- **Minecraft server** running Spigot or any Spigot fork (Paper, Purpur, etc.) — version **1.13+** (for Spigot) or **1.20.5+** (for NeoForge)
+- **Java** 21 or higher
+- **Minecraft server** running Spigot or any Spigot fork (Paper, Purpur, etc.) — version **1.20.5+**
+- **Or** NeoForge — version **1.20.5+**
 - A **Discord bot token** ([create one here](https://discord.com/developers/applications))
 
 ## Step 1: Create a Discord Bot
@@ -39,14 +40,28 @@ The build produces:
 
 Use the `<platform>/...` JAR for the `<platform>` server.
 
-## Step 3: Install the Plugin
+## Step 3: Install the Plugin/Mod
 
-1. Copy the `DiscordCraft-<platform>-<version>.jar` JAR file into your `<platform>` server's `plugins/` (or `mods/`) folder (or `<platform>/server/plugins/` for the built-in test server).
-2. Start (or restart) the server. The plugin/mod will generate its configuration files and then **disable itself** because no bot token is set yet.
+### For Spigot/Paper/Purpur:
+1. Copy the `DiscordCraft-Spigot-<version>.jar` file into your server's `plugins/` folder.
+2. Start (or restart) the server. The plugin will generate its configuration files in `plugins/DiscordCraft/` and then **disable itself** because no bot token is set yet.
+
+### For NeoForge:
+1. Copy the `DiscordCraft-NeoForge-<version>.jar` file into your server's `mods/` folder.
+2. Start (or restart) the server. The mod will generate its configuration files in `config/DiscordCraft/` and then **disable itself** because no bot token is set yet.
 
 ## Step 4: Configure the Bot Token
 
+### For Spigot/Paper/Purpur:
 1. Open `plugins/DiscordCraft/bot.yml`.
+2. Paste your bot token in the `token` field:
+   ```yaml
+   token: 'YOUR_BOT_TOKEN_HERE'
+   ```
+3. Save the file and **restart the server**. The bot should now come online in Discord.
+
+### For NeoForge:
+1. Open `config/DiscordCraft/bot.yml`.
 2. Paste your bot token in the `token` field:
    ```yaml
    token: 'YOUR_BOT_TOKEN_HERE'
