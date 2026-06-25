@@ -5,8 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +18,17 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
+import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.representer.Representer;
 
 import com.pablobh.discordcraft.configuration.Configuration;
 import com.pablobh.discordcraft.configuration.ConfigurationSection;
@@ -25,11 +38,24 @@ import net.neoforged.fml.loading.FMLPaths;
 public class NeoForgeConfiguration implements Configuration {
 
     private Map<String, Object> data;
+    private Node rootNode;
     private File configFile;
     private final String filename;
+    private final Yaml yaml;
 
     public NeoForgeConfiguration(@Nonnull String filename) {
         this.filename = filename;
+
+        LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setProcessComments(true);
+
+        DumperOptions dumperOptions = new DumperOptions();
+        dumperOptions.setProcessComments(true);
+        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        dumperOptions.setPrettyFlow(true);
+
+        this.yaml = new Yaml(new Constructor(loaderOptions), new Representer(dumperOptions), dumperOptions, loaderOptions);
+
         File configDir = FMLPaths.CONFIGDIR.get().toFile();
         File discordCraftDir = new File(configDir, "discordcraft");
 
@@ -57,25 +83,28 @@ public class NeoForgeConfiguration implements Configuration {
     }
 
     private void load() {
-        Yaml yaml = new Yaml();
-        try (FileInputStream fis = new FileInputStream(configFile)) {
-            Object loaded = yaml.load(fis);
-            if (loaded instanceof Map) {
-                data = (Map<String, Object>) loaded;
-            } else {
-                data = new HashMap<>();
-            }
+        try (FileInputStream fis = new FileInputStream(configFile);
+             InputStreamReader reader = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
+            rootNode = yaml.compose(reader);
+            data = nodeToMap(rootNode);
         } catch (IOException e) {
             LoggerFactory.getLogger("DiscordCraft").error("Failed to load config: " + filename, e);
-            data = new HashMap<>();
+            rootNode = null;
+            data = new LinkedHashMap<>();
         }
     }
 
     @Override
     public boolean save() {
-        Yaml yaml = new Yaml();
-        try (FileWriter writer = new FileWriter(configFile)) {
-            yaml.dump(data, writer);
+        if (rootNode != null) {
+            syncMapToNode(data, rootNode);
+        }
+        try (FileWriter writer = new FileWriter(configFile, StandardCharsets.UTF_8)) {
+            if (rootNode != null) {
+                yaml.serialize(rootNode, writer);
+            } else {
+                yaml.dump(data, writer);
+            }
             return true;
         } catch (IOException e) {
             LoggerFactory.getLogger("DiscordCraft").error("Failed to save config: " + filename, e);
@@ -219,7 +248,9 @@ public class NeoForgeConfiguration implements Configuration {
     public ConfigurationSection getSection(@Nonnull String path) {
         Object value = get(path);
         if (value instanceof Map) {
-            return new NeoForgeConfigurationSection((Map<String, Object>) value);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = (Map<String, Object>) value;
+            return new NeoForgeConfigurationSection(map);
         }
         return null;
     }
@@ -227,7 +258,7 @@ public class NeoForgeConfiguration implements Configuration {
     @Nonnull
     @Override
     public ConfigurationSection createSection(@Nonnull String path) {
-        Map<String, Object> section = new HashMap<>();
+        Map<String, Object> section = new LinkedHashMap<>();
         set(path, section);
         return new NeoForgeConfigurationSection(section);
     }
@@ -247,10 +278,140 @@ public class NeoForgeConfiguration implements Configuration {
         return get(path) instanceof List;
     }
 
+    // --------------------- Node <-> Map helpers ---------------------
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> nodeToMap(Node node) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        if (!(node instanceof MappingNode mappingNode)) {
+            return result;
+        }
+        for (NodeTuple tuple : mappingNode.getValue()) {
+            if (!(tuple.getKeyNode() instanceof ScalarNode keyNode)) continue;
+            String key = keyNode.getValue();
+            result.put(key, nodeToObject(tuple.getValueNode()));
+        }
+        return result;
+    }
+
+    private Object nodeToObject(Node node) {
+        if (node instanceof MappingNode) {
+            return nodeToMap(node);
+        } else if (node instanceof SequenceNode sequenceNode) {
+            List<Object> list = new ArrayList<>();
+            for (Node item : sequenceNode.getValue()) {
+                list.add(nodeToObject(item));
+            }
+            return list;
+        } else if (node instanceof ScalarNode scalarNode) {
+            return resolveScalar(scalarNode);
+        }
+        return null;
+    }
+
+    private Object resolveScalar(ScalarNode node) {
+        String value = node.getValue();
+        Tag tag = node.getTag();
+        if (Tag.INT.equals(tag)) {
+            try { return Integer.parseInt(value); } catch (NumberFormatException e) {
+                try { return Long.parseLong(value); } catch (NumberFormatException e2) { return value; }
+            }
+        }
+        if (Tag.FLOAT.equals(tag)) {
+            try { return Double.parseDouble(value); } catch (NumberFormatException e) { return value; }
+        }
+        if (Tag.BOOL.equals(tag)) {
+            return "true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value) || "on".equalsIgnoreCase(value);
+        }
+        if (Tag.NULL.equals(tag)) {
+            return null;
+        }
+        return value;
+    }
+
+    private void syncMapToNode(Map<String, Object> map, Node node) {
+        if (!(node instanceof MappingNode mappingNode)) return;
+        List<NodeTuple> tuples = mappingNode.getValue();
+        for (int i = 0; i < tuples.size(); i++) {
+            NodeTuple tuple = tuples.get(i);
+            if (!(tuple.getKeyNode() instanceof ScalarNode keyNode)) continue;
+            String key = keyNode.getValue();
+            if (!map.containsKey(key)) continue;
+            Object value = map.get(key);
+            Node valueNode = tuple.getValueNode();
+            if (value instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> subMap = (Map<String, Object>) value;
+                if (valueNode instanceof MappingNode) {
+                    syncMapToNode(subMap, valueNode);
+                } else {
+                    // node was null/scalar but data now has a map — build a new MappingNode
+                    MappingNode newMapping = objectToMappingNode(subMap);
+                    newMapping.setBlockComments(valueNode.getBlockComments());
+                    newMapping.setInLineComments(valueNode.getInLineComments());
+                    newMapping.setEndComments(valueNode.getEndComments());
+                    tuples.set(i, new NodeTuple(keyNode, newMapping));
+                }
+            } else if (valueNode instanceof ScalarNode scalarNode) {
+                ScalarNode updated = new ScalarNode(
+                    scalarNode.getTag(),
+                    objectToScalar(value),
+                    scalarNode.getStartMark(),
+                    scalarNode.getEndMark(),
+                    scalarNode.getScalarStyle()
+                );
+                updated.setBlockComments(scalarNode.getBlockComments());
+                updated.setInLineComments(scalarNode.getInLineComments());
+                updated.setEndComments(scalarNode.getEndComments());
+                tuples.set(i, new NodeTuple(keyNode, updated));
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private MappingNode objectToMappingNode(Map<String, Object> map) {
+        List<NodeTuple> tuples = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            ScalarNode keyNode = new ScalarNode(Tag.STR, entry.getKey(), null, null, DumperOptions.ScalarStyle.PLAIN);
+            Node valueNode;
+            Object val = entry.getValue();
+            if (val instanceof Map) {
+                valueNode = objectToMappingNode((Map<String, Object>) val);
+            } else if (val instanceof List) {
+                valueNode = objectToSequenceNode((List<Object>) val);
+            } else {
+                String strVal = val == null ? "" : val.toString();
+                valueNode = new ScalarNode(Tag.STR, strVal, null, null, DumperOptions.ScalarStyle.PLAIN);
+            }
+            tuples.add(new NodeTuple(keyNode, valueNode));
+        }
+        return new MappingNode(Tag.MAP, tuples, DumperOptions.FlowStyle.BLOCK);
+    }
+
+    @SuppressWarnings("unchecked")
+    private SequenceNode objectToSequenceNode(List<Object> list) {
+        List<Node> nodes = new ArrayList<>();
+        for (Object item : list) {
+            if (item instanceof Map) {
+                nodes.add(objectToMappingNode((Map<String, Object>) item));
+            } else {
+                String strVal = item == null ? "" : item.toString();
+                nodes.add(new ScalarNode(Tag.STR, strVal, null, null, DumperOptions.ScalarStyle.PLAIN));
+            }
+        }
+        return new SequenceNode(Tag.SEQ, nodes, DumperOptions.FlowStyle.BLOCK);
+    }
+
+    private String objectToScalar(Object value) {
+        if (value == null) return "null";
+        return value.toString();
+    }
+
+    // --------------------- Path helpers ---------------------
+
     private Object getFromPath(Map<String, Object> map, String path) {
         String[] parts = path.split("\\.");
         Object current = map;
-        
         for (String part : parts) {
             if (current instanceof Map) {
                 current = ((Map<?, ?>) current).get(part);
@@ -258,33 +419,34 @@ public class NeoForgeConfiguration implements Configuration {
                 return null;
             }
         }
-        
         return current;
     }
 
     private void setInPath(Map<String, Object> map, String path, Object value) {
         String[] parts = path.split("\\.");
         Map<String, Object> current = map;
-        
         for (int i = 0; i < parts.length - 1; i++) {
             Object next = current.get(parts[i]);
             if (!(next instanceof Map)) {
-                next = new HashMap<String, Object>();
+                next = new LinkedHashMap<String, Object>();
                 current.put(parts[i], next);
             }
-            current = (Map<String, Object>) next;
+            @SuppressWarnings("unchecked")
+            Map<String, Object> nextMap = (Map<String, Object>) next;
+            current = nextMap;
         }
-        
         current.put(parts[parts.length - 1], value);
     }
 
     private Set<String> getAllKeys(Map<String, Object> map, String prefix) {
-        Set<String> keys = new java.util.HashSet<>();
+        Set<String> keys = new HashSet<>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             String key = prefix.isEmpty() ? entry.getKey() : prefix + "." + entry.getKey();
             keys.add(key);
             if (entry.getValue() instanceof Map) {
-                keys.addAll(getAllKeys((Map<String, Object>) entry.getValue(), key));
+                @SuppressWarnings("unchecked")
+                Map<String, Object> subMap = (Map<String, Object>) entry.getValue();
+                keys.addAll(getAllKeys(subMap, key));
             }
         }
         return keys;
