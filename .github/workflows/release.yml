@@ -54,6 +54,7 @@ jobs:
           name: "DiscordCraft Spigot ${{ github.event.release.tag_name || steps.version.outputs.version }}"
           version: ${{ github.event.release.tag_name || steps.version.outputs.version }}
           version-type: release
+          changelog-file: RELEASE_NOTES.md
           loaders: |
             spigot
             paper
@@ -83,6 +84,7 @@ jobs:
           name: "DiscordCraft NeoForge ${{ github.event.release.tag_name || steps.version.outputs.version }}"
           version: ${{ github.event.release.tag_name || steps.version.outputs.version }}
           version-type: release
+          changelog-file: RELEASE_NOTES.md
           loaders: |
             neoforge
           game-versions: |
