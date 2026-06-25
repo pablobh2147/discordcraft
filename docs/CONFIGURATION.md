@@ -29,7 +29,9 @@ This document covers the detailed configuration of the DiscordCraft plugin, incl
 
 ## Configuration Files
 
-All configuration files are located in `plugins/DiscordCraft/`.
+Configuration files are located in:
+- **Spigot/Paper/Purpur:** `plugins/DiscordCraft/`
+- **NeoForge:** `config/DiscordCraft/`
 
 ### bot.yml
 
