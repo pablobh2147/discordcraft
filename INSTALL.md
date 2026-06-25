@@ -17,7 +17,7 @@
    - **Message Content Intent**
 5. Go to the **OAuth2** tab, then **URL Generator**:
    - Under **Scopes**, select `bot` and `applications.commands`.
-   - Under **Bot Permissions**, select at minimum: `Send Messages`, `Read Message History`, `Use Slash Commands`, and `Manage Messages`.
+   - Under **Bot Permissions**, select at minimum: `Send Messages`, `Read Message History`, `Use Slash Commands`, `Manage Messages`, and `Manage Webhooks`.
 6. Copy the generated URL and open it in your browser to **invite the bot** to your Discord server.
 
 ## Step 2: Download or Build the Plugin
