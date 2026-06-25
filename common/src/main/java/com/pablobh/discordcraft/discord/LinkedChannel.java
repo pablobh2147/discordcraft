@@ -3,6 +3,9 @@ package com.pablobh.discordcraft.discord;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -100,6 +103,11 @@ public class LinkedChannel {
         channel.sendMessage(message.toDiscordMessage()).queue();
     }
 
+    public void sendMessageAndWait(@Nonnull Message message) throws InterruptedException, ExecutionException, TimeoutException {
+        Objects.requireNonNull(message, "Message cannot be null");
+        channel.sendMessage(message.toDiscordMessage()).submit().get(10, TimeUnit.SECONDS);
+    }
+
     public TextChannel getChannel() {
         return channel;
     }
@@ -117,7 +125,7 @@ public class LinkedChannel {
         List<Webhook> webhooks = channel.retrieveWebhooks().complete();
 
         webhook = webhooks.stream()
-            .filter(w -> w.getName().equals(WEBHOOK_NAME))
+            .filter(w -> w.getName().equals(WEBHOOK_NAME) && w.getToken() != null)
             .findFirst()
             .orElseGet(() -> channel.createWebhook(WEBHOOK_NAME).complete());
 

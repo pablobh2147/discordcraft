@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="MIT"
+issueTrackerURL="https://github.com/pablobh2147/discordcraft/issues"
+
+[[mods]]
+modId="discordcraft"
+version="${version}"
+displayName="DiscordCraft"
+authors="pablobh2147"
+description='''
+Discord integration mod for Minecraft servers.
+Relays chat and events between a Minecraft server and a Discord guild.
+'''
+logoFile="icon.png"
+
+[[dependencies.discordcraft]]
+modId="neoforge"
+type="required"
+versionRange="[26.1.0,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.discordcraft]]
+modId="minecraft"
+type="required"
+versionRange="[26.1,27)"
+ordering="NONE"
+side="BOTH"

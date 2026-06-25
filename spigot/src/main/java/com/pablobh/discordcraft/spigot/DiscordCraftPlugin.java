@@ -54,9 +54,8 @@ public class DiscordCraftPlugin extends JavaPlugin {
 
         discordCraft.notifyServerStop();
         discordCraft.saveConfigurations();
-        discordCraft.getLogger().info(getDescription().getName() + " v" + getDescription().getVersion() + " has been disabled!");
-
         discordCraft.shutdown();
+        discordCraft.getLogger().info(getDescription().getName() + " v" + getDescription().getVersion() + " has been disabled!");
     }
 
     private void registerEventListeners(@Nonnull AvatarStyle avatarStyle) {

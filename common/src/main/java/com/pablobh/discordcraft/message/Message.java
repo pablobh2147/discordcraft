@@ -14,6 +14,9 @@ public abstract class Message {
     public static final char FINAL_PLACEHOLDER_CHAR = '%';
 
     @Nonnull
+    public abstract String getContent();
+
+    @Nonnull
     @Override
     public abstract String toString();
 
