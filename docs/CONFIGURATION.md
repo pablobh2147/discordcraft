@@ -18,6 +18,7 @@ This document covers the detailed configuration of the DiscordCraft plugin, incl
   - [/whitelist](#whitelist)
   - [/stop](#stop)
   - [/help](#help)
+  - [/config](#config)
 - [Channel Linking](#channel-linking)
   - [Adding a Channel](#adding-a-channel)
   - [Removing a Channel](#removing-a-channel)
@@ -211,6 +212,17 @@ The delay (in seconds) and the countdown message can be configured in `commands.
 ### /help
 
 Lists all available commands and their descriptions.
+
+### /config
+
+Manages plugin configuration.
+
+**Subcommands:**
+- `/config reload` — Reloads all configuration files without restarting the server
+
+This is useful when you've made changes to `config.yml`, `messages.yml`, or `commands.yml` and want to apply them immediately.
+
+**Requires:** Administrator
 
 ---
 
