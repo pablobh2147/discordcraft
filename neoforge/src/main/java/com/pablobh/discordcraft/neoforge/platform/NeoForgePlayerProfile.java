@@ -14,18 +14,15 @@ import net.minecraft.server.players.UserWhiteListEntry;
 
 public class NeoForgePlayerProfile implements MinecraftPlayerProfile {
 
-    private final GameProfile profile;
     private final NameAndId nameAndId;
     private final MinecraftServer server;
 
     public NeoForgePlayerProfile(GameProfile profile, MinecraftServer server) {
-        this.profile = profile;
         this.nameAndId = new NameAndId(profile);
         this.server = server;
     }
 
     public NeoForgePlayerProfile(NameAndId nameAndId, MinecraftServer server) {
-        this.profile = null;
         this.nameAndId = nameAndId;
         this.server = server;
     }
