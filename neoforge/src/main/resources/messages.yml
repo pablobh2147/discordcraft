@@ -230,13 +230,13 @@ player:
 
   # Sent when a player is killed by another player
   # Placeholders: %killer_name%, %killer_displayname%, %killer_uuid%, %killer_ip%,
-  #               %victim_name%, %victim_displayname%, %victim_uuid%, %victim_ip%
+  #               %victim_name%, %victim_displayname%, %victim_uuid%, %victim_ip%, %death_message%
   murder:
     embed:
       title: "Player Killed"
-      description: "**%killer_name%** killed **%victim_name%** ⚔️"
+      description: "%death_message% ⚔️"
       color: "#8B0000"
-      thumbnail: "https://mc-heads.net/head/%killer_uuid%/64"
+      thumbnail: "https://mc-heads.net/head/%victim_uuid%/64"
 
   # Sent when a player unlocks an advancement
   # Placeholders: %player_name%, %player_displayname%, %player_uuid%, %player_ip%,

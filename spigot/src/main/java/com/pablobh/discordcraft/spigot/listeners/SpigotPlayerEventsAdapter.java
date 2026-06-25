@@ -31,7 +31,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -65,32 +64,33 @@ public class SpigotPlayerEventsAdapter implements Listener {
     @EventHandler
     private void onPlayerDied(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        EntityDamageEvent damageEvent = event.getEntity().getLastDamageCause();
+        EntityDamageEvent damageEvent = player.getLastDamageCause();
+        String deathMessage = event.getDeathMessage();
 
         String damageCause = null;
         if (damageEvent != null) {
             damageCause = damageEvent.getCause().name();
         }
 
-        handler.onPlayerDeath(
-            new SpigotPlayer(player),
-            event.getDeathMessage(),
-            damageCause
-        );
-    }
-
-    @EventHandler
-    public void onPlayerMurder(EntityDeathEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            if (player.getLastDamageCause() instanceof EntityDamageByEntityEvent lastDamageEvent) {
-                if (lastDamageEvent.getDamager() instanceof Player killer) {
-                    handler.onPlayerKillPlayer(
-                        new SpigotPlayer(killer),
-                        new SpigotPlayer(player)
-                    );
-                }
+        // Check if this is a murder (player killed by another player)
+        if (damageEvent instanceof EntityDamageByEntityEvent entityDamageEvent) {
+            if (entityDamageEvent.getDamager() instanceof Player killer) {
+                handler.onPlayerKillPlayer(
+                    new SpigotPlayer(killer),
+                    new SpigotPlayer(player),
+                    deathMessage
+                );
+                event.setDeathMessage(null);
+                return;
             }
         }
+
+        // Handle normal death
+        handler.onPlayerDeath(
+            new SpigotPlayer(player),
+            deathMessage,
+            damageCause
+        );
     }
 
     @EventHandler

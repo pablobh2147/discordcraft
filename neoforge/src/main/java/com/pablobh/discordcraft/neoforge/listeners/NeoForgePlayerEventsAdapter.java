@@ -31,6 +31,7 @@ import com.pablobh.discordcraft.neoforge.platform.NeoForgePlayer;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
@@ -63,25 +64,29 @@ public class NeoForgePlayerEventsAdapter {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onPlayerDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             DamageSource source = event.getSource();
             String deathMessage = source.getLocalizedDeathMessage(player).getString();
             String damageCause = source.getMsgId();
 
+            // Check if this is a murder (player killed by another player)
+            if (source.getEntity() instanceof ServerPlayer killer) {
+                handler.onPlayerKillPlayer(
+                    new NeoForgePlayer(killer),
+                    new NeoForgePlayer(player),
+                    deathMessage
+                );
+                return;
+            }
+
+            // Handle normal death
             handler.onPlayerDeath(
                 new NeoForgePlayer(player),
                 deathMessage,
                 damageCause
             );
-
-            if (source.getEntity() instanceof ServerPlayer killer) {
-                handler.onPlayerKillPlayer(
-                    new NeoForgePlayer(killer),
-                    new NeoForgePlayer(player)
-                );
-            }
         }
     }
 

@@ -124,7 +124,7 @@ public class PlayerEventHandler {
         }
     }
 
-    public void onPlayerKillPlayer(MinecraftPlayer killer, MinecraftPlayer victim) {
+    public void onPlayerKillPlayer(MinecraftPlayer killer, MinecraftPlayer victim, @Nullable String deathMessage) {
         Message message = messageService.getDiscordMessage("player.murder");
 
         if (message == null) {
@@ -133,10 +133,11 @@ public class PlayerEventHandler {
 
         message.replace("killer", killer);
         message.replace("victim", victim);
+        message.replace("death_message", deathMessage != null ? deathMessage : "");
 
         for (LinkedChannel channel : discordService.getLinkedChannels()) {
             if (channel.canSendPlayerMurderMessages()) {
-                channel.sendMessage(message.toString());
+                channel.sendMessage(message);
             }
         }
     }
