@@ -3,6 +3,11 @@ package com.pablobh.discordcraft.discord;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
@@ -25,6 +30,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import okhttp3.Dispatcher;
+import okhttp3.OkHttpClient;
 
 public class DiscordService {
 
@@ -39,6 +46,14 @@ public class DiscordService {
 
     private JDA jda;
     private final DiscordCraft discordCraft;
+
+    private OkHttpClient httpClient;
+    private ScheduledExecutorService rateLimitScheduler;
+    private ExecutorService rateLimitElastic;
+    private ScheduledExecutorService gatewayPool;
+    private ExecutorService callbackPool;
+    private ExecutorService eventPool;
+    private ScheduledExecutorService audioPool;
 
     private Guild mainGuild;
     private DiscordLogger discordLogger;
@@ -72,7 +87,27 @@ public class DiscordService {
 
     private boolean initializeJDA(String token) {
         try {
+            rateLimitScheduler = Executors.newScheduledThreadPool(2, daemonThreadFactory("JDA RateLimit Scheduler"));
+            rateLimitElastic = Executors.newCachedThreadPool(daemonThreadFactory("JDA RateLimit Elastic"));
+            gatewayPool = Executors.newScheduledThreadPool(1, daemonThreadFactory("JDA Gateway"));
+            callbackPool = Executors.newFixedThreadPool(2, daemonThreadFactory("JDA Callback"));
+            eventPool = Executors.newFixedThreadPool(2, daemonThreadFactory("JDA Event"));
+            audioPool = Executors.newScheduledThreadPool(1, daemonThreadFactory("JDA Audio"));
+
+            Dispatcher dispatcher = new Dispatcher(Executors.newCachedThreadPool(daemonThreadFactory("OkHttp Dispatcher")));
+            httpClient = new OkHttpClient.Builder()
+                .dispatcher(dispatcher)
+                .build();
+
             JDABuilder builder = JDABuilder.createDefault(token);
+
+            builder.setHttpClient(httpClient);
+            builder.setRateLimitScheduler(rateLimitScheduler, false);
+            builder.setRateLimitElastic(rateLimitElastic, false);
+            builder.setGatewayPool(gatewayPool, false);
+            builder.setCallbackPool(callbackPool, false);
+            builder.setEventPool(eventPool, false);
+            builder.setAudioPool(audioPool, false);
 
             configureMemoryUsage(builder);
             configureActivity(builder);
@@ -142,6 +177,27 @@ public class DiscordService {
             jda.shutdownNow();
             Thread.currentThread().interrupt();
         }
+
+        if (rateLimitScheduler != null) rateLimitScheduler.shutdown();
+        if (rateLimitElastic != null) rateLimitElastic.shutdown();
+        if (gatewayPool != null) gatewayPool.shutdown();
+        if (callbackPool != null) callbackPool.shutdown();
+        if (eventPool != null) eventPool.shutdown();
+        if (audioPool != null) audioPool.shutdown();
+        if (httpClient != null) {
+            httpClient.dispatcher().executorService().shutdown();
+            httpClient.connectionPool().evictAll();
+        }
+        
+    }
+
+    private static ThreadFactory daemonThreadFactory(String name) {
+        AtomicInteger counter = new AtomicInteger(0);
+        return runnable -> {
+            Thread thread = new Thread(runnable, name + " " + counter.incrementAndGet());
+            thread.setDaemon(true);
+            return thread;
+        };
     }
 
     public TextChannel getTextChannel(long id) {
