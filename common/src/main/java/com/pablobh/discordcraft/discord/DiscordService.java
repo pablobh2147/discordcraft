@@ -128,16 +128,19 @@ public class DiscordService {
     }
 
     public void shutdown() {
-        if (jda != null) {
-            jda.shutdown();
-            try {
-                if (!jda.awaitShutdown(java.time.Duration.ofSeconds(10))) {
-                    jda.shutdownNow();
-                }
-            } catch (InterruptedException e) {
+        if (jda == null) {
+            return;
+        }
+
+        jda.shutdown();
+        try {
+            if (!jda.awaitShutdown(java.time.Duration.ofSeconds(10))) {
                 jda.shutdownNow();
-                Thread.currentThread().interrupt();
+                jda.awaitShutdown(java.time.Duration.ofSeconds(5));
             }
+        } catch (InterruptedException e) {
+            jda.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 

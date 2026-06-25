@@ -139,7 +139,11 @@ public class DiscordCraft {
 
         for (LinkedChannel channel : discordService.getLinkedChannels()) {
             if (channel.canSendServerStopMessages()) {
-                channel.sendMessage(msg);
+                try {
+                    channel.sendMessageAndWait(msg);
+                } catch (Exception e) {
+                    logger.warning("Failed to send server stop message: " + e.getMessage());
+                }
             }
         }
     }

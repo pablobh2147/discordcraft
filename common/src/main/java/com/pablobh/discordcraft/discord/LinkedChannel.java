@@ -100,6 +100,11 @@ public class LinkedChannel {
         channel.sendMessage(message.toDiscordMessage()).queue();
     }
 
+    public void sendMessageAndWait(@Nonnull Message message) {
+        Objects.requireNonNull(message, "Message cannot be null");
+        channel.sendMessage(message.toDiscordMessage()).complete();
+    }
+
     public TextChannel getChannel() {
         return channel;
     }
