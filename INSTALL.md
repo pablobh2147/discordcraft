@@ -22,11 +22,17 @@
 
 ## Step 2: Download or Build the Plugin
 
-**Option A — Download a release**
+### Option A: Download a Release (Recommended)
 
-Download the latest `DiscordCraft-<platform>-x.x.x.jar` from the [Releases page](https://github.com/pablobh2147/discordcraft/releases).
+Download the latest version for your platform:
 
-**Option B — Build from source**
+- **[GitHub Releases](https://github.com/pablobh2147/discordcraft/releases)** — All platforms
+- **[Modrinth](https://modrinth.com/project/discordcraft)** — Spigot and NeoForge
+- **[CurseForge](https://www.curseforge.com/minecraft/bukkit-plugins/discordcraft)** — Spigot and NeoForge
+
+Download the appropriate `DiscordCraft-<platform>-x.x.x.jar` file for your server.
+
+### Option B: Build from Source (Advanced)
 
 ```bash
 git clone https://github.com/pablobh2147/discordcraft.git
@@ -35,10 +41,11 @@ cd discordcraft
 ```
 
 The build produces:
-- `common/build/libs/common-<version>.jar` — platform-agnostic shared library
-- `<platform>/build/libs/DiscordCraft-<platform>-<version>.jar` — the platform-specific plugin/mod
+- `spigot/build/libs/DiscordCraft-Spigot-<version>.jar` — Spigot/Paper/Purpur plugin
+- `neoforge/build/libs/DiscordCraft-NeoForge-<version>.jar` — NeoForge mod
+- `common/build/libs/common-<version>.jar` — Shared library (not needed for installation)
 
-Use the `<platform>/...` JAR for the `<platform>` server.
+Use the platform-specific JAR file for your server.
 
 ## Step 3: Install the Plugin/Mod
 
