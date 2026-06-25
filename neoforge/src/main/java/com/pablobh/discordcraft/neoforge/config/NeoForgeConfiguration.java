@@ -280,7 +280,6 @@ public class NeoForgeConfiguration implements Configuration {
 
     // --------------------- Node <-> Map helpers ---------------------
 
-    @SuppressWarnings("unchecked")
     private Map<String, Object> nodeToMap(Node node) {
         Map<String, Object> result = new LinkedHashMap<>();
         if (!(node instanceof MappingNode mappingNode)) {
@@ -332,11 +331,15 @@ public class NeoForgeConfiguration implements Configuration {
     private void syncMapToNode(Map<String, Object> map, Node node) {
         if (!(node instanceof MappingNode mappingNode)) return;
         List<NodeTuple> tuples = mappingNode.getValue();
+
+        Set<String> coveredKeys = new HashSet<>();
+
         for (int i = 0; i < tuples.size(); i++) {
             NodeTuple tuple = tuples.get(i);
             if (!(tuple.getKeyNode() instanceof ScalarNode keyNode)) continue;
             String key = keyNode.getValue();
             if (!map.containsKey(key)) continue;
+            coveredKeys.add(key);
             Object value = map.get(key);
             Node valueNode = tuple.getValueNode();
             if (value instanceof Map) {
@@ -366,23 +369,42 @@ public class NeoForgeConfiguration implements Configuration {
                 tuples.set(i, new NodeTuple(keyNode, updated));
             }
         }
+
+        // Append keys that exist in data but have no corresponding node yet
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (coveredKeys.contains(entry.getKey())) continue;
+            ScalarNode newKeyNode = new ScalarNode(Tag.STR, entry.getKey(), null, null, DumperOptions.ScalarStyle.PLAIN);
+            Node newValueNode = objectToNode(entry.getValue());
+            tuples.add(new NodeTuple(newKeyNode, newValueNode));
+        }
     }
 
     @SuppressWarnings("unchecked")
+    private Node objectToNode(Object value) {
+        if (value instanceof Map) {
+            return objectToMappingNode((Map<String, Object>) value);
+        } else if (value instanceof List) {
+            return objectToSequenceNode((List<Object>) value);
+        } else {
+            Tag tag;
+            if (value instanceof Boolean) {
+                tag = Tag.BOOL;
+            } else if (value instanceof Integer || value instanceof Long) {
+                tag = Tag.INT;
+            } else if (value instanceof Double || value instanceof Float) {
+                tag = Tag.FLOAT;
+            } else {
+                tag = Tag.STR;
+            }
+            return new ScalarNode(tag, objectToScalar(value), null, null, DumperOptions.ScalarStyle.PLAIN);
+        }
+    }
+
     private MappingNode objectToMappingNode(Map<String, Object> map) {
         List<NodeTuple> tuples = new ArrayList<>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             ScalarNode keyNode = new ScalarNode(Tag.STR, entry.getKey(), null, null, DumperOptions.ScalarStyle.PLAIN);
-            Node valueNode;
-            Object val = entry.getValue();
-            if (val instanceof Map) {
-                valueNode = objectToMappingNode((Map<String, Object>) val);
-            } else if (val instanceof List) {
-                valueNode = objectToSequenceNode((List<Object>) val);
-            } else {
-                String strVal = val == null ? "" : val.toString();
-                valueNode = new ScalarNode(Tag.STR, strVal, null, null, DumperOptions.ScalarStyle.PLAIN);
-            }
+            Node valueNode = objectToNode(entry.getValue());
             tuples.add(new NodeTuple(keyNode, valueNode));
         }
         return new MappingNode(Tag.MAP, tuples, DumperOptions.FlowStyle.BLOCK);

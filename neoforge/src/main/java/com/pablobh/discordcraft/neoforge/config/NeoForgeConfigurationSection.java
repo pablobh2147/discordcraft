@@ -60,6 +60,14 @@ public class NeoForgeConfigurationSection implements ConfigurationSection {
         if (value instanceof Number) {
             return ((Number) value).intValue();
         }
+        if (value instanceof String) {
+            try {
+                int parsed = Integer.parseInt((String) value);
+                set(path, parsed);
+                return parsed;
+            } catch (NumberFormatException ignored) {
+            }
+        }
         return defaultValue;
     }
 
@@ -73,6 +81,14 @@ public class NeoForgeConfigurationSection implements ConfigurationSection {
         Object value = get(path);
         if (value instanceof Number) {
             return ((Number) value).longValue();
+        }
+        if (value instanceof String) {
+            try {
+                long parsed = Long.parseLong((String) value);
+                set(path, parsed);
+                return parsed;
+            } catch (NumberFormatException ignored) {
+            }
         }
         return defaultValue;
     }
@@ -101,6 +117,14 @@ public class NeoForgeConfigurationSection implements ConfigurationSection {
         Object value = get(path);
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
+        }
+        if (value instanceof String) {
+            try {
+                double parsed = Double.parseDouble((String) value);
+                set(path, parsed);
+                return parsed;
+            } catch (NumberFormatException ignored) {
+            }
         }
         return defaultValue;
     }
@@ -144,6 +168,7 @@ public class NeoForgeConfigurationSection implements ConfigurationSection {
         return data.keySet();
     }
 
+    @SuppressWarnings("unchecked")
     @Nullable
     @Override
     public ConfigurationSection getSection(@Nonnull String path) {
@@ -192,6 +217,7 @@ public class NeoForgeConfigurationSection implements ConfigurationSection {
         return current;
     }
 
+    @SuppressWarnings("unchecked")
     private void setInPath(Map<String, Object> map, String path, Object value) {
         String[] parts = path.split("\\.");
         Map<String, Object> current = map;
@@ -208,6 +234,7 @@ public class NeoForgeConfigurationSection implements ConfigurationSection {
         current.put(parts[parts.length - 1], value);
     }
 
+    @SuppressWarnings("unchecked")
     private Set<String> getAllKeys(Map<String, Object> map, String prefix) {
         Set<String> keys = new java.util.HashSet<>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
