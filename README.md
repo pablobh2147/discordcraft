@@ -40,7 +40,10 @@ For complete installation instructions, see the **[Installation Guide](INSTALL.m
 
 ## Documentation
 
-For detailed configuration, available commands, channel linking, and message customization, see the **[Configuration Guide](docs/CONFIGURATION.md)**.
+- **[Installation Guide](INSTALL.md)** — Step-by-step setup instructions
+- **[Configuration Guide](docs/CONFIGURATION.md)** — Detailed configuration, commands, and customization
+- **[Troubleshooting Guide](docs/TROUBLESHOOTING.md)** — Common issues and solutions
+- **[FAQ](docs/FAQ.md)** — Frequently asked questions
 
 ## Building for Development
 
