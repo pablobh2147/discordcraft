@@ -36,7 +36,7 @@ jobs:
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           # --- Modrinth ---
-          modrinth-id: discordcraft
+          modrinth-id: TuwgoQcx
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
           # --- CurseForge ---
@@ -66,7 +66,7 @@ jobs:
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           # --- Modrinth ---
-          modrinth-id: discordcraft
+          modrinth-id: TuwgoQcx
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
           # --- CurseForge ---
