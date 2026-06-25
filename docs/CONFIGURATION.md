@@ -18,6 +18,7 @@ This document covers the detailed configuration of the DiscordCraft plugin, incl
   - [/whitelist](#whitelist)
   - [/stop](#stop)
   - [/help](#help)
+  - [/config](#config)
 - [Channel Linking](#channel-linking)
   - [Adding a Channel](#adding-a-channel)
   - [Removing a Channel](#removing-a-channel)
@@ -29,7 +30,9 @@ This document covers the detailed configuration of the DiscordCraft plugin, incl
 
 ## Configuration Files
 
-All configuration files are located in `plugins/DiscordCraft/`.
+Configuration files are located in:
+- **Spigot/Paper/Purpur:** `plugins/DiscordCraft/`
+- **NeoForge:** `config/DiscordCraft/`
 
 ### bot.yml
 
@@ -46,6 +49,16 @@ The main bot configuration file. This file is created on first run and updated a
 | `channels` | section | Linked channels configuration — managed via `/link` commands |
 
 > **Note:** The `guild` and `channels` fields are managed automatically. You should only manually edit `token`, `activity`, and `log-channel`.
+
+#### Environment Variable
+
+Instead of storing the token in `bot.yml`, you can use the `DISCORDCRAFT_BOT_TOKEN` environment variable:
+
+```bash
+export DISCORDCRAFT_BOT_TOKEN='YOUR_BOT_TOKEN_HERE'
+```
+
+The environment variable takes precedence over the `bot.yml` file. This is more secure and recommended for production deployments.
 
 ### config.yml
 
@@ -199,6 +212,17 @@ The delay (in seconds) and the countdown message can be configured in `commands.
 ### /help
 
 Lists all available commands and their descriptions.
+
+### /config
+
+Manages plugin configuration.
+
+**Subcommands:**
+- `/config reload` — Reloads all configuration files without restarting the server
+
+This is useful when you've made changes to `config.yml`, `messages.yml`, or `commands.yml` and want to apply them immediately.
+
+**Requires:** Administrator
 
 ---
 
